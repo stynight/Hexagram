@@ -273,6 +273,16 @@ async function run(vp) {
   ok(`[${T}] 恢復跟隨系統`, (await cssVar("--bg")) === "#F3F4F6" && (await page.evaluate(() => document.documentElement.style.getPropertyValue("--bg"))) === "");
   await noOverflow("主題頁");
   await shot("16-theme-auto");
+  // 11 真的刪除一筆（頁內確認）
+  await page.click('.nav-item[data-page="cases"]');
+  const before = await page.locator(".case").count();
+  await page.locator('.case [data-act="case-del"]').first().click();
+  await page.click('[data-act="case-del-yes"]');
+  const after = await page.locator(".case").count();
+  ok(`[${T}] 確認後真的刪除一筆`, after === before - 1, `${before}→${after}`);
+  await page.reload();
+  await page.click('.nav-item[data-page="cases"]');
+  ok(`[${T}] 刪除後重新整理仍是 ${before - 1} 筆`, (await page.locator(".case").count()) === before - 1);
   ok(`[${T}] 沒有錯誤`, errors.length === 0, errors.join(" | "));
   await browser.close();
 }
