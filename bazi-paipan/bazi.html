@@ -1,0 +1,2593 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}body{margin:0}img{max-width:100%}</style>
+<title>八字排盤合盤</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="八字排盤與合盤：公曆、農曆、四柱輸入，基本排盤、專業細盤（大運流年流月流日流時）與兩人合盤關係清單。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap">
+<style>
+/* 版面：桌面左側導覽＋右側內容；手機頂部分頁。
+   配色：每個主題只給底色、卡片、文字、主色、抬頭帶幾個基礎色，其餘全部由 color-mix 混出。淺色預設「月白」，深色預設「墨夜」，主題頁可換。 */
+:root {
+  --bg: #F3F4F6;
+  --card: #FFFFFF;
+  --ink: #1F2328;
+  --accent: #4A5B8C;
+  --on-accent: #FFFFFF;
+  --bar: #1F2430;
+  --bar-ink: #E6EAF2;
+  --mu: #1A973D; --huo: #D2261E; --tu: #8A681B; --jin: #D5820A; --shui: #2B62D5;
+  --danger: #B42318;
+  --shadow: 0 1px 2px rgba(20, 24, 32, .05), 0 6px 18px rgba(20, 24, 32, .05);
+  --card-2: color-mix(in srgb, var(--ink) 4%, var(--card));
+  --ink-2: color-mix(in srgb, var(--ink) 74%, var(--card));
+  --dim: color-mix(in srgb, var(--ink) 54%, var(--card));
+  --line: color-mix(in srgb, var(--ink) 12%, var(--card));
+  --line-2: color-mix(in srgb, var(--ink) 6%, var(--card));
+  --gold: var(--accent);
+  --gold-ink: color-mix(in srgb, var(--accent) 80%, var(--ink));
+  --gold-soft: color-mix(in srgb, var(--accent) 15%, var(--card));
+  --gold-softer: color-mix(in srgb, var(--accent) 6%, var(--card));
+  --chip: color-mix(in srgb, var(--ink) 6%, var(--card));
+  --scroll: color-mix(in srgb, var(--ink) 26%, var(--card));
+  --bar-2: color-mix(in srgb, var(--bar-ink) 9%, var(--bar));
+  --bar-dim: color-mix(in srgb, var(--bar-ink) 62%, var(--bar));
+  --bar-accent: color-mix(in srgb, var(--accent) 50%, var(--bar-ink));
+  --btn: var(--bar);
+  --btn-ink: var(--bar-accent);
+  --r: 14px;
+  --f-serif: "Noto Serif TC", "Songti TC", "STSong", "SimSun", "PMingLiU", serif;
+  --f-sans: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Hiragino Sans", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111214; --card: #1A1C20; --ink: #E8EAED; --accent: #8AB4F8; --on-accent: #10131A;
+    --bar: #0B0C0E; --bar-ink: #DDE3EC;
+    --mu: #58CF78; --huo: #FF6B5E; --tu: #D4AA5E; --jin: #F2AA3A; --shui: #73A2FF;
+    --danger: #FF7B6E;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111214; --card: #1A1C20; --ink: #E8EAED; --accent: #8AB4F8; --on-accent: #10131A;
+  --bar: #0B0C0E; --bar-ink: #DDE3EC;
+  --mu: #58CF78; --huo: #FF6B5E; --tu: #D4AA5E; --jin: #F2AA3A; --shui: #73A2FF;
+  --danger: #FF7B6E;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); }
+body { font-family: var(--f-sans); font-size: 14px; line-height: 1.5; -webkit-text-size-adjust: 100%; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
+.serif { font-family: var(--f-serif); }
+.num { font-variant-numeric: tabular-nums; }
+.w0 { color: var(--mu); } .w1 { color: var(--huo); } .w2 { color: var(--tu); } .w3 { color: var(--jin); } .w4 { color: var(--shui); }
+.dim { color: var(--dim); }
+.gold { color: var(--gold-ink); }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+
+/* ---------- 外框 ---------- */
+.app {
+  display: grid; grid-template-columns: 184px minmax(0, 1fr); gap: 20px;
+  max-width: 1520px; margin: 0 auto;
+  padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.nav {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.nav-brand { font-family: var(--f-serif); font-weight: 700; font-size: 18px; letter-spacing: .08em; color: var(--ink); padding: 6px 14px 12px; }
+.nav-brand small { display: block; font-family: var(--f-sans); font-weight: 400; font-size: 12px; letter-spacing: 0; color: var(--dim); }
+.nav-item {
+  text-align: left; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--card); color: var(--ink-2); font-size: 15px; position: relative;
+}
+.nav-item:hover { border-color: var(--gold); color: var(--ink); }
+.nav-item[aria-current="page"] { background: var(--gold-soft); border-color: var(--gold); color: var(--gold-ink); font-weight: 700; }
+.nav-item[aria-current="page"]::before { content: ""; position: absolute; left: 6px; top: 12px; bottom: 12px; width: 3px; border-radius: 3px; background: var(--gold); }
+.nav-theme { margin-top: 10px; text-align: left; padding: 9px 16px; border-radius: 12px; border: 1px dashed var(--line); background: transparent; color: var(--dim); font-size: 13px; }
+.nav-theme:hover { color: var(--ink); border-color: var(--gold); }
+.main { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.page { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+@media (max-width: 899px) {
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bar); }
+  .app { display: block; padding: 0 0 40px; }
+  .nav {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 25; flex-direction: row; gap: 0;
+    background: var(--bar);
+    padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px));
+    margin-bottom: 14px;
+  }
+  .nav-brand, .nav-theme { display: none; }
+  .nav-item {
+    flex: 1 1 0; min-width: 0; text-align: center; border: 0; border-radius: 0; background: transparent;
+    color: var(--bar-dim); padding: 13px 2px 11px; font-size: 13.5px; white-space: nowrap;
+  }
+  .nav-item:hover { color: var(--bar-ink); border-color: transparent; }
+  .nav-item[aria-current="page"] { background: transparent; color: var(--bar-accent); font-weight: 700; }
+  .nav-item[aria-current="page"]::before { left: 22%; right: 22%; top: auto; bottom: 0; width: auto; height: 3px; border-radius: 3px 3px 0 0; background: var(--bar-accent); }
+  .main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}
+
+/* ---------- 通用 ---------- */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); min-width: 0; }
+.card-pad { padding: 20px 22px; }
+.card-title { font-family: var(--f-serif); font-size: 17px; font-weight: 700; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.card-title small { font-family: var(--f-sans); font-size: 12px; font-weight: 400; color: var(--dim); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 38px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--card); color: var(--ink); font-size: 14px; white-space: nowrap;
+}
+.btn:hover { border-color: var(--gold); }
+.btn-gold { background: var(--gold); border-color: var(--gold); color: var(--on-accent); }
+.btn-gold:hover { filter: brightness(1.06); }
+.btn-gray { background: color-mix(in srgb, var(--ink) 55%, var(--card)); border-color: transparent; color: var(--card); }
+.btn-dark { background: var(--btn); border-color: var(--btn); color: var(--btn-ink); font-weight: 700; letter-spacing: .12em; }
+.btn-danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, var(--line)); }
+.btn-danger.solid { background: var(--danger); color: var(--card); border-color: var(--danger); }
+.btn-sm { min-height: 32px; padding: 0 12px; font-size: 13px; }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; filter: none; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--gold-ink); text-decoration: underline; text-underline-offset: 3px; font-size: inherit; }
+.hint { font-size: 12.5px; color: var(--dim); }
+.empty { padding: 36px 22px; text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.empty p { margin: 0; color: var(--ink-2); max-width: 36em; }
+.row-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; background: var(--chip); color: var(--ink-2); font-size: 12px; white-space: nowrap; }
+.chip.gold { background: var(--gold-soft); color: var(--gold-ink); }
+.chip.warn { background: color-mix(in srgb, var(--danger) 12%, var(--card)); color: var(--danger); }
+
+/* ---------- 輸入頁 ---------- */
+.form { display: flex; flex-direction: column; gap: 18px; max-width: 760px; margin: 0 auto; width: 100%; }
+.banner { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 12px 16px; border-radius: 12px; background: var(--gold-softer); border: 1px solid var(--gold); color: var(--gold-ink); }
+.frow { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 12px; align-items: center; }
+.frow > label, .frow > .flabel { color: var(--ink-2); font-size: 15px; }
+.field {
+  width: 100%; min-height: 42px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--card); color: var(--ink);
+}
+.field:hover { border-color: color-mix(in srgb, var(--gold) 60%, var(--line)); }
+select.field { padding-right: 28px; }
+.fgroup { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.fgroup select.field { width: auto; min-width: 0; flex: 1 1 82px; }
+.fgroup .unit { color: var(--dim); font-size: 13px; }
+.sexmode { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.radios { display: flex; gap: 18px; }
+.radio { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 15px; }
+.radio input { appearance: none; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--dim); margin: 0; display: grid; place-items: center; cursor: pointer; background: var(--card); }
+.radio input::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: transparent; }
+.radio input:checked { border-color: var(--gold); }
+.radio input:checked::after { background: var(--gold); }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--card-2); border: 1px solid var(--line); }
+.seg button { border: 0; background: transparent; padding: 7px 22px; border-radius: 999px; color: var(--ink-2); font-size: 15px; }
+.seg button[aria-pressed="true"] { background: var(--gold); color: var(--on-accent); font-weight: 700; }
+.seg button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+.checks { display: flex; gap: 10px 22px; flex-wrap: wrap; align-items: center; }
+.check { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 15px; }
+.check input { appearance: none; width: 19px; height: 19px; border-radius: 4px; border: 1.5px solid var(--dim); margin: 0; display: grid; place-items: center; cursor: pointer; background: var(--card); }
+.check input:checked { background: var(--gold); border-color: var(--gold); }
+.check input:checked::after { content: ""; width: 9px; height: 5px; border: 2px solid var(--on-accent); border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); }
+.switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+.switch input { appearance: none; width: 44px; height: 24px; border-radius: 999px; background: var(--scroll); position: relative; margin: 0; cursor: pointer; transition: background .15s; flex: none; }
+.switch input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #FFF; box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform .15s; }
+.switch input:checked { background: var(--gold); }
+.switch input:checked::after { transform: translateX(20px); }
+.preview { padding: 12px 14px; border-radius: 10px; background: var(--card-2); border: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; color: var(--ink-2); }
+.preview .pv-gz { font-family: var(--f-serif); font-size: 22px; font-weight: 700; letter-spacing: .08em; color: var(--ink); }
+.preview .err { color: var(--danger); }
+.gobtn { width: 100%; min-height: 58px; font-size: 18px; border-radius: 999px; }
+.cands { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow: auto; padding: 2px; }
+.cand { display: flex; gap: 10px; align-items: center; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; font-size: 14px; }
+.cand:hover { border-color: var(--gold); }
+.cand:has(input:checked) { border-color: var(--gold); background: var(--gold-softer); }
+.cand input { accent-color: var(--gold); margin: 0; }
+.placebox { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.coords { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.coords label { display: inline-flex; align-items: center; gap: 6px; color: var(--dim); font-size: 13px; }
+.coords input.field, .coords select.field { width: 108px; min-height: 36px; padding: 6px 8px; }
+.coords select.field { width: 128px; }
+
+/* 即時起局 */
+.now-card {
+  width: 100%; max-width: 760px; margin: 0 auto; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 20px; align-items: center;
+  padding: 18px 24px; text-align: left; border-radius: var(--r); border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow); color: var(--ink);
+}
+.now-card:hover { border-color: var(--gold); }
+.now-clock { width: 88px; height: 88px; }
+.now-gz { font-family: var(--f-serif); font-size: 24px; font-weight: 700; letter-spacing: .32em; line-height: 1.45; }
+.now-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; font-size: 12.5px; color: var(--dim); }
+.now-pill { padding: 6px 22px; border-radius: 999px; border: 1px solid var(--gold); color: var(--gold-ink); font-size: 15px; background: var(--card); }
+.now-card:hover .now-pill { background: var(--gold); color: var(--on-accent); }
+
+/* ---------- 案例列表 ---------- */
+.caselist { display: flex; flex-direction: column; }
+.case { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 16px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--line-2); }
+.case:first-child { border-top: 0; }
+.case-name { font-family: var(--f-serif); font-weight: 700; font-size: 16px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.case-meta { font-size: 12.5px; color: var(--dim); }
+.case-gz { font-family: var(--f-serif); font-size: 17px; font-weight: 700; letter-spacing: .14em; }
+.case-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.case-edit { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.case-edit .field { max-width: 280px; min-height: 36px; }
+.case-confirm { grid-column: 1 / -1; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--danger) 8%, var(--card)); color: var(--danger); }
+.listhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.listhead .field { max-width: 240px; min-height: 36px; }
+
+/* ---------- 抬頭帶 ---------- */
+.hbar {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; align-items: center;
+  padding: 16px 22px; border-radius: var(--r); color: var(--bar-ink);
+  background: radial-gradient(120% 140% at 0% 0%, var(--bar-2) 0%, var(--bar) 60%);
+  border: 1px solid color-mix(in srgb, var(--bar-ink) 12%, var(--bar));
+  box-shadow: var(--shadow);
+}
+.sx { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.sx-ring { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--bar-accent); color: var(--bar-accent); font-family: var(--f-serif); font-size: 26px; font-weight: 700; background: radial-gradient(circle at 35% 30%, var(--bar-2), var(--bar)); }
+.sx-tag { font-size: 11.5px; color: var(--bar-accent); letter-spacing: .08em; }
+.hbar-name { font-family: var(--f-serif); font-size: 26px; font-weight: 700; color: var(--bar-accent); letter-spacing: .04em; overflow-wrap: anywhere; }
+.hbar-lines { display: flex; flex-direction: column; gap: 2px; font-size: 14px; color: var(--bar-ink); }
+.hbar-lines .k { color: var(--bar-dim); margin-right: 6px; }
+.hbar-lines .zao { color: var(--bar-accent); }
+.hbar-main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 22px; align-items: center; min-width: 0; }
+.hbar-acts { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.hbtn { min-height: 34px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--bar-accent); background: transparent; color: var(--bar-accent); font-size: 14px; }
+.hbtn:hover { background: color-mix(in srgb, var(--bar-accent) 16%, transparent); }
+.hdone { font-size: 13px; color: var(--bar-dim); padding: 0 6px; white-space: nowrap; }
+.hbar .switch { color: var(--bar-ink); }
+@media (max-width: 899px) {
+  .hbar { grid-template-columns: auto minmax(0, 1fr); padding: 14px 16px; gap: 12px 14px; }
+  .hbar-acts { grid-column: 1 / -1; justify-content: flex-start; }
+  .hbar-main { grid-template-columns: minmax(0, 1fr); }
+  .hbar-name { font-size: 20px; }
+  .hbar-lines { font-size: 13px; }
+  .sx-ring { width: 46px; height: 46px; font-size: 21px; }
+}
+
+/* ---------- 基本信息條 ---------- */
+.infobar { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 12px 18px; font-size: 13px; color: var(--ink-2); }
+.infobar b { color: var(--ink); font-weight: 600; }
+.bd-warn { color: var(--danger); font-weight: 600; }
+.chip { border-radius: 4px; }
+#page-basic { max-width: 1000px; }
+.infogrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 0; }
+.infogrid > div { display: flex; gap: 12px; padding: 10px 18px; border-top: 1px solid var(--line-2); font-size: 13.5px; min-width: 0; }
+.infogrid .k { color: var(--dim); flex: none; width: 5.5em; }
+.infogrid .v { min-width: 0; overflow-wrap: anywhere; }
+
+/* ---------- 命盤表 ---------- */
+.pan-wrap { overflow-x: auto; }
+table.pan { --labw: 56px; width: 100%; border-collapse: collapse; table-layout: fixed; text-align: center; }
+table.pan col.c-lab { width: var(--labw); }
+table.pan th { font-weight: 400; color: var(--dim); font-size: 13px; text-align: center; padding: 0 2px; vertical-align: middle; }
+table.pan .ssa { display: none; }
+table.pan .nw { white-space: nowrap; }
+table.pan td { padding: 2px 1px; vertical-align: middle; overflow-wrap: anywhere; }
+table.pan tr > * { border-top: 0; }
+table.pan tr.r-head td { color: var(--dim); font-size: 13px; padding: 10px 0 6px; }
+table.pan tr.r-head td.on-dyn { color: var(--gold-ink); }
+table.pan tr.r-ss td { font-size: 13.5px; padding: 3px 0; }
+table.pan tr.r-big td { font-family: var(--f-serif); font-size: 36px; font-weight: 700; line-height: 1.18; padding: 2px 0; }
+table.pan tr.r-big td .wxs { font-family: var(--f-sans); font-size: 11px; font-weight: 400; color: var(--dim); margin-left: 1px; vertical-align: 2px; }
+table.pan tr.r-cang > * { background: var(--card-2); }
+table.pan tr.r-cang td { font-size: 13px; line-height: 1.6; padding: 8px 1px; }
+table.pan tr.r-cang td .cg { display: block; white-space: nowrap; }
+table.pan tr.r-fu > * { background: var(--card-2); }
+table.pan tr.r-fu td { font-size: 13px; line-height: 1.6; padding: 6px 1px 10px; color: var(--ink-2); }
+table.pan tr.r-fu td .cg { display: block; white-space: nowrap; }
+table.pan tr.r-sm td { font-size: 13.5px; padding: 5px 1px; color: var(--ink); }
+table.pan tr.r-sm:nth-child(even) > * { background: color-mix(in srgb, var(--card-2) 55%, transparent); }
+table.pan tr.r-ss2 td { font-size: 12px; color: var(--ink-2); }
+table.pan tr.r-sha td { font-size: 12.5px; color: var(--gold-ink); line-height: 1.55; padding: 8px 1px; vertical-align: top; }
+table.pan tr.r-sha td .sha { display: block; }
+table.pan tr.r-sha th { vertical-align: top; padding-top: 8px; }
+table.pan td.sep, table.pan th.sep { border-left: 1px solid var(--line); }
+table.pan td.ph { color: var(--dim); }
+table.pan td.ph .phhint { display: block; font-size: 11px; line-height: 1.3; }
+table.pan col.c-dyn { background: transparent; }
+.sha-toggle { display: flex; width: 100%; align-items: center; justify-content: center; gap: 4px; border: 1px dashed var(--line); background: transparent; border-radius: 8px; min-height: 34px; padding: 4px 8px; font-size: 13px; color: var(--gold-ink); margin-top: 8px; }
+.sha-toggle:hover { border-color: var(--gold); }
+
+/* 旺相休囚死：資訊帶，不做成按鈕樣子 */
+.wbar { display: grid; grid-template-columns: auto repeat(5, minmax(0, 1fr)); align-items: center; background: var(--gold-softer); color: var(--gold-ink); border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold); font-size: 15px; letter-spacing: .08em; }
+.wbar > span { text-align: center; padding: 8px 2px; }
+.wbar > span b { font-weight: 700; font-family: var(--f-serif); }
+.wbar > .wl { font-size: 12px; letter-spacing: 0; color: var(--dim); padding: 8px 10px; border-right: 1px solid var(--line); text-align: left; }
+.wbar > span + span:not(:nth-child(2)) { border-left: 1px dotted color-mix(in srgb, var(--gold) 55%, transparent); }
+.pro-right .wbar { border-bottom: 0; }
+.page > .wbar { border-radius: 0; border-left: 0; border-right: 0; }
+
+/* 留意 */
+.attn { padding: 14px 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.attn-row { display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 8px; }
+.attn-row .k { color: var(--gold-ink); font-weight: 600; }
+.attn-row .v { overflow-wrap: anywhere; }
+
+/* ---------- 專業細盤 ---------- */
+.pro { container-type: inline-size; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.pro-body { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.pro-left, .pro-right { min-width: 0; }
+.pro-left { padding: 8px 10px 12px; }
+.pro-right { display: flex; flex-direction: column; overflow: hidden; }
+@container (min-width: 1040px) {
+  .pro-body { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); align-items: start; }
+}
+.pinfo { padding: 12px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 14px; font-size: 13px; background: var(--card-2); border-bottom: 1px solid var(--line); }
+.pinfo .k { color: var(--dim); margin-right: 4px; }
+.pinfo-lines { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pinfo-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.pinfo-side .row { display: flex; gap: 8px; align-items: center; }
+.siling { font-size: 14px; }
+.siling b { font-family: var(--f-serif); font-size: 18px; }
+.todaybtn { min-height: 34px; min-width: 52px; padding: 0 10px; border-radius: 9px; border: 1px solid var(--gold); background: var(--card); color: var(--gold-ink); font-family: var(--f-serif); font-weight: 700; font-size: 14px; }
+.todaybtn:hover { background: var(--gold); color: var(--on-accent); }
+.algo { grid-column: 1 / -1; margin: 2px 0 0; font-size: 11.5px; color: var(--dim); line-height: 1.5; }
+
+/* 干支條 */
+.strip { display: grid; grid-template-columns: 46px minmax(0, 1fr); border-bottom: 1px solid var(--line); min-width: 0; }
+.strip:last-of-type { border-bottom: 0; }
+.strip-title { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 0; font-family: var(--f-serif); font-weight: 700; font-size: 19px; line-height: 1.15; color: var(--ink); border-right: 1px solid var(--line-2); }
+.strip-title small { font-family: var(--f-sans); font-weight: 400; font-size: 11px; color: var(--dim); margin-top: 4px; }
+.strip-main { min-width: 0; display: flex; flex-direction: column; }
+.strip-track { position: relative; display: flex; overflow-x: auto; scrollbar-width: none; scroll-behavior: auto; overscroll-behavior-x: contain; }
+.strip-track::-webkit-scrollbar { display: none; }
+.cell {
+  flex: 0 0 auto; width: 58px; padding: 7px 0 6px; border: 0; border-right: 1px solid var(--line-2); background: transparent;
+  display: flex; flex-direction: column; align-items: center; gap: 0; line-height: 1.22; color: var(--ink); position: relative;
+}
+.cell:hover { background: var(--gold-softer); }
+.cell[aria-pressed="true"] { background: var(--gold-soft); box-shadow: inset 0 -3px 0 var(--gold), inset 0 3px 0 var(--gold); }
+.cell[aria-pressed="true"] .c-top { font-weight: 700; color: var(--ink); }
+.cell .c-top { font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.cell .c-sub { font-size: 11.5px; color: var(--dim); white-space: nowrap; }
+.cell .c-gz { font-family: var(--f-serif); font-size: 20px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+.cell .c-gz i { font-style: normal; font-family: var(--f-sans); font-size: 12px; font-weight: 400; color: var(--ink-2); margin-left: 1px; }
+.cell .c-xy { font-size: 11.5px; color: var(--ink-2); margin-top: 2px; white-space: nowrap; }
+.cell .c-big { font-family: var(--f-serif); font-size: 20px; font-weight: 700; line-height: 1.2; }
+.cell.today::before { content: ""; position: absolute; top: 2px; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: var(--huo); }
+.today-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--huo); vertical-align: 2px; margin: 0 2px; }
+.cell.unborn { opacity: .5; }
+.strip.s-day .cell { width: 54px; }
+.strip.s-hour .cell { width: 60px; }
+.strip-empty { padding: 14px 12px; color: var(--dim); font-size: 13px; }
+.sbar { display: grid; grid-template-columns: 22px minmax(0, 1fr) 22px; align-items: center; gap: 4px; padding: 2px 4px 5px; }
+.sbar-btn { width: 22px; height: 20px; border: 0; background: transparent; color: var(--ink-2); font-size: 11px; padding: 0; border-radius: 4px; }
+.sbar-btn:hover:not(:disabled) { background: var(--chip); color: var(--ink); }
+.sbar-btn:disabled { opacity: .3; cursor: default; }
+.sbar-rail { position: relative; height: 10px; border-radius: 5px; background: var(--line-2); cursor: pointer; touch-action: none; }
+.sbar-thumb { position: absolute; top: 1px; left: 0; height: 8px; border-radius: 4px; background: var(--scroll); cursor: grab; min-width: 28px; touch-action: none; }
+.sbar-thumb:active { cursor: grabbing; background: var(--gold); }
+.strip.fits .sbar { display: none; }
+.swipe-hint { font-size: 11.5px; color: var(--dim); padding: 6px 14px 8px; border-top: 1px solid var(--line-2); }
+
+/* ---------- 關係清單 ---------- */
+.rel { display: flex; flex-direction: column; }
+.rel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.rel-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rel-col { min-width: 0; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 8px; }
+.rel-col + .rel-col { border-left: 1px solid var(--line); }
+.rel-col h3 { font-family: var(--f-serif); font-size: 16px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.rel-col h3 small { font-family: var(--f-sans); font-weight: 400; font-size: 12px; color: var(--dim); }
+.rlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ritem { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 10px; align-items: start; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--card); }
+.ritem.top { background: var(--gold-softer); border-color: var(--gold); }
+.ritem .sc { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15px; text-align: center; padding: 3px 0; border-radius: 8px; background: var(--chip); color: var(--ink); }
+.ritem.top .sc { background: var(--gold); color: var(--on-accent); }
+.ritem .rt { font-weight: 600; font-size: 14.5px; display: flex; gap: 6px; flex-wrap: wrap; align-items: baseline; }
+.ritem .rt .tl { font-family: var(--f-serif); }
+.ritem .src { font-size: 12.5px; color: var(--ink-2); overflow-wrap: anywhere; }
+.ritem .calc { font-size: 11.5px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.toplabel { font-size: 12px; color: var(--gold-ink); font-weight: 600; letter-spacing: .06em; }
+.foldbtn { align-self: flex-start; }
+.rel-none { color: var(--dim); font-size: 13px; padding: 8px 0; }
+@media (max-width: 760px) {
+  .rel-cols { grid-template-columns: minmax(0, 1fr); }
+  .rel-col + .rel-col { border-left: 0; border-top: 1px solid var(--line); }
+}
+
+/* 權重 */
+.weights { padding: 16px 20px 20px; border-bottom: 1px solid var(--line); background: var(--card-2); display: flex; flex-direction: column; gap: 14px; }
+.wgroups { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px 24px; }
+.wgroup h4 { margin: 0 0 6px; font-size: 13px; color: var(--gold-ink); letter-spacing: .06em; }
+.wslider { display: grid; grid-template-columns: 6.6em minmax(0, 1fr) 3.2em; gap: 8px; align-items: center; font-size: 13px; padding: 2px 0; }
+.wslider .wl { color: var(--ink-2); }
+.wslider .wl small { display: block; color: var(--dim); font-size: 11px; }
+.wslider input[type="range"] { width: 100%; accent-color: var(--gold); margin: 0; }
+.wslider output { font-variant-numeric: tabular-nums; text-align: right; font-weight: 600; }
+.wslider.changed .wl { color: var(--gold-ink); font-weight: 600; }
+
+/* ---------- 合盤 ---------- */
+.hp-setup { padding: 28px 22px 26px; display: flex; flex-direction: column; gap: 26px; }
+.hp-sides { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); gap: 0 24px; align-items: stretch; }
+.hp-div { background: var(--line); }
+.hp-side { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 12px 0; min-height: 190px; justify-content: center; text-align: center; }
+.hp-side h3 { font-family: var(--f-serif); font-size: 15px; color: var(--dim); font-weight: 400; letter-spacing: .1em; }
+.hp-side .btn { min-width: 200px; min-height: 46px; font-size: 15px; }
+.hp-chosen { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.hp-chosen .nm { font-family: var(--f-serif); font-size: 19px; font-weight: 700; }
+.hp-chosen .gz { font-family: var(--f-serif); font-size: 20px; font-weight: 700; letter-spacing: .14em; }
+.hp-go { max-width: 760px; width: 100%; margin: 0 auto; }
+.hp-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.hp-panel { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.hp-mini { display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: var(--r); background: radial-gradient(120% 140% at 0% 0%, var(--bar-2) 0%, var(--bar) 60%); border: 1px solid color-mix(in srgb, var(--bar-ink) 12%, var(--bar)); color: var(--bar-ink); flex-wrap: wrap; }
+.hp-mini .sx-ring { width: 40px; height: 40px; font-size: 18px; }
+.hp-mini .nm { font-family: var(--f-serif); font-weight: 700; font-size: 18px; color: var(--bar-accent); }
+.hp-mini .ln { font-size: 12.5px; }
+.hp-mini .side-tag { margin-left: auto; font-family: var(--f-serif); font-size: 20px; font-weight: 700; color: var(--bar-accent); }
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
+.duo > div { padding: 14px 20px; min-width: 0; }
+.duo > div + div { border-left: 1px solid var(--line); }
+.wxtable { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.wxtable th, .wxtable td { padding: 6px 6px; border-top: 1px solid var(--line-2); text-align: center; }
+.wxtable th { color: var(--dim); font-weight: 400; }
+.wxtable td.note { text-align: left; color: var(--ink-2); font-size: 12.5px; }
+@media (max-width: 1099px) {
+  .hp-panels { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .hp-sides { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .hp-div { height: 1px; }
+  .hp-side { min-height: 0; }
+  .duo { grid-template-columns: minmax(0, 1fr); }
+  .duo > div + div { border-left: 0; border-top: 1px solid var(--line); }
+}
+
+/* ---------- 對話框與提示 ---------- */
+.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); background: rgba(10, 8, 5, .45); }
+.modal-box { width: min(560px, 100%); max-height: min(78vh, 680px); display: flex; flex-direction: column; background: var(--card); border-radius: var(--r); border: 1px solid var(--line); box-shadow: 0 20px 60px rgba(0, 0, 0, .3); }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.modal-body { overflow: auto; padding: 8px 10px; }
+.pick { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; text-align: left; padding: 12px 12px; border: 0; border-bottom: 1px solid var(--line-2); background: transparent; border-radius: 8px; color: var(--ink); }
+.pick:hover { background: var(--gold-softer); }
+.pick .nm { font-family: var(--f-serif); font-weight: 700; font-size: 16px; }
+.pick .gz { font-family: var(--f-serif); font-weight: 700; letter-spacing: .1em; }
+.pick .mt { grid-column: 1 / -1; font-size: 12.5px; color: var(--dim); }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; max-width: calc(100% - 32px); padding: 10px 18px; border-radius: 999px; background: var(--bar); color: var(--bar-ink); font-size: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
+
+/* ---------- 手機細節 ---------- */
+@media (max-width: 899px) {
+  .card-pad { padding: 16px; }
+  .frow { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .seg button { padding: 7px 16px; }
+  .now-card { grid-template-columns: auto minmax(0, 1fr); padding: 14px 16px; gap: 12px 16px; }
+  .now-side { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; justify-items: start; gap: 2px 14px; }
+  .now-side .now-pill { grid-row: span 2; }
+  .now-clock { width: 64px; height: 64px; }
+  .now-gz { font-size: 20px; letter-spacing: .24em; }
+  .case { padding: 12px 14px; grid-template-columns: minmax(0, 1fr); }
+  .case-acts { justify-content: flex-start; }
+  table.pan { --labw: 38px; }
+  table.pan th { font-size: 11.5px; }
+  table.pan tr.r-big td { font-size: 27px; }
+}
+@container (max-width: 460px) {
+  table.pan .ssf { display: none; }
+  table.pan .ssa { display: inline; }
+}
+@container (max-width: 520px) {
+  table.pan { --labw: 26px; }
+  table.pan th { font-size: 11px; padding: 0; }
+  table.pan tr.r-head td { font-size: 11px; }
+  table.pan tr.r-ss td { font-size: 11px; }
+  table.pan tr.r-big td { font-size: 22px; }
+  table.pan tr.r-big td .wxs { display: none; }
+  table.pan tr.r-cang td { font-size: 10.5px; line-height: 1.5; padding: 6px 0; }
+  table.pan tr.r-sm td { font-size: 11px; padding: 4px 0; }
+  table.pan tr.r-sha td { font-size: 10px; line-height: 1.4; }
+  .pro-left { padding: 6px 4px 10px; }
+  .cell { width: 50px; }
+  .cell .c-gz, .cell .c-big { font-size: 18px; }
+  .strip { grid-template-columns: 36px minmax(0, 1fr); }
+  .strip-title { font-size: 16px; }
+  .pinfo { grid-template-columns: minmax(0, 1fr); }
+  .pinfo-side { flex-direction: row; justify-content: space-between; align-items: center; }
+}
+
+/* ---------- 主題 ---------- */
+#page-theme { max-width: 1100px; }
+.theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; margin-top: 16px; }
+.theme-card { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink); text-align: left; position: relative; }
+.theme-card:hover { border-color: var(--gold); }
+.theme-card[aria-pressed="true"] { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold); }
+.theme-card[aria-pressed="true"]::after { content: "使用中"; position: absolute; top: 4px; right: 4px; font-size: 11.5px; font-weight: 700; color: var(--on-accent); background: var(--gold); border-radius: 6px; padding: 2px 7px; box-shadow: 0 1px 3px rgba(0, 0, 0, .2); }
+.tc-prev { display: flex; flex-direction: column; height: 96px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line-2); }
+.tc-split { flex-direction: row; }
+.tc-split > .tc-prev { flex: 1; height: auto; border: 0; border-radius: 0; }
+.tc-bar { height: 24px; display: flex; align-items: center; gap: 6px; padding: 0 8px; font-family: var(--f-serif); font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; }
+.tc-bar i { flex: none; width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid currentColor; }
+.tc-body { flex: 1; display: flex; padding: 7px 8px; }
+.tc-cardm { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; border-radius: 6px; padding: 5px 7px; }
+.tc-gz { font-family: var(--f-serif); font-weight: 700; font-size: 16px; letter-spacing: .04em; white-space: nowrap; }
+.tc-sel { display: block; height: 7px; width: 60%; border-radius: 4px; }
+.tc-name { display: flex; gap: 8px; align-items: baseline; font-family: var(--f-serif); font-weight: 700; font-size: 15px; }
+.tc-name small { font-family: var(--f-sans); font-weight: 400; font-size: 12px; color: var(--dim); }
+.cp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px 24px; margin: 16px 0 14px; }
+.cp { display: grid; grid-template-columns: 6.5em 48px minmax(0, 1fr); gap: 10px; align-items: center; font-size: 14px; cursor: pointer; }
+.cp-l small { display: block; font-size: 11.5px; color: var(--dim); }
+.cp input[type="color"] { width: 48px; height: 34px; padding: 2px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); cursor: pointer; }
+.cp code { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+@media (max-width: 899px) {
+  .theme-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+}
+
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+<script>
+/* 先套用上次選的主題，避免畫面閃一下預設色 */
+try { var tv = JSON.parse(localStorage.getItem("bazi.theme.vars") || "null"); if (tv) for (var tk in tv) document.documentElement.style.setProperty(tk, tv[tk]); } catch (e) { /* 無痕或封鎖 */ }
+</script>
+</head>
+<body>
+<div class="app">
+  <nav class="nav" aria-label="頁面">
+    <div class="nav-brand">八字排盤<small>排盤・細盤・合盤</small></div>
+    <button type="button" class="nav-item" data-act="go" data-page="input" aria-current="page">排盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="cases" aria-current="false">案例</button>
+    <button type="button" class="nav-item" data-act="go" data-page="basic" aria-current="false">基本排盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="pro" aria-current="false">專業細盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="hepan" aria-current="false">合盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="theme" aria-current="false">主題</button>
+  </nav>
+  <main class="main">
+    <section class="page" id="page-input" aria-label="排盤輸入">
+      <div class="banner" id="f-banner" hidden></div>
+      <form class="card card-pad form" id="f-form" novalidate>
+        <div class="frow"><label for="f-name">命主姓名</label><input class="field" id="f-name" placeholder="請輸入姓名（可留空）" maxlength="30" autocomplete="off"></div>
+        <div class="sexmode">
+          <div class="radios" role="radiogroup" aria-label="性別">
+            <label class="radio"><input type="radio" name="f-sex" id="f-sex-m" value="m" checked> 男</label>
+            <label class="radio"><input type="radio" name="f-sex" id="f-sex-f" value="f"> 女</label>
+          </div>
+          <div class="seg" role="group" aria-label="輸入方式">
+            <button type="button" data-act="mode" data-mode="solar" aria-pressed="true">公曆</button>
+            <button type="button" data-act="mode" data-mode="lunar" aria-pressed="false">農曆</button>
+            <button type="button" data-act="mode" data-mode="sizhu" aria-pressed="false">四柱</button>
+          </div>
+        </div>
+        <div class="frow" id="g-solar"><span class="flabel">出生日期</span>
+          <div class="fgroup"><select class="field" id="f-sy" aria-label="公曆年"></select><select class="field" id="f-sm" aria-label="公曆月"></select><select class="field" id="f-sd" aria-label="公曆日"></select></div>
+        </div>
+        <div class="frow" id="g-lunar" hidden><span class="flabel">農曆日期</span>
+          <div class="fgroup"><select class="field" id="f-ly" aria-label="農曆年"></select><select class="field" id="f-lm" aria-label="農曆月"></select><select class="field" id="f-ld" aria-label="農曆日"></select></div>
+        </div>
+        <div class="frow" id="g-time"><span class="flabel">出生時間</span>
+          <div class="fgroup"><select class="field" id="f-hh" aria-label="時"></select><select class="field" id="f-mi" aria-label="分"></select><span class="unit" id="f-shichen">子時</span></div>
+        </div>
+        <div class="frow" id="g-sizhu" hidden><span class="flabel">四柱</span>
+          <div class="fgroup"><select class="field" id="f-p0" aria-label="年柱"></select><select class="field" id="f-p1" aria-label="月柱"></select><select class="field" id="f-p2" aria-label="日柱"></select><select class="field" id="f-p3" aria-label="時柱"></select></div>
+        </div>
+        <div class="frow" id="g-sizhu-note" hidden><span class="flabel">符合時間</span>
+          <div style="min-width:0"><div class="cands" id="f-cands"></div><p class="hint" style="margin:6px 0 0">在 1801–2100 年間反查。按所選時區的標準時計，不套用真太陽時與夏令時；取時段中點起大運。預設選離今天最近的一筆。</p></div>
+        </div>
+        <div class="frow"><label for="f-place">出生地點</label>
+          <div class="placebox">
+            <select class="field" id="f-place"></select>
+            <div class="coords">
+              <label>經度 <input class="field num" id="f-lon" type="number" step="0.01" min="-180" max="180" inputmode="decimal"></label>
+              <label>緯度 <input class="field num" id="f-lat" type="number" step="0.01" min="-90" max="90" inputmode="decimal"></label>
+              <label>時區 <select class="field" id="f-tz"></select></label>
+            </div>
+            <p class="hint" style="margin:0">經度東正西負、緯度北正南負。只有勾選真太陽時才會用到經度。</p>
+          </div>
+        </div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="f-dst"> 夏令時</label>
+          <label class="check"><input type="checkbox" id="f-ts"> 真太陽時</label>
+          <label class="check"><input type="checkbox" id="f-zs"> 早晚子時</label>
+          <label class="switch" style="margin-left:auto"><input type="checkbox" id="f-save"> 排盤後存入案例</label>
+        </div>
+        <p class="hint" style="margin:-8px 0 0">夏令時：輸入的時間減一小時。真太陽時：依經度修正，再加均時差。早晚子時：勾選後 23:00–24:00 不換日（日柱用當天、時干用次日）；不勾則 23:00 起換日。</p>
+        <div class="preview" id="f-preview" aria-live="polite"></div>
+        <button class="btn btn-dark gobtn" id="f-go" type="submit">開始排盤</button>
+      </form>
+      <button class="now-card" id="nowcard" type="button" data-act="now">
+        <svg class="now-clock" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="46" fill="var(--card)" stroke="var(--line)" stroke-width="2"></circle>
+          <g stroke="var(--dim)" stroke-width="2" stroke-linecap="round">
+            <line x1="50" y1="9" x2="50" y2="14"></line><line x1="91" y1="50" x2="86" y2="50"></line><line x1="50" y1="91" x2="50" y2="86"></line><line x1="9" y1="50" x2="14" y2="50"></line>
+          </g>
+          <g fill="var(--dim)"><circle cx="70.5" cy="14.5" r="1.3"></circle><circle cx="85.5" cy="29.5" r="1.3"></circle><circle cx="85.5" cy="70.5" r="1.3"></circle><circle cx="70.5" cy="85.5" r="1.3"></circle><circle cx="29.5" cy="85.5" r="1.3"></circle><circle cx="14.5" cy="70.5" r="1.3"></circle><circle cx="14.5" cy="29.5" r="1.3"></circle><circle cx="29.5" cy="14.5" r="1.3"></circle></g>
+          <line id="nc-h" x1="50" y1="50" x2="50" y2="28" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"></line>
+          <line id="nc-m" x1="50" y1="50" x2="50" y2="16" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"></line>
+          <line id="nc-s" x1="50" y1="56" x2="50" y2="14" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round"></line>
+          <circle cx="50" cy="50" r="3" fill="var(--gold)"></circle>
+        </svg>
+        <span class="now-gz" id="nc-gz"></span>
+        <span class="now-side"><span class="now-pill">即時起局</span><span id="nc-lunar"></span><span id="nc-solar"></span></span>
+      </button>
+    </section>
+    <section class="page" id="page-cases" aria-label="案例列表" hidden><div class="card" id="cases-card"></div></section>
+    <section class="page" id="page-basic" aria-label="基本排盤" hidden></section>
+    <section class="page" id="page-pro" aria-label="專業細盤" hidden></section>
+    <section class="page" id="page-hepan" aria-label="合盤" hidden></section>
+    <section class="page" id="page-theme" aria-label="主題配色" hidden></section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="modal" id="modal" hidden></div>
+<script>
+/* ===== ENGINE BEGIN ===== */
+/* ==========================================================
+   八字排盤計算引擎
+   - 干支、五行、十神、長生、納音、旬空等一律用公式
+   - 節氣：VSOP87 截斷級數求太陽視黃經（沿用舊版並經驗收用例驗證）
+   - 農曆：Meeus 真朔 + 中氣置閏
+   ========================================================== */
+const Bazi = (() => {
+"use strict";
+
+/* ---------------- 1. 編號與基本公式 ---------------- */
+const GAN = "甲乙丙丁戊己庚辛壬癸".split("");
+const ZHI = "子丑寅卯辰巳午未申酉戌亥".split("");
+const WX = "木火土金水".split("");
+const SHENGXIAO = "鼠牛虎兔龍蛇馬羊猴雞狗豬".split("");
+const mod = (a, n) => ((a % n) + n) % n;
+
+const ganWx = g => g >> 1;                                   // 干：編號整除 2
+const ganYang = g => (g & 1) === 0;
+const zhiSeason = b => Math.floor(mod(b - 2, 12) / 3);        // 0 春 1 夏 2 秋 3 冬
+const SEASON_WX = [0, 1, 3, 4];                               // 木 火 金 水
+const zhiWx = b => (mod(b - 2, 12) % 3 === 2) ? 2 : SEASON_WX[zhiSeason(b)]; // 季末為土
+const zhiYang = b => (b & 1) === 0;
+const gzIndex = (g, b) => ((g & 1) === (b & 1)) ? mod(6 * g - 5 * b, 60) : -1;
+const gzName = i => GAN[mod(i, 10)] + ZHI[mod(i, 12)];
+const gOf = i => mod(i, 10), bOf = i => mod(i, 12);
+
+/* 十神：(對方五行 − 日主五行) mod 5，陰陽同為偏、異為正 */
+const SS_SAME = ["比肩", "食神", "偏財", "七殺", "偏印"];
+const SS_DIFF = ["劫財", "傷官", "正財", "正官", "正印"];
+const SS_ABBR = { 比肩: "比", 劫財: "劫", 食神: "食", 傷官: "傷", 偏財: "才", 正財: "財", 七殺: "殺", 正官: "官", 偏印: "梟", 正印: "印" };
+function tenGod(dm, g) {
+  const rel = mod(ganWx(g) - ganWx(dm), 5);
+  return ((dm & 1) === (g & 1) ? SS_SAME : SS_DIFF)[rel];
+}
+/* 藏干（本氣、中氣、餘氣） */
+const CANG = [[9], [5, 9, 7], [0, 2, 4], [1], [4, 1, 9], [2, 6, 4], [3, 5], [5, 3, 1], [6, 8, 4], [7], [4, 7, 3], [8, 0]];
+const zhiTenGod = (dm, b) => tenGod(dm, CANG[b][0]);
+
+/* 十二長生：陽干順行、陰干逆行；土隨火 */
+const CS = ["長生", "沐浴", "冠帶", "臨官", "帝旺", "衰", "病", "死", "墓", "絕", "胎", "養"];
+function csStart(g) {
+  const s = [0, 1, 1, 2, 3][ganWx(g)];                 // 木 火 土(隨火) 金 水
+  return ganYang(g) ? mod(11 + 3 * s, 12) : mod(6 + 3 * s, 12);
+}
+function csStep(g, b) {
+  const st = csStart(g);
+  return ganYang(g) ? mod(b - st, 12) : mod(st - b, 12);
+}
+const changSheng = (g, b) => CS[csStep(g, b)];
+const luOf = g => ganYang(g) ? mod(csStart(g) + 3, 12) : mod(csStart(g) - 3, 12); // 臨官 = 祿
+const yangRenOf = g => mod(luOf(g) + 1, 12);                                     // 祿前一位
+
+/* 旬空 */
+function xunKong(i) { const head = i - mod(i, 10); return [mod(head + 10, 12), mod(head + 11, 12)]; }
+
+/* 納音：大衍數求五行，名稱取 30 組固定名 */
+const NAYIN_NAMES = ["海中金", "爐中火", "大林木", "路旁土", "劍鋒金", "山頭火", "澗下水", "城頭土", "白蠟金", "楊柳木",
+  "泉中水", "屋上土", "霹靂火", "松柏木", "長流水", "沙中金", "山下火", "平地木", "壁上土", "金箔金",
+  "覆燈火", "天河水", "大驛土", "釵釧金", "桑柘木", "大溪水", "沙中土", "天上火", "石榴木", "大海水"];
+function nayinWx(i) {
+  const p = i - mod(i, 2);
+  const dg = g => 9 - (g % 5), dz = b => 9 - (b % 6);
+  const s = dg(p % 10) + dz(p % 12) + dg((p + 1) % 10) + dz((p + 1) % 12);
+  let r = mod(49 - s, 5); if (r === 0) r = 5;
+  const HETU = { 1: 4, 2: 1, 3: 0, 4: 3, 5: 2 };          // 河圖數 → 五行
+  return mod(HETU[r] + 1, 5);                            // 所生者為納音
+}
+const nayin = i => NAYIN_NAMES[Math.floor(mod(i, 60) / 2)];
+
+/* 旺相休囚死（以月支五行為令） */
+function wangXiang(mb) {
+  const w = zhiWx(mb);
+  return [[w, "旺"], [mod(w + 1, 5), "相"], [mod(w + 4, 5), "休"], [mod(w + 3, 5), "囚"], [mod(w + 2, 5), "死"]];
+}
+
+/* 人元司令（按入節後天數分配；採《淵海子平》常見分野） */
+const SILING = {
+  2: [[4, 7], [2, 7], [0, 16]], 3: [[0, 10], [1, 20]], 4: [[1, 9], [9, 3], [4, 18]],
+  5: [[4, 5], [6, 9], [2, 16]], 6: [[2, 10], [5, 9], [3, 11]], 7: [[3, 9], [1, 3], [5, 18]],
+  8: [[5, 7], [4, 3], [8, 3], [6, 17]], 9: [[6, 10], [7, 20]], 10: [[7, 9], [3, 3], [4, 18]],
+  11: [[4, 7], [0, 5], [8, 18]], 0: [[8, 10], [9, 20]], 1: [[9, 9], [7, 3], [5, 18]]
+};
+function siLing(mb, days) {
+  let acc = 0; const list = SILING[mb];
+  for (const [g, n] of list) { acc += n; if (days < acc) return g; }
+  return list[list.length - 1][0];
+}
+
+/* ---------------- 2. 曆算（沿用舊版） ---------------- */
+const RAD = Math.PI / 180;
+const mod360 = x => ((x % 360) + 360) % 360;
+const sind = d => Math.sin(d * RAD);
+
+function toJD(y, m, d, frac) {
+  frac = frac || 0;
+  if (m <= 2) { y -= 1; m += 12; }
+  const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5 + frac;
+}
+function fromJD(jd) {
+  const z = Math.floor(jd + 0.5), f = jd + 0.5 - z;
+  let a = z;
+  if (z >= 2299161) { const al = Math.floor((z - 1867216.25) / 36524.25); a = z + 1 + al - Math.floor(al / 4); }
+  const b = a + 1524, c = Math.floor((b - 122.1) / 365.25), dd = Math.floor(365.25 * c),
+    e = Math.floor((b - dd) / 30.6001);
+  const day = b - dd - Math.floor(30.6001 * e) + f;
+  const mo = e < 14 ? e - 1 : e - 13;
+  const yr = mo > 2 ? c - 4716 : c - 4715;
+  return { y: yr, m: mo, d: Math.floor(day), frac: day - Math.floor(day) };
+}
+const ymdToDayNum = (y, m, d) => Math.round(toJD(y, m, d, 0) + 0.5);
+function dayNumToYMD(n) { const o = fromJD(n); return { y: o.y, m: o.m, d: o.d }; }
+const dayGZ = dn => mod(dn + 49, 60);            // 1949-10-01（JDN 2433191）為甲子
+const monthLen = (y, m) => ymdToDayNum(m === 12 ? y + 1 : y, m === 12 ? 1 : m + 1, 1) - ymdToDayNum(y, m, 1);
+
+/* ΔT（Espenak & Meeus） */
+function deltaT(y) {
+  let u, t;
+  if (y < 1600) { u = (y - 1000) / 100; return 1574.2 - 556.01 * u + 71.23472 * u * u + 0.319781 * u ** 3 - 0.8503463 * u ** 4 - 0.005050998 * u ** 5 + 0.0083572073 * u ** 6; }
+  if (y < 1700) { t = y - 1600; return 120 - 0.9808 * t - 0.01532 * t * t + t ** 3 / 7129; }
+  if (y < 1800) { t = y - 1700; return 8.83 + 0.1603 * t - 0.0059285 * t * t + 0.00013336 * t ** 3 - t ** 4 / 1174000; }
+  if (y < 1860) { t = y - 1800; return 13.72 - 0.332447 * t + 0.0068612 * t * t + 0.0041116 * t ** 3 - 0.00037436 * t ** 4 + 0.0000121272 * t ** 5 - 0.0000001699 * t ** 6 + 0.000000000875 * t ** 7; }
+  if (y < 1900) { t = y - 1860; return 7.62 + 0.5737 * t - 0.251754 * t * t + 0.01680668 * t ** 3 - 0.0004473624 * t ** 4 + t ** 5 / 233174; }
+  if (y < 1920) { t = y - 1900; return -2.79 + 1.494119 * t - 0.0598939 * t * t + 0.0061966 * t ** 3 - 0.000197 * t ** 4; }
+  if (y < 1941) { t = y - 1920; return 21.20 + 0.84493 * t - 0.076100 * t * t + 0.0020936 * t ** 3; }
+  if (y < 1961) { t = y - 1950; return 29.07 + 0.407 * t - t * t / 233 + t ** 3 / 2547; }
+  if (y < 1986) { t = y - 1975; return 45.45 + 1.067 * t - t * t / 260 - t ** 3 / 718; }
+  if (y < 2005) { t = y - 2000; return 63.86 + 0.3345 * t - 0.060374 * t * t + 0.0017275 * t ** 3 + 0.000651814 * t ** 4 + 0.00002373599 * t ** 5; }
+  if (y < 2050) { t = y - 2000; return 62.92 + 0.32217 * t + 0.005589 * t * t; }
+  if (y < 2150) { u = (y - 1820) / 100; return -20 + 32 * u * u - 0.5628 * (2150 - y); }
+  u = (y - 1820) / 100; return -20 + 32 * u * u;
+}
+
+/* 太陽視黃經（VSOP87 截斷） */
+const L0 = [[175347046,0,0],[3341656,4.6692568,6283.07585],[34894,4.6261,12566.1517],[3497,2.7441,5753.3849],[3418,2.8289,3.5231],[3136,3.6277,77713.7715],[2676,4.4181,7860.4194],[2343,6.1352,3930.2097],[1324,0.7425,11506.7698],[1273,2.0371,529.691],[1199,1.1096,1577.3435],[990,5.233,5884.927],[902,2.045,26.298],[857,3.508,398.149],[780,1.179,5223.694],[753,2.533,5507.553],[505,4.583,18849.228],[492,4.205,775.523],[357,2.92,0.067],[317,5.849,11790.629],[284,1.899,796.298],[271,0.315,10977.079],[243,0.345,5486.778],[206,4.806,2544.314],[205,1.869,5573.143],[202,2.458,6069.777],[156,0.833,213.299],[132,3.411,2942.463],[126,1.083,20.775],[115,0.645,0.98],[103,0.636,4694.003],[102,0.976,15720.839],[102,4.267,7.114],[99,6.21,2146.17],[98,0.68,155.42],[86,5.98,161000.69],[85,1.3,6275.96],[85,3.67,71430.7],[80,1.81,17260.15],[79,3.04,12036.46],[75,1.76,5088.63],[74,3.5,3154.69],[74,4.68,801.82],[70,0.83,9437.76],[62,3.98,8827.39],[61,1.82,7084.9],[57,2.78,6286.6],[56,4.39,14143.5],[56,3.47,6279.55],[52,0.19,12139.55],[52,1.33,1748.02],[51,0.28,5856.48],[49,0.49,1194.45],[41,5.37,8429.24],[41,2.4,19651.05],[39,6.17,10447.39],[37,6.04,10213.29],[37,2.57,1059.38],[36,1.71,2352.87],[36,1.78,6812.77],[33,0.59,17789.85],[30,0.44,83996.85],[30,2.74,1349.87],[25,3.16,4690.48]];
+const L1 = [[628331966747,0,0],[206059,2.678235,6283.07585],[4303,2.6351,12566.1517],[425,1.59,3.523],[119,5.796,26.298],[109,2.966,1577.344],[93,2.59,18849.23],[72,1.14,529.69],[68,1.87,398.15],[67,4.41,5507.55],[59,2.89,5223.69],[56,2.17,155.42],[45,0.4,796.3],[36,0.47,775.52],[29,2.65,7.11],[21,5.34,0.98],[19,1.85,5486.78],[19,4.97,213.3],[17,2.99,6275.96],[16,0.03,2544.31],[16,1.43,2146.17],[15,1.21,10977.08],[12,2.83,1748.02],[12,3.26,5088.63],[12,5.27,1194.45],[12,2.08,4694],[11,0.77,553.57],[10,1.3,6286.6],[10,4.24,1349.87],[9,2.7,242.73],[9,5.64,951.72],[8,5.3,2352.87],[6,2.65,9437.76],[6,4.67,4690.48]];
+const L2 = [[52919,0,0],[8720,1.0721,6283.0758],[309,0.867,12566.152],[27,0.05,3.52],[16,5.19,26.3],[16,3.68,155.42],[10,0.76,18849.23],[9,2.06,77713.77],[7,0.83,775.52],[5,4.66,1577.34],[4,1.03,7.11],[4,3.44,5573.14],[3,5.14,796.3],[3,6.05,5507.55],[3,1.19,242.73],[3,6.12,529.69],[3,0.31,398.15],[3,2.28,553.57],[2,4.38,5223.69],[2,3.75,0.98]];
+const L3 = [[289,5.844,6283.076],[35,0,0],[17,5.49,12566.15],[3,5.2,155.42],[1,4.72,3.52],[1,5.3,18849.23],[1,5.97,242.73]];
+const L4 = [[114,3.142,0],[8,4.13,6283.08],[1,3.84,12566.15]];
+const L5 = [[1,3.14,0]];
+const R0 = [[100013989,0,0],[1670700,3.0984635,6283.07585],[13956,3.05525,12566.1517],[3084,5.1985,77713.7715],[1628,1.1739,5753.3849],[1576,2.8469,7860.4194],[925,5.453,11506.77],[542,4.564,3930.21],[472,3.661,5884.927],[346,0.964,5507.553],[329,5.9,5223.694],[307,0.299,5573.143],[243,4.273,11790.629],[212,5.847,1577.344],[186,5.022,10977.079],[175,3.012,18849.228],[110,5.055,5486.778],[98,0.89,6069.78],[86,5.69,15720.84],[86,1.27,161000.69],[65,0.27,17260.15],[63,0.92,529.69],[57,2.01,83996.85],[56,5.24,71430.7],[49,3.25,2544.31],[47,2.58,775.52],[45,5.54,9437.76],[43,6.01,6275.96],[39,5.36,4694],[38,2.39,8827.39],[37,0.83,19651.05],[37,4.9,12139.55],[36,1.67,12036.46],[35,1.84,2942.46],[33,0.24,7084.9],[32,0.18,5088.63],[32,1.78,398.15],[28,1.21,6286.6],[28,1.9,6279.55],[26,4.59,10447.39]];
+function sumSer(ser, t) { let s = 0; for (const [a, b, c] of ser) s += a * Math.cos(b + c * t); return s; }
+
+function apparentSunLon(jde) {
+  const t = (jde - 2451545) / 365250;
+  const L = (sumSer(L0, t) + sumSer(L1, t) * t + sumSer(L2, t) * t * t + sumSer(L3, t) * t ** 3 + sumSer(L4, t) * t ** 4 + sumSer(L5, t) * t ** 5) / 1e8;
+  const R = sumSer(R0, t) / 1e8;
+  let lon = mod360(L / RAD + 180);
+  const T = t * 10;
+  lon += -0.09033 / 3600;                                     // FK5
+  const Om = 125.04452 - 1934.136261 * T;
+  const Ls = 280.4665 + 36000.7698 * T;
+  const Lm = 218.3165 + 481267.8813 * T;
+  const dpsi = (-17.20 * sind(Om) - 1.32 * sind(2 * Ls) - 0.23 * sind(2 * Lm) + 0.21 * sind(2 * Om)) / 3600; // 章動
+  const ab = -20.4898 / 3600 / R;                             // 光行差
+  return mod360(lon + dpsi + ab);
+}
+/* 某公曆年中太陽視黃經達 lon 的時刻（世界時 JD） */
+function solarTermJD(year, lon) {
+  let jd = toJD(year, 1, 1, 0) + mod360(lon - 280) / 360 * 365.2422;
+  for (let i = 0; i < 14; i++) {
+    const jde = jd + deltaT(year) / 86400;
+    const diff = mod360(lon - apparentSunLon(jde) + 180) - 180;
+    jd += diff * 365.2422 / 360;
+    if (Math.abs(diff) < 1e-7) break;
+  }
+  return jd;
+}
+/* 真朔（Meeus 第 49 章） */
+function newMoonJD(k) {
+  const T = k / 1236.85, T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+  let jde = 2451550.09766 + 29.530588861 * k + 0.00015437 * T2 - 0.000000150 * T3 + 0.00000000073 * T4;
+  const E = 1 - 0.002516 * T - 0.0000074 * T2;
+  const M = 2.5534 + 29.10535670 * k - 0.0000014 * T2 - 0.00000011 * T3;
+  const Mp = 201.5643 + 385.81693528 * k + 0.0107582 * T2 + 0.00001238 * T3 - 0.000000058 * T4;
+  const F = 160.7108 + 390.67050284 * k - 0.0016118 * T2 - 0.00000227 * T3 + 0.000000011 * T4;
+  const Om = 124.7746 - 1.56375588 * k + 0.0020672 * T2 + 0.00000215 * T3;
+  let c = 0;
+  c += -0.40720 * sind(Mp); c += 0.17241 * E * sind(M); c += 0.01608 * sind(2 * Mp); c += 0.01039 * sind(2 * F);
+  c += 0.00739 * E * sind(Mp - M); c += -0.00514 * E * sind(Mp + M); c += 0.00208 * E * E * sind(2 * M);
+  c += -0.00111 * sind(Mp - 2 * F); c += -0.00057 * sind(Mp + 2 * F); c += 0.00056 * E * sind(2 * Mp + M);
+  c += -0.00042 * sind(3 * Mp); c += 0.00042 * E * sind(M + 2 * F); c += 0.00038 * E * sind(M - 2 * F);
+  c += -0.00024 * E * sind(2 * Mp - M); c += -0.00017 * sind(Om); c += -0.00007 * sind(Mp + 2 * M);
+  c += 0.00004 * sind(2 * Mp - 2 * F); c += 0.00004 * sind(3 * M); c += 0.00003 * sind(Mp + M - 2 * F);
+  c += 0.00003 * sind(2 * Mp + 2 * F); c += -0.00003 * sind(Mp + M + 2 * F); c += 0.00003 * sind(Mp - M + 2 * F);
+  c += -0.00002 * sind(Mp - M - 2 * F); c += -0.00002 * sind(3 * Mp + M); c += 0.00002 * sind(4 * Mp);
+  const A = [299.77 + 0.107408 * k - 0.009173 * T2, 251.88 + 0.016321 * k, 251.83 + 26.651886 * k,
+    349.42 + 36.412478 * k, 84.66 + 18.206239 * k, 141.74 + 53.303771 * k, 207.14 + 2.453732 * k,
+    154.84 + 7.306860 * k, 34.52 + 27.261239 * k, 207.19 + 0.121824 * k, 291.34 + 1.844379 * k,
+    161.72 + 24.198154 * k, 239.56 + 25.513099 * k, 331.55 + 3.592518 * k];
+  const W = [0.000325, 0.000165, 0.000164, 0.000126, 0.000110, 0.000062, 0.000060, 0.000056,
+    0.000047, 0.000042, 0.000040, 0.000037, 0.000035, 0.000023];
+  for (let i = 0; i < 14; i++) c += W[i] * sind(A[i]);
+  jde += c;
+  return jde - deltaT(fromJD(jde).y) / 86400;   // → 世界時
+}
+/* 均時差（分鐘） */
+function equationOfTime(jdUT) {
+  const jde = jdUT + deltaT(fromJD(jdUT).y) / 86400;
+  const T = (jde - 2451545) / 36525;
+  const Lm = mod360(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
+  const lam = apparentSunLon(jde);
+  const eps = 23.439291111 - 0.013004167 * T - 1.6389e-7 * T * T + 5.036e-7 * T ** 3;
+  const a = mod360(Math.atan2(Math.cos(eps * RAD) * Math.sin(lam * RAD), Math.cos(lam * RAD)) / RAD);
+  let E = Lm - 0.0057183 - a;
+  E = ((E + 180) % 360 + 360) % 360 - 180;
+  return E * 4;
+}
+
+/* ---------------- 3. 節氣 ---------------- */
+const TERM_NAMES = ["小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至",
+  "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"];
+const termCache = new Map();
+function termsOfYear(Y) {                       // 該公曆年的 24 節氣（小寒…冬至）
+  if (termCache.has(Y)) return termCache.get(Y);
+  const arr = TERM_NAMES.map((name, k) => {
+    const lon = mod360(285 + 15 * k);
+    const jd = solarTermJD(Y, lon);
+    const isJie = k % 2 === 0;
+    return { k, name, lon, jd, isJie, branch: isJie ? mod(1 + k / 2, 12) : null, year: Y };
+  });
+  termCache.set(Y, arr);
+  return arr;
+}
+function jieAround(jdUT) {                      // 前一個節、後一個節
+  const Y = fromJD(jdUT).y;
+  const list = [];
+  for (const yy of [Y - 1, Y, Y + 1]) for (const t of termsOfYear(yy)) if (t.isJie) list.push(t);
+  list.sort((a, b) => a.jd - b.jd);
+  let prev = null, next = null;
+  for (const t of list) { if (t.jd <= jdUT) prev = t; else { next = t; break; } }
+  return { prev, next };
+}
+function termAround(jdUT) {                     // 前後最近的節氣（含中氣）
+  const Y = fromJD(jdUT).y;
+  const list = [];
+  for (const yy of [Y - 1, Y, Y + 1]) for (const t of termsOfYear(yy)) list.push(t);
+  list.sort((a, b) => a.jd - b.jd);
+  let prev = null, next = null;
+  for (const t of list) { if (t.jd <= jdUT) prev = t; else { next = t; break; } }
+  return { prev, next };
+}
+function solarYearOf(jdUT) {
+  const Y = fromJD(jdUT).y;
+  return jdUT >= termsOfYear(Y)[2].jd ? Y : Y - 1;
+}
+const yearGZ = Y => mod(Y - 1984, 60);
+function monthGZ(yearIdx, mb) {                 // 五虎遁
+  const yinStem = mod((yearIdx % 10 % 5) * 2 + 2, 10);
+  return gzIndex(mod(yinStem + mod(mb - 2, 12), 10), mb);
+}
+function hourGZ(dayIdx, hb) {                   // 五鼠遁
+  return gzIndex(mod((dayIdx % 10 % 5) * 2 + hb, 10), hb);
+}
+
+/* ---------------- 4. 農曆 ---------------- */
+const CN_TZ = 8 / 24;
+const jdToCnDay = jd => Math.floor(jd + 0.5 + CN_TZ);
+const suiCache = new Map();
+function suiMonths(Y) {                         // 冬至(Y-1) 所在月 起，到冬至(Y) 所在月之前
+  if (suiCache.has(Y)) return suiCache.get(Y);
+  const w1 = solarTermJD(Y - 1, 270), w2 = solarTermJD(Y, 270);
+  const ws1 = jdToCnDay(w1), ws2 = jdToCnDay(w2);
+  const k0 = Math.floor((w1 - 2451550.09766) / 29.530588861) - 1;
+  const nms = [];
+  for (let i = 0; i < 17; i++) nms.push(jdToCnDay(newMoonJD(k0 + i)));
+  let s = -1, e = -1;
+  for (let i = 0; i < nms.length - 1; i++) {
+    if (s < 0 && nms[i] <= ws1 && ws1 < nms[i + 1]) s = i;
+    if (e < 0 && nms[i] <= ws2 && ws2 < nms[i + 1]) e = i;
+  }
+  const count = e - s;
+  const zq = [];
+  for (const yy of [Y - 1, Y]) for (const t of termsOfYear(yy)) if (!t.isJie) zq.push(jdToCnDay(t.jd));
+  const months = [];
+  let num = 11, leapDone = false, ly = Y - 1;
+  for (let i = s; i < e; i++) {
+    const a = nms[i], b = nms[i + 1];
+    let leap = false;
+    if (i > s) {
+      if (count === 13 && !leapDone && !zq.some(d => d >= a && d < b)) { leap = true; leapDone = true; }
+      if (!leap) { num = num === 12 ? 1 : num + 1; if (num === 1) ly = Y; }
+    }
+    months.push({ start: a, end: b, num, leap, ly });
+  }
+  suiCache.set(Y, months);
+  return months;
+}
+function lunarOfDay(dn) {
+  const { y } = dayNumToYMD(dn);
+  for (const Y of [y, y + 1]) {
+    for (const m of suiMonths(Y)) if (dn >= m.start && dn < m.end)
+      return { year: m.ly, month: m.num, leap: m.leap, day: dn - m.start + 1, size: m.end - m.start };
+  }
+  return null;
+}
+function lunarMonthsOfYear(ly) {                // 某農曆年的所有月份（含閏月）
+  const out = [];
+  for (const Y of [ly, ly + 1]) for (const m of suiMonths(Y)) if (m.ly === ly) out.push(m);
+  out.sort((a, b) => a.start - b.start);
+  const seen = new Set();
+  return out.filter(m => { const k = m.start; if (seen.has(k)) return false; seen.add(k); return true; });
+}
+function lunarToDayNum(ly, lm, leap, ld) {
+  const m = lunarMonthsOfYear(ly).find(x => x.num === lm && !!x.leap === !!leap);
+  if (!m) return null;
+  return m.start + Math.min(ld, m.end - m.start) - 1;
+}
+const LUNAR_MONTH = ["", "正月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "冬月", "臘月"];
+const LUNAR_DAY = ["", "初一", "初二", "初三", "初四", "初五", "初六", "初七", "初八", "初九", "初十",
+  "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十",
+  "廿一", "廿二", "廿三", "廿四", "廿五", "廿六", "廿七", "廿八", "廿九", "三十"];
+const lunarText = l => l ? `${l.year}年${l.leap ? "閏" : ""}${LUNAR_MONTH[l.month]}${LUNAR_DAY[l.day]}` : "";
+
+/* ---------------- 5. 時間換算 ---------------- */
+const pad2 = n => String(n).padStart(2, "0");
+function jdToClock(jd) {                        // 「本地 JD」→ 年月日時分秒
+  const t = Math.round((jd + 0.5) * 86400);
+  const dayNum = Math.floor(t / 86400);
+  const sec = t - dayNum * 86400;
+  const { y, m, d } = dayNumToYMD(dayNum);
+  return { y, m, d, hh: Math.floor(sec / 3600), mi: Math.floor((sec % 3600) / 60), ss: sec % 60, dayNum };
+}
+const clockToJD = c => toJD(c.y, c.m, c.d, ((c.hh || 0) + (c.mi || 0) / 60 + (c.ss || 0) / 3600) / 24);
+const jdNow = () => 2440587.5 + Date.now() / 86400000;
+function addCalendar(c, Y, M, D, H, Mi) {      // 按年、月、日、時順加
+  let y = c.y + (Y || 0), m = c.m + (M || 0);
+  while (m > 12) { m -= 12; y += 1; }
+  const base = toJD(y, m, 1, 0) + (c.d - 1) + ((c.hh || 0) + (c.mi || 0) / 60 + (c.ss || 0) / 3600) / 24;
+  return jdToClock(base + (D || 0) + ((H || 0) + (Mi || 0) / 60) / 24);
+}
+const hourBranchOf = hh => Math.floor((hh + 1) / 2) % 12;
+const SHICHEN_RANGE = b => b === 0 ? "23–01" : `${pad2(2 * b - 1)}–${pad2(2 * b + 1)}`;
+
+/* ---------------- 6. 排盤主體 ---------------- */
+/*
+ input = { name, sex:'m'|'f', y,m,d,hh,mi,ss, tz(小時), dst, lon, lat, trueSolar, zishi:'day23'|'split' }
+ 年、月柱以絕對時刻比對節氣；日、時柱以（真太陽時或標準時）鐘面讀數決定。
+*/
+function buildChart(inp) {
+  const tz = inp.tz == null ? 8 : +inp.tz;
+  const civil = { y: inp.y, m: inp.m, d: inp.d, hh: inp.hh || 0, mi: inp.mi || 0, ss: inp.ss || 0 };
+  const jdCivil = clockToJD(civil);
+  const jdUT = jdCivil - tz / 24 - (inp.dst ? 1 / 24 : 0);
+  const jdStd = jdUT + tz / 24;                                  // 標準時（已去掉夏令時）
+  let jdClock = jdStd, solarOffsetMin = 0, eot = 0;
+  const lon = inp.lon == null ? tz * 15 : +inp.lon;
+  if (inp.trueSolar) {
+    eot = equationOfTime(jdUT);
+    solarOffsetMin = (lon - tz * 15) * 4 + eot;
+    jdClock = jdStd + solarOffsetMin / 1440;
+  }
+  const clock = jdToClock(jdClock);
+  const std = jdToClock(jdStd);
+
+  // 年、月
+  const solarYear = solarYearOf(jdUT);
+  const yi = yearGZ(solarYear);
+  const { prev: prevJie, next: nextJie } = jieAround(jdUT);
+  const mb = prevJie.branch;
+  const mi = monthGZ(yi, mb);
+  // 日、時
+  const zishi = inp.zishi || "day23";
+  let dayNum = clock.dayNum;
+  const hb = hourBranchOf(clock.hh);
+  let hourDay = dayNum;
+  if (clock.hh >= 23) {
+    if (zishi === "day23") { dayNum += 1; hourDay = dayNum; }
+    else { hourDay = dayNum + 1; }                              // 夜子時：日柱不換，時干用次日
+  }
+  const di = dayGZ(dayNum);
+  const hi = hourGZ(dayGZ(hourDay), hb);
+  const pillars = [yi, mi, di, hi];
+  const dm = di % 10;
+
+  // 農曆（以鐘面日期）
+  const lunar = lunarOfDay(clock.dayNum);
+
+  // 起運
+  const male = inp.sex !== "f";
+  const forward = ganYang(yi % 10) === male;                    // 陽男陰女順
+  const target = forward ? nextJie : prevJie;
+  const diffMin = Math.abs(target.jd - jdUT) * 1440;
+  let rem = diffMin * 120;                                      // 三天折一年 ⇔ 時間 ×120
+  const qY = Math.floor(rem / 518400); rem -= qY * 518400;      // 每年 360 天
+  const qM = Math.floor(rem / 43200); rem -= qM * 43200;        // 每月 30 天
+  const qD = Math.floor(rem / 1440); rem -= qD * 1440;
+  const qH = Math.floor(rem / 60);
+  const jiao = addCalendar(std, qY, qM, qD, qH);                // 交運（標準時）
+  const jiaoJD = clockToJD(jiao) - tz / 24;
+  const jiaoSolarYear = solarYearOf(jiaoJD);
+  const jiaoStem = yearGZ(jiaoSolarYear) % 10;
+  const jiaoJie = jieAround(jiaoJD).prev;
+  const jiaoLichun = termsOfYear(jiaoSolarYear)[2];
+  const birthYear = civil.y;
+  const dayun = [];
+  for (let k = 0; k < 10; k++) {
+    const st = addCalendar(jiao, 10 * k, 0, 0, 0);
+    dayun.push({
+      k, idx: mod(mi + (forward ? 1 : -1) * (k + 1), 60),
+      startYear: jiao.y + 10 * k, startAge: jiao.y + 10 * k - birthYear + 1,
+      startJD: clockToJD(st) - tz / 24
+    });
+  }
+  const yun = {
+    forward, diffMin, Y: qY, M: qM, D: qD, H: qH, target,
+    jiao, jiaoJD, jiaoStems: [jiaoStem, mod(jiaoStem + 5, 10)],
+    jiaoJieName: jiaoJie.name, jiaoDaysAfterJie: Math.floor(jiaoJD - jiaoJie.jd),
+    jiaoDaysAfterLichun: Math.floor(jiaoJD - jiaoLichun.jd),
+    xiaoYunFrom: birthYear, xiaoYunTo: Math.max(birthYear, jiao.y - 1),
+    dayun
+  };
+
+  // 司令、旺衰、交節
+  const daysSinceJie = jdUT - prevJie.jd;
+  const siling = siLing(mb, daysSinceJie);
+  const ta = termAround(jdUT);
+  const nearJie = (jdUT - prevJie.jd) < (nextJie.jd - jdUT) ? { t: prevJie, after: true, dist: jdUT - prevJie.jd } : { t: nextJie, after: false, dist: nextJie.jd - jdUT };
+  const boundary = nearJie.dist < 1 ? nearJie : null;
+
+  // 胎命身
+  const extra = taiMingShen(pillars);
+
+  return {
+    input: Object.assign({}, inp), tz, lon, lat: inp.lat, civil, std, clock, jdUT, jdClock, solarOffsetMin, eot,
+    trueSolar: !!inp.trueSolar, dst: !!inp.dst, zishi, sex: male ? "m" : "f", male,
+    pillars, dm, solarYear, lunar, prevJie, nextJie, termAround: ta, daysSinceJie, siling, boundary,
+    monthBranch: mb, wangxiang: wangXiang(mb), shengxiao: SHENGXIAO[yi % 12],
+    yun, extra, birthYear, hourClockBranch: hb
+  };
+}
+
+/* 只憑四柱成盤（找不到日期時使用；無大運） */
+function chartFromPillars(p, sex) {
+  const male = sex !== "f";
+  return {
+    input: { mode: "sizhu" }, pillarsOnly: true, pillars: p.slice(), dm: p[2] % 10, sex: male ? "m" : "f", male,
+    monthBranch: p[1] % 12, wangxiang: wangXiang(p[1] % 12), shengxiao: SHENGXIAO[p[0] % 12], extra: taiMingShen(p)
+  };
+}
+
+/* 胎元、命宮、身宮、胎息 */
+function taiMingShen(p) {
+  const [yi, mi, di, hi] = p;
+  const taiyuan = gzIndex(mod(mi % 10 + 1, 10), mod(mi % 12 + 3, 12));
+  const m1 = mod(mi % 12 - 2, 12) + 1, t1 = mod(hi % 12 - 2, 12) + 1;   // 寅=1 … 丑=12
+  const mingN = mod(26 - (m1 + t1) - 1, 12) + 1;
+  const shenN = mod(2 + (m1 + t1) - 1, 12) + 1;
+  const withStem = n => { const b = mod(n + 1, 12); return monthGZ(yi, b); }; // 五虎遁
+  const taixi = gzIndex(mod(di % 10 + 5, 10), mod(1 - di % 12, 12));
+  return { taiyuan, minggong: withStem(mingN), shengong: withStem(shenN), taixi };
+}
+
+/* ---------------- 7. 歲運 ---------------- */
+function currentDayunIndex(chart, jdUT) {       // -1 表示小運期
+  const dy = chart.yun.dayun;
+  let k = -1;
+  for (let i = 0; i < dy.length; i++) if (jdUT >= dy[i].startJD) k = i;
+  return k;
+}
+function dayunIndexForYear(chart, Y) {          // 以年份（大運起始年）歸屬
+  const dy = chart.yun.dayun;
+  let k = -1;
+  for (let i = 0; i < dy.length; i++) if (Y >= dy[i].startYear) k = i;
+  return k;
+}
+function xiaoYun(chart, Y) {
+  const age = Y - chart.birthYear + 1;
+  return mod(chart.pillars[3] + (chart.yun.forward ? 1 : -1) * age, 60);
+}
+function liuYue(Y, tzHours) {                   // 某流年的 12 個月（立春起）
+  const tz = tzHours == null ? 8 : tzHours;
+  const cur = termsOfYear(Y), nxt = termsOfYear(Y + 1);
+  const yi = yearGZ(Y);
+  const out = [];
+  for (let k = 0; k < 12; k++) {
+    const t = k < 11 ? cur[2 + 2 * k] : nxt[0];
+    const t2 = k < 10 ? cur[4 + 2 * k] : (k === 10 ? nxt[0] : nxt[2]);
+    const b = mod(2 + k, 12);
+    const c = jdToClock(t.jd + tz / 24), c2 = jdToClock(t2.jd + tz / 24);
+    out.push({ k, name: t.name, jd: t.jd, endJD: t2.jd, branch: b, idx: monthGZ(yi, b), clock: c, startDay: c.dayNum, endDay: c2.dayNum - 1 });
+  }
+  return out;
+}
+function liuRi(month) {
+  const out = [];
+  for (let dn = month.startDay; dn <= month.endDay; dn++) { const o = dayNumToYMD(dn); out.push({ dayNum: dn, y: o.y, m: o.m, d: o.d, idx: dayGZ(dn) }); }
+  return out;
+}
+function liuShi(dayNum) {
+  const di = dayGZ(dayNum);
+  const out = [];
+  for (let b = 0; b < 12; b++) out.push({ branch: b, idx: hourGZ(di, b), range: SHICHEN_RANGE(b) });
+  return out;
+}
+/* 「此刻」：以本地時間（tz 小時）定流年、流月、流日、流時（23 點換日） */
+function momentOf(jdUT, tzHours) {
+  const tz = tzHours == null ? 8 : tzHours;
+  const c = jdToClock(jdUT + tz / 24);
+  let dayNum = c.dayNum; if (c.hh >= 23) dayNum += 1;
+  const Y = solarYearOf(jdUT);
+  const months = liuYue(Y, tz);
+  let mk = 0; for (const m of months) if (jdUT >= m.jd) mk = m.k;
+  return { Y, monthK: mk, dayNum, hourBranch: hourBranchOf(c.hh), clock: c };
+}
+
+/* ---------------- 8. 神煞 ---------------- */
+const TIANYI = { 0: [1, 7], 4: [1, 7], 6: [1, 7], 1: [0, 8], 5: [0, 8], 2: [11, 9], 3: [11, 9], 8: [3, 5], 9: [3, 5], 7: [6, 2] };
+const TAIJI = { 0: [0, 6], 1: [0, 6], 2: [3, 9], 3: [3, 9], 4: [4, 10, 1, 7], 5: [4, 10, 1, 7], 6: [2, 11], 7: [2, 11], 8: [5, 8], 9: [5, 8] };
+const WENCHANG = [5, 6, 8, 9, 8, 9, 11, 0, 2, 3];
+const TIANDE = { 2: ["g", 3], 3: ["z", 8], 4: ["g", 8], 5: ["g", 7], 6: ["z", 11], 7: ["g", 0], 8: ["g", 9], 9: ["z", 2], 10: ["g", 2], 11: ["g", 1], 0: ["z", 5], 1: ["g", 6] };
+const juGroup = b => b % 4;                                   // 0 申子辰 1 巳酉丑 2 寅午戌 3 亥卯未
+const juStart = grp => mod(8 - 3 * grp, 12);                  // 長生位
+const JU_WX = [4, 3, 1, 0];                                   // 水 金 火 木
+const SHENSHA_ORDER = ["天乙貴人", "太極貴人", "文昌貴人", "天德貴人", "月德貴人", "祿神", "羊刃", "桃花", "紅鸞", "天喜", "驛馬", "華蓋", "空亡"];
+function shensha(chart, g, b) {
+  const p = chart.pillars, ds = chart.dm, ys = p[0] % 10, yb = p[0] % 12, dbr = p[2] % 12, mbr = p[1] % 12;
+  const out = new Set();
+  if (TIANYI[ds].includes(b) || TIANYI[ys].includes(b)) out.add("天乙貴人");
+  if (TAIJI[ds].includes(b) || TAIJI[ys].includes(b)) out.add("太極貴人");
+  if (WENCHANG[ds] === b || WENCHANG[ys] === b) out.add("文昌貴人");
+  const td = TIANDE[mbr];
+  if ((td[0] === "g" && g === td[1]) || (td[0] === "z" && b === td[1])) out.add("天德貴人");
+  if (g === 2 * JU_WX[juGroup(mbr)]) out.add("月德貴人");
+  if (b === luOf(ds)) out.add("祿神");
+  if (b === yangRenOf(ds)) out.add("羊刃");
+  for (const ref of [yb, dbr]) {
+    const st = juStart(juGroup(ref));
+    if (b === mod(st + 1, 12)) out.add("桃花");
+    if (b === mod(st + 6, 12)) out.add("驛馬");
+    if (b === mod(st + 8, 12)) out.add("華蓋");
+  }
+  if (b === mod(3 - yb, 12)) out.add("紅鸞");
+  if (b === mod(9 - yb, 12)) out.add("天喜");
+  if (xunKong(p[2]).includes(b) || xunKong(p[0]).includes(b)) out.add("空亡");
+  return SHENSHA_ORDER.filter(n => out.has(n));
+}
+
+/* ---------------- 9. 干支關係 ---------------- */
+const LIUHE_HUA = { 0: 2, 2: 0, 3: 1, 4: 3, 5: 4, 6: 2 };      // 子丑土 寅亥木 卯戌火 辰酉金 巳申水 午未土
+const FANG_START = [2, 8, 5, 11];                            // 三合局 → 所刑之方
+function xingTarget(b) {
+  const grp = juGroup(b), role = mod(b - juStart(grp), 12) / 4;
+  return mod(FANG_START[grp] + role, 12);
+}
+const isXing = (a, b) => xingTarget(a) === b || xingTarget(b) === a;
+const ANHE = new Set(["0-5", "0-10", "1-2", "3-8", "6-11"]);  // 子巳 子戌 丑寅 卯申 午亥
+const juRole = b => mod(b - juStart(juGroup(b)), 12) / 4;     // 0 生 1 旺 2 墓
+
+const TYPE_LABEL = {
+  sanhui: "三會", sanhe: "三合", chong: "沖", liuhe: "六合", sanxing: "三刑", xing: "刑", banhe: "半合",
+  gonghe: "拱合", hai: "害", po: "破", anhe: "暗合", ganhe: "天干五合", ganchong: "天干四沖", ganke: "天干相剋"
+};
+
+/* items: [{key,label,kind:'natal'|'dyn', pos?, layer?, side?, idx}] → 原始關係清單 */
+function findRelations(items) {
+  const rel = [];
+  const n = items.length;
+  const G = items.map(it => it.idx % 10), B = items.map(it => it.idx % 12);
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const a = G[i], b = G[j];
+    const lo = a <= b ? i : j, hi = lo === i ? j : i;
+    const d = Math.abs(a - b);
+    if (d === 5) rel.push({ cat: "gan", type: "ganhe", m: [lo, hi], text: `${GAN[G[lo]]}${GAN[G[hi]]}合`, hua: mod(Math.min(a, b) + 2, 5) });
+    else if (d === 6) rel.push({ cat: "gan", type: "ganchong", m: [lo, hi], text: `${GAN[G[lo]]}${GAN[G[hi]]}相沖` });
+    else if (d === 4) {
+      const ki = mod(ganWx(a) + 2, 5) === ganWx(b) ? i : j, kj = ki === i ? j : i;
+      rel.push({ cat: "gan", type: "ganke", m: [ki, kj], text: `${GAN[G[ki]]}${GAN[G[kj]]}相剋` });
+    }
+  }
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const a = B[i], b = B[j];
+    const sm = a <= b ? i : j, lg = sm === i ? j : i;
+    const S = ZHI[B[sm]], L = ZHI[B[lg]];
+    if (a !== b && mod(a + b, 12) === 1) rel.push({ cat: "zhi", type: "liuhe", m: [sm, lg], text: `${S}${L}合`, hua: LIUHE_HUA[Math.min(a, b)] });
+    if (Math.abs(a - b) === 6) rel.push({ cat: "zhi", type: "chong", m: [sm, lg], text: `${S}${L}相沖` });
+    if (a === b && xingTarget(a) === a) rel.push({ cat: "zhi", type: "xing", m: [i, j], text: `${ZHI[a]}${ZHI[a]}相刑`, self: true });
+    else if (a !== b && isXing(a, b)) {
+      const both = xingTarget(a) === b && xingTarget(b) === a;
+      const f = both ? sm : (xingTarget(a) === b ? i : j), t = f === i ? j : i;
+      rel.push({ cat: "zhi", type: "xing", m: [f, t], text: `${ZHI[B[f]]}${ZHI[B[t]]}相刑` });
+    }
+    if (a !== b && mod(a + b, 12) === 7) rel.push({ cat: "zhi", type: "hai", m: [sm, lg], text: `${S}${L}相害` });
+    if (a !== b && mod(b - a, 12) === (zhiYang(a) ? 9 : 3)) {
+      const f = zhiYang(a) ? i : j, t = f === i ? j : i;
+      rel.push({ cat: "zhi", type: "po", m: [f, t], text: `${ZHI[B[f]]}${ZHI[B[t]]}相破` });
+    }
+    if (a !== b && juGroup(a) === juGroup(b)) {
+      const ra = juRole(a), rb = juRole(b);
+      const f = ra < rb ? i : j, t = f === i ? j : i;
+      const wx = JU_WX[juGroup(a)];
+      if (Math.abs(ra - rb) === 1) rel.push({ cat: "zhi", type: "banhe", m: [f, t], text: `${ZHI[B[f]]}${ZHI[B[t]]}半合`, hua: wx, ju: true });
+      else rel.push({ cat: "zhi", type: "gonghe", m: [f, t], text: `${ZHI[B[f]]}${ZHI[B[t]]}拱合`, hua: wx, ju: true });
+    }
+    if (a !== b && ANHE.has(`${Math.min(a, b)}-${Math.max(a, b)}`)) rel.push({ cat: "zhi", type: "anhe", m: [sm, lg], text: `${S}${L}暗合` });
+  }
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) for (let k = j + 1; k < n; k++) {
+    const t = [i, j, k], bs = t.map(x => B[x]);
+    if (new Set(bs).size !== 3) continue;
+    if (bs.every(x => juGroup(x) === juGroup(bs[0]))) {
+      const ord = t.slice().sort((p, q) => juRole(B[p]) - juRole(B[q]));
+      rel.push({ cat: "zhi", type: "sanhe", m: ord, text: ord.map(x => ZHI[B[x]]).join("") + "三合", hua: JU_WX[juGroup(bs[0])], ju: true });
+    }
+    if (bs.every(x => zhiSeason(x) === zhiSeason(bs[0]))) {
+      const ord = t.slice().sort((p, q) => mod(B[p] - 2, 12) - mod(B[q] - 2, 12));
+      rel.push({ cat: "zhi", type: "sanhui", m: ord, text: ord.map(x => ZHI[B[x]]).join("") + "三會", hua: SEASON_WX[zhiSeason(bs[0])], fang: true });
+    }
+    const key = bs.slice().sort((p, q) => p - q).join(",");
+    if (key === "2,5,8" || key === "1,7,10") {
+      const ordRef = key === "2,5,8" ? [2, 5, 8] : [1, 10, 7];
+      const ord = ordRef.map(v => t[bs.indexOf(v)]);
+      rel.push({ cat: "zhi", type: "sanxing", m: ord, text: ord.map(x => ZHI[B[x]]).join("") + "三刑" });
+    }
+  }
+  return rel;
+}
+
+/* 權重預設值 */
+const DEFAULT_WEIGHTS = {
+  type: { sanhui: 10, sanhe: 9, chong: 8, liuhe: 7, sanxing: 7, xing: 6, banhe: 5, gonghe: 4.5, hai: 4, po: 3, anhe: 2, ganhe: 8, ganchong: 8, ganke: 5 },
+  pos: { adj: 1.0, gap1: 0.7, gap2: 0.5, day: 1.2 },
+  layer: { dayun: 1.0, xiaoyun: 0.7, liunian: 0.85, liuyue: 0.6, liuri: 0.4, liushi: 0.25, dyndyn: 0.8 },
+  he: { dayStem: 1.5, dayBranch: 1.3, oneDay: 1.0, same: 0.8, other: 0.6 },
+  power: { ling: 1.2, kong: 0.7 },
+  view: { top: 5, fold: 3.0 }
+};
+
+/*
+ ctx = { mode:'single'|'pair', charts: {A: chart, B?: chart} }
+ items 帶 side（'A'|'B'|'T'），T 為雙方共用的流年月日時
+*/
+function scoreRelations(raw, items, ctx, W) {
+  const out = [];
+  const isNatal = it => it.kind === "natal";
+  const distCoef = (p, q) => [0, W.pos.adj, W.pos.gap1, W.pos.gap2][Math.abs(p - q)] || W.pos.gap2;
+  for (const r of raw) {
+    const mem = r.m.map(x => items[x]);
+    const natal = mem.filter(isNatal), dyn = mem.filter(x => !isNatal(x));
+    let pos;
+    if (ctx.mode === "pair") {
+      const sides = new Set(mem.filter(x => x.side !== "T").map(x => x.side));
+      if (!(sides.has("A") && sides.has("B"))) continue;          // 合盤只看兩人之間
+      if (!dyn.length) {
+        let sum = 0, cnt = 0;
+        for (let i = 0; i < mem.length; i++) for (let j = i + 1; j < mem.length; j++) {
+          const x = mem[i], y = mem[j];
+          let f;
+          if (x.side === y.side) f = distCoef(x.pos, y.pos) * ((x.pos === 2 || y.pos === 2) ? W.pos.day : 1);
+          else if (x.pos === 2 && y.pos === 2) f = r.cat === "gan" ? W.he.dayStem : W.he.dayBranch;
+          else if (x.pos === 2 || y.pos === 2) f = W.he.oneDay;
+          else if (x.pos === y.pos) f = W.he.same;
+          else f = W.he.other;
+          sum += f; cnt++;
+        }
+        pos = sum / cnt;
+      } else {
+        const lc = Math.min(...dyn.map(x => W.layer[x.layer]));
+        pos = lc * (natal.some(x => x.pos === 2) ? W.pos.day : 1) * (natal.length ? 1 : W.layer.dyndyn);
+      }
+    } else {
+      if (!dyn.length) {
+        let sum = 0, cnt = 0;
+        for (let i = 0; i < natal.length; i++) for (let j = i + 1; j < natal.length; j++) { sum += distCoef(natal[i].pos, natal[j].pos); cnt++; }
+        pos = (sum / cnt) * (natal.some(x => x.pos === 2) ? W.pos.day : 1);
+      } else {
+        const lc = Math.min(...dyn.map(x => W.layer[x.layer]));
+        pos = lc * (natal.some(x => x.pos === 2) ? W.pos.day : 1) * (natal.length ? 1 : W.layer.dyndyn);
+      }
+    }
+    // 力量
+    let power = 1; const notes = [];
+    if (r.hua != null) {
+      const months = ctx.mode === "pair" ? [ctx.charts.A, ctx.charts.B] : [ctx.charts.A];
+      let bonus = 0;
+      for (const c of months) {
+        const w = zhiWx(c.monthBranch);
+        if (r.hua === w) bonus = Math.max(bonus, W.power.ling - 1);
+        else if (r.hua === mod(w + 1, 5)) bonus = Math.max(bonus, (W.power.ling - 1) / 2);
+      }
+      if (bonus > 0) { power *= 1 + bonus; notes.push(bonus >= W.power.ling - 1 - 1e-9 ? "化神得令" : "化神得相"); }
+    }
+    if (r.cat === "zhi") {
+      const kongHit = mem.some(x => {
+        const c = ctx.charts[x.side === "B" ? "B" : "A"];
+        if (x.side === "T") return [ctx.charts.A, ctx.charts.B].filter(Boolean).some(cc => xunKong(cc.pillars[2]).includes(x.idx % 12));
+        return xunKong(c.pillars[2]).includes(x.idx % 12);
+      });
+      if (kongHit) { power *= W.power.kong; notes.push("旬空"); }
+    }
+    const typeScore = W.type[r.type];
+    const score = typeScore * pos * power;
+    out.push(Object.assign({}, r, { members: mem, typeScore, pos, power, score, notes, now: dyn.length > 0 }));
+  }
+  out.sort((a, b) => b.score - a.score);
+  return out;
+}
+
+/* 留意（精簡字串，去重） */
+const ORDER_GAN = ["ganhe", "ganchong", "ganke"];
+const ORDER_ZHI = ["sanhui", "sanhe", "liuhe", "banhe", "gonghe", "anhe", "chong", "sanxing", "xing", "hai", "po"];
+function relText(r) {
+  if (r.type === "ganhe" || r.type === "liuhe") return `${r.text}（理論化${WX[r.hua]}）`;
+  if (r.type === "sanhe" || r.type === "banhe" || r.type === "gonghe") return `${r.text}（${WX[r.hua]}局）`;
+  if (r.type === "sanhui") return `${r.text}（${WX[r.hua]}方）`;
+  return r.text;
+}
+function attention(raw) {
+  const gan = [], zhi = [];
+  for (const t of ORDER_GAN) for (const r of raw) if (r.type === t) { const s = relText(r); if (!gan.includes(s)) gan.push(s); }
+  for (const t of ORDER_ZHI) for (const r of raw) if (r.type === t) { const s = relText(r); if (!zhi.includes(s)) zhi.push(s); }
+  return { gan, zhi };
+}
+
+/* ---------------- 10. 四柱反查日期 ---------------- */
+function searchPillars(p, opt) {
+  opt = opt || {};
+  const from = opt.from || 1801, to = opt.to || 2100, tz = opt.tz == null ? 8 : opt.tz, limit = opt.limit || 40;
+  const [yi, mi, di, hi] = p;
+  if (monthGZ(yi, mi % 12) !== mi) return { error: "月柱與年柱不合（五虎遁）", list: [] };
+  if (hourGZ(di, hi % 12) !== hi) return { error: "時柱與日柱不合（五鼠遁）", list: [] };
+  const out = [];
+  const mb = mi % 12, hb = hi % 12;
+  for (let S = from - 1; S <= to; S++) {
+    if (yearGZ(S) !== yi) continue;
+    const months = liuYue(S, tz);
+    const M = months.find(m => m.branch === mb);
+    for (let dn = M.startDay - 1; dn <= M.endDay + 1; dn++) {
+      if (dayGZ(dn) !== di) continue;
+      // 時辰窗口（本地標準時，23 點換日）
+      const o = dayNumToYMD(dn);
+      const startLocal = toJD(o.y, o.m, o.d, 0) + (hb === 0 ? -1 / 24 : (2 * hb - 1) / 24);
+      const a = Math.max(startLocal - tz / 24, M.jd), b = Math.min(startLocal + 2 / 24 - tz / 24, M.endJD);
+      if (b <= a) continue;
+      const midUT = (a + b) / 2;
+      const c1 = jdToClock(a + tz / 24), c2 = jdToClock(b + tz / 24), cm = jdToClock(Math.round((midUT + tz / 24) * 1440) / 1440);
+      if (c1.y < from || c1.y > to) continue;
+      out.push({ fromJD: a, toJD: b, from: c1, to: c2, mid: cm, cut: (b - a) < 2 / 24 - 1e-6 });
+      if (out.length >= limit) break;
+    }
+  }
+  return { error: null, list: out };
+}
+
+/* ---------------- 匯出 ---------------- */
+return {
+  GAN, ZHI, WX, SHENGXIAO, CS, CANG, SS_ABBR, TERM_NAMES, LUNAR_MONTH, LUNAR_DAY, TYPE_LABEL, DEFAULT_WEIGHTS, SHENSHA_ORDER,
+  mod, ganWx, ganYang, zhiWx, zhiYang, zhiSeason, gzIndex, gzName, gOf, bOf, tenGod, zhiTenGod, changSheng, csStep, luOf, yangRenOf,
+  xunKong, nayin, nayinWx, NAYIN_NAMES, wangXiang, siLing,
+  toJD, fromJD, ymdToDayNum, dayNumToYMD, dayGZ, monthLen, deltaT, apparentSunLon, solarTermJD, newMoonJD, equationOfTime,
+  termsOfYear, jieAround, termAround, solarYearOf, yearGZ, monthGZ, hourGZ,
+  suiMonths, lunarOfDay, lunarMonthsOfYear, lunarToDayNum, lunarText,
+  jdToClock, clockToJD, jdNow, addCalendar, hourBranchOf, SHICHEN_RANGE, pad2,
+  buildChart, chartFromPillars, taiMingShen, currentDayunIndex, dayunIndexForYear, xiaoYun, liuYue, liuRi, liuShi, momentOf,
+  shensha, findRelations, scoreRelations, attention, relText, xingTarget, searchPillars
+};
+})();
+if (typeof module !== "undefined") module.exports = Bazi;
+
+/* ===== ENGINE END ===== */
+/* ===== 介面 ===== */
+(() => {
+"use strict";
+const B = Bazi;
+const { GAN, ZHI, WX, pad2, mod } = B;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 無痕或封鎖 */ } }
+};
+const localTz = () => -new Date().getTimezoneOffset() / 60;
+const gS = g => `<span class="w${B.ganWx(g)}">${GAN[g]}</span>`;
+const zS = b => `<span class="w${B.zhiWx(b)}">${ZHI[b]}</span>`;
+const gzH = i => gS(i % 10) + zS(i % 12);
+const ssAbbr = (dm, g) => B.SS_ABBR[B.tenGod(dm, g)];
+const zAbbr = (dm, b) => B.SS_ABBR[B.zhiTenGod(dm, b)];
+const fmtCN = c => `${c.y}年${pad2(c.m)}月${pad2(c.d)}日 ${pad2(c.hh)}:${pad2(c.mi)}`;
+const fmtDash = c => `${c.y}-${pad2(c.m)}-${pad2(c.d)} ${pad2(c.hh)}:${pad2(c.mi)}`;
+const fmtDate = c => `${c.y}-${pad2(c.m)}-${pad2(c.d)}`;
+function tzText(tz) {
+  if (tz === 8) return "北京時間";
+  const a = Math.abs(tz), h = Math.floor(a), m = Math.round((a - h) * 60);
+  return `UTC${tz < 0 ? "−" : "+"}${h}${m ? ":" + pad2(m) : ""}`;
+}
+const tzOption = tz => { const a = Math.abs(tz), h = Math.floor(a), m = Math.round((a - h) * 60); return `UTC${tz < 0 ? "−" : "+"}${h}${m ? ":" + pad2(m) : ""}`; };
+const lonText = v => `${v < 0 ? "西經" : "東經"}${Math.abs(v).toFixed(2)}°`;
+const latText = v => `${v < 0 ? "南緯" : "北緯"}${Math.abs(v).toFixed(2)}°`;
+function durText(days) {
+  const t = Math.round(days * 1440);
+  const d = Math.floor(t / 1440), h = Math.floor((t % 1440) / 60), mi = t % 60;
+  return `${d ? d + "天" : ""}${h ? h + "時" : ""}${mi ? mi + "分" : ""}` || "0分";
+}
+const newId = () => "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+const PLACES = [
+  ["未知地（北京時間）", 120, 39, 8], ["北京", 116.41, 39.9, 8], ["上海", 121.47, 31.23, 8], ["天津", 117.2, 39.08, 8], ["重慶", 106.55, 29.56, 8],
+  ["哈爾濱", 126.53, 45.8, 8], ["長春", 125.32, 43.82, 8], ["瀋陽", 123.43, 41.8, 8], ["大連", 121.61, 38.91, 8], ["呼和浩特", 111.75, 40.84, 8],
+  ["石家莊", 114.51, 38.04, 8], ["太原", 112.55, 37.87, 8], ["濟南", 117.12, 36.65, 8], ["青島", 120.38, 36.07, 8], ["鄭州", 113.62, 34.75, 8],
+  ["西安", 108.94, 34.34, 8], ["蘭州", 103.83, 36.06, 8], ["銀川", 106.23, 38.49, 8], ["西寧", 101.78, 36.62, 8], ["烏魯木齊", 87.62, 43.83, 8],
+  ["拉薩", 91.11, 29.65, 8], ["成都", 104.07, 30.57, 8], ["昆明", 102.83, 24.88, 8], ["貴陽", 106.63, 26.65, 8], ["南寧", 108.37, 22.82, 8],
+  ["廣州", 113.26, 23.13, 8], ["深圳", 114.06, 22.54, 8], ["香港", 114.17, 22.32, 8], ["澳門", 113.54, 22.2, 8], ["海口", 110.32, 20.04, 8],
+  ["福州", 119.3, 26.08, 8], ["廈門", 118.09, 24.48, 8], ["台北", 121.56, 25.04, 8], ["台中", 120.68, 24.15, 8], ["高雄", 120.31, 22.63, 8],
+  ["南昌", 115.86, 28.68, 8], ["長沙", 112.94, 28.23, 8], ["武漢", 114.31, 30.59, 8], ["合肥", 117.23, 31.82, 8], ["南京", 118.8, 32.06, 8],
+  ["杭州", 120.16, 30.27, 8], ["蘇州", 120.58, 31.3, 8], ["新加坡", 103.82, 1.35, 8], ["吉隆坡", 101.69, 3.14, 8], ["曼谷", 100.5, 13.76, 7],
+  ["東京", 139.69, 35.69, 9], ["首爾", 126.98, 37.57, 9], ["雪梨", 151.21, -33.87, 10], ["倫敦", -0.13, 51.51, 0], ["巴黎", 2.35, 48.86, 1],
+  ["紐約", -74.01, 40.71, -5], ["多倫多", -79.38, 43.65, -5], ["洛杉磯", -118.24, 34.05, -8], ["舊金山", -122.42, 37.77, -8], ["溫哥華", -123.12, 49.28, -8]
+];
+const TZS = [-12, -11, -10, -9.5, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0, 1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 5.75, 6, 6.5, 7, 8, 8.75, 9, 9.5, 10, 10.5, 11, 12, 12.75, 13, 14];
+
+/* ---------- 權重 ---------- */
+const WMETA = [
+  { g: "type", title: "關係類型分", min: 0, max: 12, step: 0.5, items: [["sanhui", "三會"], ["sanhe", "三合"], ["chong", "沖"], ["liuhe", "六合"], ["sanxing", "三刑（三支全）"], ["xing", "刑（含自刑）"], ["banhe", "半合"], ["gonghe", "拱合（生墓）"], ["hai", "害"], ["po", "破"], ["anhe", "暗合"], ["ganhe", "天干五合"], ["ganchong", "天干四沖"], ["ganke", "天干相剋"]] },
+  { g: "pos", title: "位置係數（原局）", min: 0, max: 2, step: 0.05, items: [["adj", "相鄰柱"], ["gap1", "隔一柱"], ["gap2", "隔兩柱"], ["day", "牽到日柱"]] },
+  { g: "layer", title: "動態層係數", min: 0, max: 1.5, step: 0.05, items: [["dayun", "大運"], ["xiaoyun", "小運"], ["liunian", "流年"], ["liuyue", "流月"], ["liuri", "流日"], ["liushi", "流時"], ["dyndyn", "歲運之間"]] },
+  { g: "he", title: "合盤位置係數", min: 0, max: 2, step: 0.05, items: [["dayStem", "日干×日干"], ["dayBranch", "日支×日支"], ["oneDay", "一方是日柱"], ["same", "同柱位"], ["other", "其他柱位"]] },
+  { g: "power", title: "力量係數", min: 0, max: 2, step: 0.05, items: [["ling", "化神得令", 1, 2], ["kong", "旬空折減", 0, 1]] },
+  { g: "view", title: "顯示", items: [["top", "置頂條數", 3, 5, 1], ["fold", "折疊門檻（分）", 0, 6, 0.5]] }
+];
+/* ---------- 主題 ---------- */
+const WX_LIGHT = { mu: "#1A973D", huo: "#D2261E", tu: "#8A681B", jin: "#D5820A", shui: "#2B62D5" };
+const WX_DARK = { mu: "#58CF78", huo: "#FF6B5E", tu: "#D4AA5E", jin: "#F2AA3A", shui: "#73A2FF" };
+const THEMES = [
+  { id: "yuebai", name: "月白", bg: "#F3F4F6", card: "#FFFFFF", ink: "#1F2328", accent: "#4A5B8C", bar: "#1F2430", barInk: "#E6EAF2" },
+  { id: "subai", name: "素白", bg: "#F6F6F5", card: "#FFFFFF", ink: "#1C1C1C", accent: "#56606B", bar: "#FFFFFF", barInk: "#1C1C1C" },
+  { id: "qingci", name: "青瓷", bg: "#EDF3F1", card: "#FCFEFD", ink: "#1D2B28", accent: "#3A8578", bar: "#1C302D", barInk: "#DDEFEA" },
+  { id: "wulan", name: "霧藍", bg: "#EDF1F7", card: "#FFFFFF", ink: "#1B2433", accent: "#3567B0", bar: "#162238", barInk: "#DCE6F5" },
+  { id: "bingjing", name: "冰晶", bg: "#F1EFFA", card: "#FFFFFF", ink: "#221F33", accent: "#7563C6", bar: "#231D3B", barInk: "#E9E4FF" },
+  { id: "nuancheng", name: "暖橙", bg: "#FAF3EC", card: "#FFFFFF", ink: "#2A1E16", accent: "#D2703A", bar: "#2A1C14", barInk: "#FBE4D2" },
+  { id: "yanzhi", name: "胭脂", bg: "#F9F0F1", card: "#FFFFFF", ink: "#2B1D20", accent: "#B04559", bar: "#2D191D", barInk: "#F6DCE1" },
+  { id: "xuanzhi", name: "宣紙金", bg: "#F2F1ED", card: "#FFFFFF", ink: "#24211C", accent: "#A98A50", bar: "#1C1A16", barInk: "#EBDDBC" },
+  { id: "moye", name: "墨夜", bg: "#111214", card: "#1A1C20", ink: "#E8EAED", accent: "#8AB4F8", bar: "#0B0C0E", barInk: "#DDE3EC" },
+  { id: "yejin", name: "夜金", bg: "#11100E", card: "#1A1916", ink: "#ECE6DA", accent: "#C9A86A", bar: "#0B0A09", barInk: "#EBDBB4" },
+  { id: "shenqing", name: "深青", bg: "#0E1615", card: "#16211F", ink: "#E2EEEA", accent: "#5CC2AE", bar: "#091010", barInk: "#D4ECE6" },
+  { id: "ziye", name: "紫夜", bg: "#13111C", card: "#1C1928", ink: "#ECE8F7", accent: "#B4A2FF", bar: "#0C0A14", barInk: "#E4DEFF" }
+];
+const THEME_KEYS = [["bg", "底色", "頁面背景"], ["card", "卡片", "命盤與清單的底"], ["ink", "文字", "主要文字"], ["accent", "主色", "選中、按鈕與重點"], ["bar", "抬頭帶", "姓名那一列與手機分頁列"], ["barInk", "抬頭文字", "抬頭帶上的字"]];
+const THEME_PROPS = ["--bg", "--card", "--ink", "--accent", "--on-accent", "--bar", "--bar-ink", "--mu", "--huo", "--tu", "--jin", "--shui", "--danger", "--shadow", "color-scheme"];
+function rgbOf(h) { const m = /^#?([0-9a-f]{6})$/i.exec(h || ""); if (!m) return [128, 128, 128]; const n = parseInt(m[1], 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function lumOf(h) { const c = rgbOf(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+const contrastOf = (a, b) => { const x = lumOf(a), y = lumOf(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const themeIsDark = t => lumOf(t.card) < 0.3;
+function themeVars(t) {
+  const dark = themeIsDark(t), wx = dark ? WX_DARK : WX_LIGHT;
+  return {
+    "--bg": t.bg, "--card": t.card, "--ink": t.ink, "--accent": t.accent,
+    "--on-accent": contrastOf(t.accent, "#FFFFFF") >= contrastOf(t.accent, "#111111") ? "#FFFFFF" : "#111111",
+    "--bar": t.bar, "--bar-ink": t.barInk,
+    "--mu": wx.mu, "--huo": wx.huo, "--tu": wx.tu, "--jin": wx.jin, "--shui": wx.shui,
+    "--danger": dark ? "#FF7B6E" : "#B42318",
+    "--shadow": dark ? "0 1px 2px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.25)" : "0 1px 2px rgba(20,24,32,.05), 0 6px 18px rgba(20,24,32,.05)",
+    "color-scheme": dark ? "dark" : "light"
+  };
+}
+const systemDark = () => { try { return matchMedia("(prefers-color-scheme: dark)").matches; } catch (e) { return false; } };
+function themeNow() {
+  if (S.theme.id === "custom") return S.theme.custom;
+  if (S.theme.id === "auto") { const host = document.documentElement.getAttribute("data-theme"); return THEMES.find(t => t.id === ((host ? host === "dark" : systemDark()) ? "moye" : "yuebai")); }
+  return THEMES.find(t => t.id === S.theme.id) || THEMES[0];
+}
+function applyTheme() {
+  const st = document.documentElement.style;
+  THEME_PROPS.forEach(p => st.removeProperty(p));
+  let vars = null;
+  if (S.theme.id !== "auto") vars = themeVars(themeNow());
+  if (vars) for (const k in vars) st.setProperty(k, vars[k]);
+  LS.set("bazi.theme.v1", S.theme);
+  LS.set("bazi.theme.vars", vars);
+}
+function themePreviewHTML(t, label) {
+  const wx = themeIsDark(t) ? WX_DARK : WX_LIGHT;
+  const mix = (a, p, b) => `color-mix(in srgb, ${a} ${p}%, ${b})`;
+  return `<span class="tc-prev" style="background:${t.bg}">
+    <span class="tc-bar" style="background:${t.bar};color:${mix(t.accent, 50, t.barInk)}"><i></i>${esc(label || t.name)}</span>
+    <span class="tc-body"><span class="tc-cardm" style="background:${t.card};border:1px solid ${mix(t.ink, 12, t.card)}">
+      <span class="tc-gz"><span style="color:${wx.mu}">甲</span><span style="color:${wx.huo}">丙</span><span style="color:${wx.tu}">戊</span><span style="color:${wx.jin}">庚</span><span style="color:${wx.shui}">壬</span></span>
+      <span class="tc-sel" style="background:${t.accent}"></span></span></span></span>`;
+}
+function renderTheme() {
+  const root = $("#page-theme");
+  const cur = S.theme.id;
+  const card = (id, name, sub, prev) => `<button type="button" class="theme-card" data-act="theme" data-id="${id}" aria-pressed="${cur === id}">${prev}<span class="tc-name">${esc(name)}<small>${esc(sub)}</small></span></button>`;
+  const yb = THEMES.find(t => t.id === "yuebai"), my = THEMES.find(t => t.id === "moye");
+  let h = card("auto", "跟隨系統", "月白／墨夜", `<span class="tc-prev tc-split">${themePreviewHTML(yb, "淺色")}${themePreviewHTML(my, "深色")}</span>`);
+  THEMES.forEach(t => { h += card(t.id, t.name, themeIsDark(t) ? "深色" : "淺色", themePreviewHTML(t)); });
+  const c = S.theme.custom;
+  h += card("custom", "自訂", themeIsDark(c) ? "深色" : "淺色", themePreviewHTML(c, "自訂"));
+  root.innerHTML = `<div class="card card-pad"><h1 class="card-title">主題配色<small>點一下就套用，設定記在這個瀏覽器；淺色主題的五行字用深色版，深色主題用亮色版</small></h1><div class="theme-grid">${h}</div></div>
+    <div class="card card-pad"><h2 class="card-title">自訂色盤<small>改任何一個顏色就切換到「自訂」並立即套用</small></h2>
+      <div class="cp-grid">${THEME_KEYS.map(([k, l, d]) => `<label class="cp" for="cp-${k}"><span class="cp-l">${l}<small>${d}</small></span><input type="color" id="cp-${k}" data-cp="${k}" value="${esc(c[k])}"><code id="cpv-${k}">${esc(c[k].toUpperCase())}</code></label>`).join("")}</div>
+      <div class="row-actions" style="justify-content:flex-start"><button type="button" class="btn btn-sm" data-act="cp-copy">把目前主題複製到自訂</button><button type="button" class="btn btn-sm" data-act="theme" data-id="auto">恢復跟隨系統</button></div>
+      <p class="hint" style="margin:10px 0 0">深淺按卡片顏色自動判斷；按鈕上的字會自動選黑或白；其他線條、淺底與次要文字都由這幾個顏色混出。</p></div>`;
+}
+function onCustomColor(inp) {
+  const k = inp.dataset.cp;
+  S.theme.custom = Object.assign({}, S.theme.custom, { [k]: inp.value.toUpperCase() });
+  S.theme.id = "custom";
+  applyTheme();
+  const code = document.getElementById("cpv-" + k); if (code) code.textContent = inp.value.toUpperCase();
+  $$(".theme-card").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === "custom" ? "true" : "false"));
+  const cc = $('.theme-card[data-id="custom"]');
+  if (cc) { const c = S.theme.custom; cc.innerHTML = `${themePreviewHTML(c, "自訂")}<span class="tc-name">自訂<small>${themeIsDark(c) ? "深色" : "淺色"}</small></span>`; }
+}
+
+function loadWeights() {
+  const W = JSON.parse(JSON.stringify(B.DEFAULT_WEIGHTS));
+  const saved = LS.get("bazi.weights.v1", null);
+  if (saved) for (const g in W) for (const k in W[g]) if (saved[g] && typeof saved[g][k] === "number") W[g][k] = saved[g][k];
+  return W;
+}
+
+/* ---------- 案例存放：登入時存帳戶（私人），否則存瀏覽器 ---------- */
+const Store = {
+  cases: LS.get("bazi.cases.v1", []),
+  col: null, status: "local", subs: new Set(), ready: false,
+  emit() { this.subs.forEach(f => { try { f(); } catch (e) { console.error(e); } }); },
+  sort() { this.cases.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)); },
+  saveLocal() { LS.set("bazi.cases.v1", this.cases); },
+  get(id) { return this.cases.find(c => c.id === id) || null; },
+  async put(c) {
+    c.updatedAt = Date.now();
+    const i = this.cases.findIndex(x => x.id === c.id);
+    if (i >= 0) this.cases[i] = c; else this.cases.unshift(c);
+    this.sort(); this.saveLocal(); this.emit();
+    if (this.col) {
+      try { await this.col.doc(c.id).set(JSON.parse(JSON.stringify(c))); }
+      catch (e) { toast("帳戶存檔沒有成功，這個案例先存在本瀏覽器。"); }
+    }
+  },
+  async remove(id) {
+    this.cases = this.cases.filter(c => c.id !== id);
+    this.saveLocal(); this.emit();
+    if (this.col) { try { await this.col.doc(id).delete(); } catch (e) { toast("帳戶裡的刪除沒有成功，稍後再試一次。"); } }
+  },
+  async initCloud() {
+    const cl = window.claude;
+    if (!cl || typeof cl.use !== "function") return;
+    try {
+      const [db, user] = await Promise.all([cl.use("db"), cl.use("user")]);
+      if (!db || !user) return;
+      const uid = await user.id();
+      if (!uid) return;
+      const col = db.doc("data/users/" + uid + "/bazi").collection("cases");
+      let synced = false;
+      col.onSnapshot(snap => {
+        if (!synced && snap.metadata.fromCache) return;
+        const remote = snap.docs.map(d => d.data()).filter(x => x && x.id);
+        if (!synced) {
+          synced = true;
+          const ids = new Set(remote.map(c => c.id));
+          const missing = this.cases.filter(c => !ids.has(c.id));
+          (async () => { for (const c of missing) { try { await col.doc(c.id).set(JSON.parse(JSON.stringify(c))); } catch (e) { /* 保留在本機 */ } } })();
+          this.cases = remote.map(x => JSON.parse(JSON.stringify(x))).concat(missing);
+        } else {
+          const pendingLocal = this.cases.filter(c => !remote.some(r => r.id === c.id) && !this.known.has(c.id));
+          this.cases = remote.map(x => JSON.parse(JSON.stringify(x))).concat(pendingLocal);
+        }
+        this.known = new Set(remote.map(r => r.id));
+        this.sort(); this.saveLocal(); this.status = "cloud"; this.emit();
+      }, () => { this.col = null; this.status = "local"; this.emit(); });
+      this.known = new Set();
+      this.col = col;
+    } catch (e) { /* 留在本機 */ }
+  },
+  known: new Set()
+};
+
+/* ---------- 狀態 ---------- */
+const S = {
+  page: "input",
+  cur: null,
+  proSel: null,
+  hepan: Object.assign({ a: null, b: null, started: false }, LS.get("bazi.hepan.v1", {})),
+  hpSel: { A: null, B: null },
+  W: loadWeights(),
+  prefs: Object.assign({ tms: false, sha: true, wOpen: false, autosave: false }, LS.get("bazi.prefs.v1", {})),
+  mode: "solar",
+  flow: null,
+  fold: {},
+  ui: { editing: null, confirming: null, filter: "" },
+  theme: (() => {
+    const t = Object.assign({ id: "auto", custom: null }, LS.get("bazi.theme.v1", {}));
+    if (!t.custom || !t.custom.bg) { const b = THEMES[0]; t.custom = { name: "自訂", bg: b.bg, card: b.card, ink: b.ink, accent: b.accent, bar: b.bar, barInk: b.barInk }; }
+    if (t.id !== "auto" && t.id !== "custom" && !THEMES.some(x => x.id === t.id)) t.id = "auto";
+    return t;
+  })()
+};
+const savePrefs = () => LS.set("bazi.prefs.v1", S.prefs);
+const saveHepan = () => LS.set("bazi.hepan.v1", { a: S.hepan.a, b: S.hepan.b, started: S.hepan.started });
+
+const chartCache = new Map();
+function chartOf(c) {
+  const key = JSON.stringify([c.mode, c.solar, c.sex, c.place, c.dst, c.trueSolar, c.zishi, c.sizhu && c.sizhu.p]);
+  if (chartCache.has(key)) return chartCache.get(key);
+  let ch;
+  if (!c.solar) ch = B.chartFromPillars(c.sizhu.p, c.sex);
+  else {
+    const s = c.solar, sz = c.mode === "sizhu";
+    ch = B.buildChart({ sex: c.sex, y: s.y, m: s.m, d: s.d, hh: s.hh, mi: s.mi, tz: c.place.tz, dst: sz ? false : c.dst, lon: c.place.lon, lat: c.place.lat, trueSolar: sz ? false : c.trueSolar, zishi: c.zishi });
+  }
+  chartCache.set(key, ch);
+  return ch;
+}
+
+/* ---------- 此刻 ---------- */
+function nowMoment() { return B.momentOf(B.jdNow(), localTz()); }
+function selNow(chart) {
+  const m = nowMoment();
+  if (chart.pillarsOnly) return null;
+  const dk = B.dayunIndexForYear(chart, m.Y);
+  return { dk, year: m.Y, mk: m.monthK, dn: m.dayNum, hb: m.hourBranch };
+}
+function yearRange(chart, dk, selYear) {
+  if (dk < 0) {
+    const from = selYear != null && selYear < chart.yun.xiaoYunFrom ? selYear : chart.yun.xiaoYunFrom;  // 合盤時另一方可能選到出生前的年份
+    return [from, chart.yun.xiaoYunTo];
+  }
+  const s = chart.yun.dayun[dk].startYear; return [s, s + 9];
+}
+
+/* ---------- 頁面切換 ---------- */
+const PAGES = ["input", "cases", "basic", "pro", "hepan", "theme"];
+function go(page, opt) {
+  if (!PAGES.includes(page)) page = "input";
+  S.page = page;
+  $$(".page").forEach(p => { p.hidden = p.id !== "page-" + page; });
+  $$(".nav-item").forEach(b => b.setAttribute("aria-current", b.dataset.page === page ? "page" : "false"));
+  render(page);
+  if (!opt || !opt.keepScroll) window.scrollTo(0, 0);
+  try { history.replaceState(null, "", "#" + page); } catch (e) { /* 無妨 */ }
+  LS.set("bazi.page", page);
+}
+function render(page) {
+  if (page === "input") renderInputDynamic();
+  else if (page === "cases") renderCases();
+  else if (page === "basic") renderBasic();
+  else if (page === "pro") renderPro();
+  else if (page === "hepan") renderHepan();
+  else if (page === "theme") renderTheme();
+}
+
+let toastTimer = null;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2800);
+}
+
+/* =========================================================
+   輸入頁
+   ========================================================= */
+function opt(v, t, sel) { return `<option value="${esc(v)}"${sel ? " selected" : ""}>${esc(t)}</option>`; }
+function buildFormOptions() {
+  let h = ""; for (let y = 1801; y <= 2100; y++) h += opt(y, y + "年"); $("#f-sy").innerHTML = h;
+  h = ""; for (let m = 1; m <= 12; m++) h += opt(m, m + "月"); $("#f-sm").innerHTML = h;
+  h = ""; for (let x = 0; x < 24; x++) h += opt(x, pad2(x) + "時"); $("#f-hh").innerHTML = h;
+  h = ""; for (let x = 0; x < 60; x++) h += opt(x, pad2(x) + "分"); $("#f-mi").innerHTML = h;
+  h = ""; for (let y = 1801; y <= 2099; y++) h += opt(y, `${y}年（${B.gzName(B.yearGZ(y))}）`); $("#f-ly").innerHTML = h;
+  h = ""; for (let i = 0; i < 60; i++) h += opt(i, B.gzName(i));
+  for (let k = 0; k < 4; k++) $("#f-p" + k).innerHTML = h;
+  h = PLACES.map((p, i) => opt(i, p[0])).join("") + opt("custom", "自訂座標"); $("#f-place").innerHTML = h;
+  $("#f-tz").innerHTML = TZS.map(t => opt(t, tzOption(t), t === 8)).join("");
+}
+function rebuildDays() {
+  const y = +$("#f-sy").value, m = +$("#f-sm").value, cur = +$("#f-sd").value || 1;
+  const n = B.monthLen(y, m);
+  let h = ""; for (let d = 1; d <= n; d++) h += opt(d, d + "日", d === Math.min(cur, n));
+  $("#f-sd").innerHTML = h;
+}
+function rebuildLunarMonths(keep) {
+  const ly = +$("#f-ly").value;
+  const ms = B.lunarMonthsOfYear(ly);
+  const cur = keep || $("#f-lm").value;
+  $("#f-lm").innerHTML = ms.map(m => opt(`${m.num}|${m.leap ? 1 : 0}`, (m.leap ? "閏" : "") + B.LUNAR_MONTH[m.num])).join("");
+  if (cur && ms.some(m => `${m.num}|${m.leap ? 1 : 0}` === cur)) $("#f-lm").value = cur;
+  rebuildLunarDays();
+}
+function rebuildLunarDays(keep) {
+  const ly = +$("#f-ly").value; const [num, lp] = ($("#f-lm").value || "1|0").split("|").map(Number);
+  const m = B.lunarMonthsOfYear(ly).find(x => x.num === num && (x.leap ? 1 : 0) === lp);
+  const n = m ? m.end - m.start : 30;
+  const cur = keep || +$("#f-ld").value || 1;
+  let h = ""; for (let d = 1; d <= n; d++) h += opt(d, B.LUNAR_DAY[d], d === Math.min(cur, n));
+  $("#f-ld").innerHTML = h;
+}
+function setPlaceByIndex(i) {
+  const p = PLACES[i]; if (!p) return;
+  $("#f-lon").value = p[1].toFixed(2); $("#f-lat").value = p[2].toFixed(2); $("#f-tz").value = String(p[3]);
+}
+function setMode(mode) {
+  S.mode = mode;
+  $$('[data-act="mode"]').forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === mode ? "true" : "false"));
+  $("#g-solar").hidden = mode !== "solar";
+  $("#g-lunar").hidden = mode !== "lunar";
+  $("#g-time").hidden = mode === "sizhu";
+  $("#g-sizhu").hidden = mode !== "sizhu";
+  $("#g-sizhu-note").hidden = mode !== "sizhu";
+  if (mode === "lunar") syncLunarFromSolar();
+  if (mode === "sizhu") syncSizhuFromSolar();
+  updatePreview();
+}
+function syncLunarFromSolar() {
+  const dn = B.ymdToDayNum(+$("#f-sy").value, +$("#f-sm").value, +$("#f-sd").value);
+  const l = B.lunarOfDay(dn); if (!l) return;
+  $("#f-ly").value = String(l.year);
+  rebuildLunarMonths(`${l.month}|${l.leap ? 1 : 0}`);
+  rebuildLunarDays(l.day); $("#f-ld").value = String(l.day);
+}
+function syncSizhuFromSolar() {
+  const r = readSolarRaw();
+  try {
+    const ch = B.buildChart(Object.assign({ sex: "m", tz: +$("#f-tz").value, lon: +$("#f-lon").value, trueSolar: false, zishi: $("#f-zs").checked ? "split" : "day23" }, r));
+    ch.pillars.forEach((p, k) => { $("#f-p" + k).value = String(p); });
+  } catch (e) { /* 保持原值 */ }
+  S.candPick = null;
+  renderCands();
+}
+function readSolarRaw() { return { y: +$("#f-sy").value, m: +$("#f-sm").value, d: +$("#f-sd").value, hh: +$("#f-hh").value, mi: +$("#f-mi").value }; }
+function fillSolar(o) {
+  $("#f-sy").value = String(o.y); $("#f-sm").value = String(o.m); rebuildDays(); $("#f-sd").value = String(o.d);
+  $("#f-hh").value = String(o.hh); $("#f-mi").value = String(o.mi);
+}
+function fillFormNow() {
+  const n = new Date();
+  fillSolar({ y: n.getFullYear(), m: n.getMonth() + 1, d: n.getDate(), hh: n.getHours(), mi: n.getMinutes() });
+  $("#f-place").value = "0"; setPlaceByIndex(0);
+  $("#f-save").checked = !!S.prefs.autosave;
+}
+let candList = [];
+function renderCands() {
+  const p = [0, 1, 2, 3].map(k => +$("#f-p" + k).value);
+  const r = B.searchPillars(p, { from: 1801, to: 2100, tz: +$("#f-tz").value });
+  candList = r.list;
+  const box = $("#f-cands");
+  if (r.error) { box.innerHTML = `<p class="hint err" style="color:var(--danger)">${esc(r.error)}。${esc(fixHint(p, r.error))}</p>`; return; }
+  if (!r.list.length) { box.innerHTML = `<p class="hint">1801–2100 年間找不到符合這組四柱的時間。仍可只看四柱，但無法排大運與流年。</p>`; return; }
+  const now = B.jdNow();
+  let best = 0, bd = Infinity;
+  r.list.forEach((c, i) => { const d = Math.abs(c.fromJD - now); if (d < bd) { bd = d; best = i; } });
+  if (S.candPick == null || S.candPick >= r.list.length) S.candPick = best;
+  box.innerHTML = r.list.map((c, i) => {
+    const l = B.lunarOfDay(B.ymdToDayNum(c.mid.y, c.mid.m, c.mid.d));
+    return `<label class="cand"><input type="radio" name="f-cand" value="${i}"${i === S.candPick ? " checked" : ""}>
+      <span class="num">${fmtDate(c.from)} ${pad2(c.from.hh)}:${pad2(c.from.mi)}–${pad2(c.to.hh)}:${pad2(c.to.mi)}</span>
+      <span class="dim">取 ${pad2(c.mid.hh)}:${pad2(c.mid.mi)} · 農曆 ${esc(B.lunarText(l))}${c.cut ? " · 交節切段" : ""}</span></label>`;
+  }).join("");
+}
+function fixHint(p, err) {
+  if (err.startsWith("月柱")) return `${B.gzName(p[0])}年的${ZHI[p[1] % 12]}月應為 ${B.gzName(B.monthGZ(p[0], p[1] % 12))}`;
+  return `${B.gzName(p[2])}日的${ZHI[p[3] % 12]}時應為 ${B.gzName(B.hourGZ(p[2], p[3] % 12))}`;
+}
+function readForm() {
+  const name = $("#f-name").value.trim();
+  const sex = $("#f-sex-f").checked ? "f" : "m";
+  const lon = parseFloat($("#f-lon").value), lat = parseFloat($("#f-lat").value), tz = parseFloat($("#f-tz").value);
+  if (!isFinite(lon) || lon < -180 || lon > 180) return { error: "經度要在 −180 到 180 之間。" };
+  if (!isFinite(lat) || lat < -90 || lat > 90) return { error: "緯度要在 −90 到 90 之間。" };
+  const pi = $("#f-place").value;
+  const place = { name: pi === "custom" ? "自訂座標" : PLACES[+pi][0], lon, lat, tz };
+  const base = { name, sex, mode: S.mode, place, dst: $("#f-dst").checked, trueSolar: $("#f-ts").checked, zishi: $("#f-zs").checked ? "split" : "day23" };
+  if (S.mode === "solar") base.solar = readSolarRaw();
+  else if (S.mode === "lunar") {
+    const ly = +$("#f-ly").value; const [lm, lp] = $("#f-lm").value.split("|").map(Number); const ld = +$("#f-ld").value;
+    const dn = B.lunarToDayNum(ly, lm, !!lp, ld);
+    if (dn == null) return { error: "這個農曆日期不存在。" };
+    const o = B.dayNumToYMD(dn);
+    base.lunar = { y: ly, m: lm, leap: !!lp, d: ld };
+    base.solar = { y: o.y, m: o.m, d: o.d, hh: +$("#f-hh").value, mi: +$("#f-mi").value };
+  } else {
+    const p = [0, 1, 2, 3].map(k => +$("#f-p" + k).value);
+    const r = B.searchPillars(p, { from: 1801, to: 2100, tz });
+    if (r.error) return { error: r.error + "。" + fixHint(p, r.error) };
+    const pick = $('input[name="f-cand"]:checked');
+    const c = r.list[pick ? +pick.value : (S.candPick || 0)];
+    base.sizhu = { p };
+    base.solar = c ? { y: c.mid.y, m: c.mid.m, d: c.mid.d, hh: c.mid.hh, mi: c.mid.mi } : null;
+  }
+  return base;
+}
+function updatePreview() {
+  const box = $("#f-preview");
+  const r = readForm();
+  $("#f-shichen").textContent = ZHI[B.hourBranchOf(+$("#f-hh").value)] + "時";
+  if (r.error) { box.innerHTML = `<span class="err">${esc(r.error)}</span>`; $("#f-go").disabled = true; return; }
+  $("#f-go").disabled = false;
+  const ch = chartOf(r);
+  const gz = ch.pillars.map(gzH).join(" ");
+  const lines = [`<span class="pv-gz">${gz}</span>`];
+  if (ch.pillarsOnly) lines.push(`<span>只排四柱，沒有出生日期，無法起大運。</span>`);
+  else {
+    lines.push(`<span>公曆 ${fmtDash(ch.civil)}（${esc(tzText(ch.tz))}${ch.dst ? "，夏令時" : ""}）｜農曆 ${esc(B.lunarText(ch.lunar))} ${ZHI[ch.pillars[3] % 12]}時</span>`);
+    if (ch.trueSolar) lines.push(`<span>真太陽時 ${fmtDash(ch.clock)}（經度修正 ${fmtSigned((ch.lon - ch.tz * 15) * 4)} 分，均時差 ${fmtSigned(ch.eot)} 分）</span>`);
+    lines.push(`<span class="dim">地點：${esc(r.place.name)}　${lonText(r.place.lon)} ${latText(r.place.lat)}</span>`);
+  }
+  box.innerHTML = lines.join("");
+}
+const fmtSigned = v => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(1);
+
+function fillFormFromCase(c) {
+  $("#f-name").value = c.name || "";
+  $("#f-sex-m").checked = c.sex !== "f"; $("#f-sex-f").checked = c.sex === "f";
+  const pi = PLACES.findIndex(p => p[0] === c.place.name);
+  $("#f-place").value = pi >= 0 ? String(pi) : "custom";
+  $("#f-lon").value = (+c.place.lon).toFixed(2); $("#f-lat").value = (+c.place.lat).toFixed(2); $("#f-tz").value = String(c.place.tz);
+  $("#f-dst").checked = !!c.dst; $("#f-ts").checked = !!c.trueSolar; $("#f-zs").checked = c.zishi === "split";
+  if (c.solar) fillSolar(c.solar);
+  if (c.mode === "lunar" && c.lunar) {
+    $("#f-ly").value = String(c.lunar.y); rebuildLunarMonths(`${c.lunar.m}|${c.lunar.leap ? 1 : 0}`); rebuildLunarDays(c.lunar.d); $("#f-ld").value = String(c.lunar.d);
+  }
+  if (c.mode === "sizhu" && c.sizhu) { c.sizhu.p.forEach((p, k) => { $("#f-p" + k).value = String(p); }); }
+  S.mode = c.mode || "solar";
+  setModeNoSync(S.mode);
+  if (S.mode === "sizhu") { S.candPick = null; renderCands(); if (c.solar) { const i = candList.findIndex(x => x.mid.y === c.solar.y && x.mid.m === c.solar.m && x.mid.d === c.solar.d); if (i >= 0) { S.candPick = i; renderCands(); } } }
+  updatePreview();
+}
+function setModeNoSync(mode) {
+  $$('[data-act="mode"]').forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === mode ? "true" : "false"));
+  $("#g-solar").hidden = mode !== "solar"; $("#g-lunar").hidden = mode !== "lunar";
+  $("#g-time").hidden = mode === "sizhu"; $("#g-sizhu").hidden = mode !== "sizhu"; $("#g-sizhu-note").hidden = mode !== "sizhu";
+}
+function updateBanner() {
+  const bn = $("#f-banner");
+  const f = S.flow;
+  if (!f) { bn.hidden = true; bn.innerHTML = ""; $("#f-go").textContent = "開始排盤"; return; }
+  bn.hidden = false;
+  if (f.type === "hepan") {
+    bn.innerHTML = `<span>正在為合盤 <b>${f.side.toUpperCase()}</b> 方新增案例，排盤後會自動存檔並回到合盤。</span><button class="btn btn-sm" type="button" data-act="flow-cancel">取消，回到合盤</button>`;
+    $("#f-go").textContent = "排盤並放入合盤";
+  } else {
+    bn.innerHTML = `<span>正在修改「${esc(f.name)}」${f.saved ? "，排盤後會更新案例列表中的這一筆" : ""}。</span><button class="btn btn-sm" type="button" data-act="flow-cancel">取消修改</button>`;
+    $("#f-go").textContent = f.saved ? "排盤並更新案例" : "重新排盤";
+  }
+}
+function renderInputDynamic() { updateBanner(); updatePreview(); tickNow(true); }
+function submitForm() {
+  const r = readForm();
+  if (r.error) { updatePreview(); return; }
+  const f = S.flow;
+  if (f && f.type === "edit") {
+    const old = Store.get(f.id);
+    const c = Object.assign({}, r, { id: f.id, createdAt: old ? old.createdAt : Date.now(), name: r.name || f.name });
+    if (old) Store.put(c);
+    S.flow = null; updateBanner();
+    setCurrent(c, !!old);
+    go(f.back || "basic");
+    toast(old ? "已更新這個案例。" : "已重新排盤。");
+    return;
+  }
+  const c = Object.assign({ id: newId(), createdAt: Date.now() }, r, { name: r.name || `案例${Store.cases.length + 1}` });
+  if (f && f.type === "hepan") {
+    Store.put(c);
+    S.hepan[f.side] = c.id; S.hepan.started = false; saveHepan();
+    S.flow = null; updateBanner();
+    go("hepan");
+    toast(`已存檔「${c.name}」並放入合盤 ${f.side.toUpperCase()} 方。`);
+    return;
+  }
+  const save = $("#f-save").checked;
+  if (save) Store.put(c);
+  setCurrent(c, save);
+  go("basic");
+  if (save) toast(`已存入案例列表：「${c.name}」。`);
+}
+function setCurrent(c, saved) {
+  S.cur = { c, chart: chartOf(c), saved: !!saved };
+  S.proSel = selNow(S.cur.chart);
+  LS.set("bazi.cur.v1", { c, saved: !!saved });
+}
+
+/* 即時起局 */
+let nowKey = "";
+function nowCase() {
+  const n = new Date(), tz = localTz();
+  return {
+    id: newId(), createdAt: Date.now(), name: "即時局", sex: "m", mode: "solar",
+    solar: { y: n.getFullYear(), m: n.getMonth() + 1, d: n.getDate(), hh: n.getHours(), mi: n.getMinutes() },
+    place: { name: tz === 8 ? "未知地（北京時間）" : "本地時間", lon: tz * 15, lat: 39, tz }, dst: false, trueSolar: false, zishi: "day23"
+  };
+}
+function tickNow(force) {
+  const n = new Date();
+  const sec = n.getSeconds(), mi = n.getMinutes(), hr = n.getHours() % 12;
+  const set = (id, deg) => { const el = document.getElementById(id); if (el) el.setAttribute("transform", `rotate(${deg} 50 50)`); };
+  set("nc-h", hr * 30 + mi * 0.5); set("nc-m", mi * 6 + sec * 0.1); set("nc-s", sec * 6);
+  const key = `${n.getFullYear()}-${n.getMonth()}-${n.getDate()}-${n.getHours()}-${mi}`;
+  if (!force && key === nowKey) return;
+  nowKey = key;
+  if (S.page !== "input" && !force) return;
+  const c = nowCase(); const ch = chartOf(c);
+  $("#nc-gz").innerHTML = ch.pillars.map(p => gS(p % 10)).join("") + "<br>" + ch.pillars.map(p => zS(p % 12)).join("");
+  $("#nc-lunar").textContent = `農曆：${B.lunarText(ch.lunar)} ${ZHI[ch.pillars[3] % 12]}時`;
+  $("#nc-solar").textContent = `公曆：${fmtCN(ch.civil)}`;
+}
+
+/* =========================================================
+   抬頭帶
+   ========================================================= */
+function headerHTML(cur, page) {
+  const { c, chart } = cur;
+  const zao = chart.male ? "乾造" : "坤造";
+  const sx = chart.shengxiao;
+  let lines;
+  if (chart.pillarsOnly) lines = `<div><span class="k">四柱</span>${chart.pillars.map(gzH).join(" ")} <span class="zao">（${zao}）</span></div><div><span class="k">日期</span>未定（四柱直排）</div>`;
+  else {
+    lines = `<div><span class="k">農曆</span>${esc(B.lunarText(chart.lunar))} ${ZHI[chart.pillars[3] % 12]}時 <span class="zao">（${zao}）</span></div>
+      <div><span class="k">陽曆</span>${fmtCN(chart.civil)} <span class="k" style="margin-left:6px">${esc(tzText(chart.tz))}${chart.dst ? "・夏令時" : ""}</span></div>`;
+    if (chart.trueSolar) lines += `<div><span class="k">真太陽時</span>${fmtCN(chart.clock)}</div>`;
+  }
+  const bd = chart.boundary;
+  const tag = bd ? `<span class="sx-tag">${bd.t.name === "立春" ? "立春盤" : "交界盤"}</span>` : "";
+  const acts = [];
+  if (page === "pro") acts.push(`<label class="switch"><input type="checkbox" data-act="tms"${S.prefs.tms ? " checked" : ""}> 胎命身</label>`);
+  acts.push(cur.saved ? `<span class="hdone">已存檔</span>` : `<button class="hbtn" type="button" data-act="save-cur">存檔</button>`);
+  acts.push(`<button class="hbtn" type="button" data-act="edit-cur">編輯</button>`);
+  return `<header class="hbar">
+    <div class="sx"><span class="sx-ring" aria-label="生肖${sx}">${sx}</span>${tag}</div>
+    <div class="hbar-main"><h1 class="hbar-name">${esc(c.name)}</h1><div class="hbar-lines">${lines}</div></div>
+    <div class="hbar-acts">${acts.join("")}</div>
+  </header>`;
+}
+function emptyChartHTML(title) {
+  return `<div class="card empty"><p>${esc(title)}</p><div class="row-actions"><button class="btn btn-gold" type="button" data-act="go" data-page="input">去排盤</button><button class="btn" type="button" data-act="now">即時起局</button><button class="btn" type="button" data-act="go" data-page="cases">從案例打開</button></div></div>`;
+}
+
+/* =========================================================
+   命盤表（基本排盤與專業細盤共用）
+   ========================================================= */
+function cellsFor(col, chart, row) {
+  const dm = chart.dm;
+  if (col.idx == null) {
+    if (row === "ss") return `<td class="ph${col.sep ? " sep" : ""}">—<span class="phhint">${esc(col.ph || "")}</span></td>`;
+    if (row === "head") return `<td class="${col.sep ? "sep" : ""}">${esc(col.title)}</td>`;
+    return `<td class="ph${col.sep ? " sep" : ""}">${row === "gan" || row === "zhi" ? "—" : ""}</td>`;
+  }
+  const g = col.idx % 10, b = col.idx % 12;
+  const cls = col.sep ? ' class="sep"' : "";
+  switch (row) {
+    case "head": return `<td class="${col.sep ? "sep " : ""}${col.kind === "dyn" ? "on-dyn" : ""}">${esc(col.title)}</td>`;
+    case "ss": return `<td${cls}>${col.pos === 2 && col.kind === "natal" ? (chart.male ? "元男" : "元女") : B.tenGod(dm, g)}</td>`;
+    case "gan": return `<td${cls}>${gS(g)}${col.wxs ? `<span class="wxs">${WX[B.ganWx(g)]}</span>` : ""}</td>`;
+    case "zhi": return `<td${cls}>${zS(b)}${col.wxs ? `<span class="wxs">${WX[B.zhiWx(b)]}</span>` : ""}</td>`;
+    case "cang": return `<td${cls}>${B.CANG[b].map(x => `<span class="cg">${gS(x)}${WX[B.ganWx(x)]}</span>`).join("")}</td>`;
+    case "fu": return `<td${cls}>${B.CANG[b].map(x => `<span class="cg">${B.tenGod(dm, x)}</span>`).join("")}</td>`;
+    case "cangss": return `<td${cls}>${B.CANG[b].map(x => { const t = B.tenGod(dm, x); return `<span class="cg">${gS(x)}<span class="ssf">${t}</span><span class="ssa">${B.SS_ABBR[t]}</span></span>`; }).join("")}</td>`;
+    case "xy": return `<td${cls}>${B.changSheng(dm, b)}</td>`;
+    case "zz": return `<td${cls}>${B.changSheng(g, b)}</td>`;
+    case "kong": return `<td${cls}>${B.xunKong(col.idx).map(x => ZHI[x]).join("")}</td>`;
+    case "ny": return `<td${cls}>${B.nayin(col.idx)}</td>`;
+    case "sha": {
+      const list = chart.pillarsOnly ? B.shensha(chart, g, b) : B.shensha(chart, g, b);
+      if (!S.prefs.sha) return `<td${cls}><span class="dim">${list.length ? list.length + " 項" : "—"}</span></td>`;
+      return `<td${cls}>${list.length ? list.map(s => `<span class="sha">${s.length === 4 ? `<span class="nw">${s.slice(0, 2)}</span><span class="nw">${s.slice(2)}</span>` : s}</span>`).join("") : '<span class="dim">—</span>'}</td>`;
+    }
+  }
+  return "<td></td>";
+}
+const ROW_LABEL = { head: "日期", ss: "主星", gan: "天干", zhi: "地支", cang: "藏干", fu: "副星", cangss: "藏干", xy: "星運", zz: "自坐", kong: "空亡", ny: "納音", sha: "神煞" };
+const ROW_CLASS = { head: "r-head", ss: "r-ss", gan: "r-big", zhi: "r-big", cang: "r-cang", fu: "r-fu", cangss: "r-cang", xy: "r-sm", zz: "r-sm", kong: "r-sm", ny: "r-sm", sha: "r-sha" };
+function panTableHTML(cols, chart, rows, caption) {
+  let h = `<div class="pan-wrap"><table class="pan">${caption ? `<caption class="sr-only">${esc(caption)}</caption>` : ""}<colgroup><col class="c-lab">${cols.map(() => "<col>").join("")}</colgroup>`;
+  for (const row of rows) {
+    h += `<tr class="${ROW_CLASS[row]}"><th scope="row">${ROW_LABEL[row]}</th>${cols.map(col => cellsFor(col, chart, row)).join("")}</tr>`;
+  }
+  h += "</table></div>";
+  if (rows.includes("sha")) h += `<button type="button" class="sha-toggle" data-act="sha" aria-expanded="${S.prefs.sha}">${S.prefs.sha ? "收起神煞（只顯示每柱項數）" : "展開神煞"}</button>`;
+  return h;
+}
+function natalCols(chart, wxs) {
+  return ["年柱", "月柱", "日柱", "時柱"].map((t, pos) => ({ title: t, idx: chart.pillars[pos], kind: "natal", pos, wxs, sep: false }));
+}
+function wbarHTML(chart) {
+  return `<div class="wbar"><span class="wl">旺相休囚死<br>月令${ZHI[chart.monthBranch]}</span>${chart.wangxiang.map(([w, s]) => `<span><b class="w${w}">${WX[w]}</b>${s}</span>`).join("")}</div>`;
+}
+function attnHTML(raw) {
+  const a = B.attention(raw);
+  return `<div class="card attn">
+    <div class="attn-row"><span class="k">天干留意</span><span class="v">${a.gan.length ? a.gan.join("，") : "無合沖關係"}</span></div>
+    <div class="attn-row"><span class="k">地支留意</span><span class="v">${a.zhi.length ? a.zhi.join("，") : "無刑沖合害"}</span></div>
+  </div>`;
+}
+function natalItems(chart, side) {
+  return ["年柱", "月柱", "日柱", "時柱"].map((label, pos) => ({ label, short: label[0], kind: "natal", pos, idx: chart.pillars[pos], side: side || "A" }));
+}
+
+/* =========================================================
+   基本排盤
+   ========================================================= */
+function renderBasic() {
+  const root = $("#page-basic");
+  if (!S.cur) { root.innerHTML = emptyChartHTML("還沒有排盤。先到排盤頁輸入出生資料，或按即時起局。"); return; }
+  const { chart } = S.cur;
+  const cols = natalCols(chart, true);
+  const info = basicInfoHTML(chart);
+  const raw = B.findRelations(natalItems(chart));
+  root.innerHTML = headerHTML(S.cur, "basic") + info +
+    `<div class="card" style="padding:6px 12px 12px">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "cang", "fu", "xy", "zz", "kong", "ny", "sha"], "基本排盤")}</div>` +
+    wbarHTML(chart) + attnHTML(raw) + extraInfoHTML(chart);
+}
+function basicInfoHTML(chart) {
+  if (chart.pillarsOnly) return `<div class="card infobar"><span>這是四柱直排的盤，沒有出生日期，所以沒有節氣、大運與流年。</span></div>`;
+  const pj = chart.prevJie, nj = chart.nextJie;
+  const after = chart.jdUT - pj.jd, before = nj.jd - chart.jdUT;
+  const bd = chart.boundary;
+  const parts = [`<span>出生於<b>${pj.name}</b>後 ${durText(after)}，<b>${nj.name}</b>前 ${durText(before)}</span>`];
+  if (bd) parts.push(`<span class="bd-warn">節氣交界盤：距${bd.t.name} ${durText(bd.dist)}（${bd.after ? "交節後" : "交節前"}），月柱${bd.t.name === "立春" ? "與年柱" : ""}要留意</span>`);
+  else parts.push(`<span class="dim">非節氣交界盤（距最近的節超過一天）</span>`);
+  return `<div class="card infobar">${parts.join("")}</div>`;
+}
+function extraInfoHTML(chart) {
+  const e = chart.extra;
+  const tz = chart.tz == null ? 8 : chart.tz;
+  const fmtT = t => { const k = B.jdToClock(t.jd + tz / 24); return `${fmtDash(k)}:${pad2(k.ss)}`; };
+  const items = [["生肖", chart.shengxiao], ["胎元", `${gzH(e.taiyuan)}（${B.nayin(e.taiyuan)}）`], ["胎息", `${gzH(e.taixi)}（${B.nayin(e.taixi)}）`],
+    ["命宮", `${gzH(e.minggong)}（${B.nayin(e.minggong)}）`], ["身宮", `${gzH(e.shengong)}（${B.nayin(e.shengong)}）`]];
+  if (!chart.pillarsOnly) {
+    items.push(["人元司令", `${gS(chart.siling)}${WX[B.ganWx(chart.siling)]}用事（入${chart.prevJie.name}第 ${Math.floor(chart.daysSinceJie) + 1} 天）`]);
+    items.push([chart.prevJie.name, fmtT(chart.prevJie)], [chart.nextJie.name, fmtT(chart.nextJie)]);
+    const y = chart.yun;
+    items.push(["起運", `出生後 ${y.Y}年${y.M}月${y.D}天${y.H}時`], ["交運", `${fmtDash(y.jiao)}，大運${y.forward ? "順" : "逆"}排`]);
+    items.push(["地點", `${esc(chart.input.lon != null ? lonText(chart.lon) : "")} ${chart.lat != null ? latText(chart.lat) : ""}`]);
+  }
+  return `<div class="card"><div class="card-pad" style="padding-bottom:8px"><h2 class="card-title">基本信息</h2></div><div class="infogrid">${items.map(([k, v]) => `<div><span class="k">${esc(k)}</span><span class="v">${v}</span></div>`).join("")}</div></div>`;
+}
+
+/* =========================================================
+   專業細盤
+   ========================================================= */
+function proCols(chart, sel) {
+  const cols = [];
+  const months = B.liuYue(sel.year, localTz());
+  const hasM = sel.mk != null, hasD = sel.dn != null, hasH = sel.hb != null;
+  cols.push(hasH && hasD ? { title: "流時", idx: B.hourGZ(B.dayGZ(sel.dn), sel.hb), kind: "dyn", layer: "liushi", label: "流時" } : { title: "流時", idx: null, ph: hasD ? "點流時" : "先選流日" });
+  cols.push(hasD ? { title: "流日", idx: B.dayGZ(sel.dn), kind: "dyn", layer: "liuri", label: "流日" } : { title: "流日", idx: null, ph: hasM ? "點流日" : "先選流月" });
+  cols.push(hasM ? { title: "流月", idx: months[sel.mk].idx, kind: "dyn", layer: "liuyue", label: "流月" } : { title: "流月", idx: null, ph: "點流月" });
+  cols.push({ title: "流年", idx: B.yearGZ(sel.year), kind: "dyn", layer: "liunian", label: "流年" });
+  if (sel.dk >= 0) cols.push({ title: "大運", idx: chart.yun.dayun[sel.dk].idx, kind: "dyn", layer: "dayun", label: "大運" });
+  else if (sel.year >= chart.birthYear) cols.push({ title: "小運", idx: B.xiaoYun(chart, sel.year), kind: "dyn", layer: "xiaoyun", label: "小運" });
+  else cols.push({ title: "大運", idx: null, ph: "未出生" });
+  natalCols(chart, false).forEach((c, i) => { c.sep = i === 0; c.label = c.title; cols.push(c); });
+  return cols;
+}
+function dynItems(cols, side) {
+  return cols.filter(c => c.kind === "dyn" && c.idx != null).map(c => ({ label: c.label, short: c.label, kind: "dyn", layer: c.layer, idx: c.idx, side: side || "A" }));
+}
+function cellToday(level, v, now, chart) {
+  if (level === "dayun") return B.dayunIndexForYear(chart, now.Y) === v;
+  if (level === "year") return now.Y === v;
+  if (level === "month") return v.Y === now.Y && v.k === now.monthK;
+  if (level === "day") return v === now.dayNum;
+  if (level === "hour") return v.dn === now.dayNum && v.b === now.hourBranch;
+  return false;
+}
+function stripHTML(pid, key, cls, title, sub, cells) {
+  return `<div class="strip ${cls}" data-strip="${pid}:${cls}" data-key="${esc(key)}">
+    <div class="strip-title" aria-hidden="true">${title}${sub ? `<small>${sub}</small>` : ""}</div>
+    <div class="strip-main">
+      <div class="strip-track" role="group" aria-label="${esc(title.replace(/<br>/g, ""))}">${cells}</div>
+      <div class="sbar"><button type="button" class="sbar-btn" aria-label="向左捲動">◀</button><div class="sbar-rail"><div class="sbar-thumb"></div></div><button type="button" class="sbar-btn" aria-label="向右捲動">▶</button></div>
+    </div>
+  </div>`;
+}
+function stripsHTML(pid, chart, sel) {
+  const now = nowMoment(), dm = chart.dm, y = chart.yun;
+  const pr = v => `aria-pressed="${v ? "true" : "false"}"`;
+  // 大運
+  let cells = `<button type="button" class="cell${cellToday("dayun", -1, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="dayun" data-v="-1" ${pr(sel.dk === -1)}>
+      <span class="c-top num">${y.xiaoYunFrom}</span><span class="c-sub">1~${Math.max(1, y.dayun[0].startAge - 1)}歲</span><span class="c-big">小</span><span class="c-big">運</span></button>`;
+  y.dayun.forEach((d, k) => {
+    cells += `<button type="button" class="cell${cellToday("dayun", k, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="dayun" data-v="${k}" ${pr(sel.dk === k)}>
+      <span class="c-top num">${d.startYear}</span><span class="c-sub">${d.startAge}歲</span>
+      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span></button>`;
+  });
+  let h = stripHTML(pid, "dy", "s-dayun", "大<br>運", "", cells);
+  // 流年
+  const [y0, y1] = yearRange(chart, sel.dk, sel.year);
+  cells = "";
+  for (let Y = y0; Y <= y1; Y++) {
+    const i = B.yearGZ(Y), xy = Y >= chart.birthYear ? B.xiaoYun(chart, Y) : null;
+    cells += `<button type="button" class="cell${cellToday("year", Y, now, chart) ? " today" : ""}${Y < chart.birthYear ? " unborn" : ""}" data-act="sel" data-pid="${pid}" data-level="year" data-v="${Y}" ${pr(sel.year === Y)}>
+      <span class="c-top num">${Y}</span>
+      <span class="c-gz">${gS(i % 10)}<i>${ssAbbr(dm, i % 10)}</i></span><span class="c-gz">${zS(i % 12)}<i>${zAbbr(dm, i % 12)}</i></span>
+      <span class="c-xy">${xy != null ? B.gzName(xy) : "未出生"}</span></button>`;
+  }
+  h += stripHTML(pid, `ln${y0}`, "s-year", "流<br>年", "小運", cells);
+  // 流月
+  const months = B.liuYue(sel.year, localTz());
+  cells = months.map(m => `<button type="button" class="cell${cellToday("month", { Y: sel.year, k: m.k }, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="month" data-v="${m.k}" ${pr(sel.mk === m.k)}>
+      <span class="c-top">${m.name}</span><span class="c-sub num">${m.clock.m}/${m.clock.d}</span>
+      <span class="c-gz">${gS(m.idx % 10)}<i>${ssAbbr(dm, m.idx % 10)}</i></span><span class="c-gz">${zS(m.idx % 12)}<i>${zAbbr(dm, m.idx % 12)}</i></span></button>`).join("");
+  h += stripHTML(pid, `ly${sel.year}`, "s-month", "流<br>月", "", cells);
+  // 流日
+  if (sel.mk != null) {
+    const days = B.liuRi(months[sel.mk]);
+    cells = days.map(d => {
+      const l = B.lunarOfDay(d.dayNum);
+      return `<button type="button" class="cell${cellToday("day", d.dayNum, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="day" data-v="${d.dayNum}" ${pr(sel.dn === d.dayNum)}>
+      <span class="c-top num">${d.m}/${d.d}</span><span class="c-sub">${l ? (l.day === 1 ? (l.leap ? "閏" : "") + B.LUNAR_MONTH[l.month] : B.LUNAR_DAY[l.day]) : ""}</span>
+      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span></button>`;
+    }).join("");
+    h += stripHTML(pid, `lr${sel.year}-${sel.mk}`, "s-day", "流<br>日", "", cells);
+  }
+  // 流時
+  if (sel.dn != null) {
+    cells = B.liuShi(sel.dn).map(t => `<button type="button" class="cell${cellToday("hour", { dn: sel.dn, b: t.branch }, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="hour" data-v="${t.branch}" ${pr(sel.hb === t.branch)}>
+      <span class="c-top">${ZHI[t.branch]}時</span><span class="c-sub num">${t.range}</span>
+      <span class="c-gz">${gS(t.idx % 10)}<i>${ssAbbr(dm, t.idx % 10)}</i></span><span class="c-gz">${zS(t.idx % 12)}<i>${zAbbr(dm, t.idx % 12)}</i></span></button>`).join("");
+    h += stripHTML(pid, `ls${sel.dn}`, "s-hour", "流<br>時", "", cells);
+  }
+  return h;
+}
+function ageOf(chart) {
+  const n = new Date();
+  const l = B.lunarOfDay(B.ymdToDayNum(n.getFullYear(), n.getMonth() + 1, n.getDate()));
+  const xu = l && chart.lunar ? l.year - chart.lunar.year + 1 : null;
+  let zhou = n.getFullYear() - chart.civil.y;
+  if (n.getMonth() + 1 < chart.civil.m || (n.getMonth() + 1 === chart.civil.m && n.getDate() < chart.civil.d)) zhou--;
+  return { xu, zhou };
+}
+function proInfoHTML(pid, chart) {
+  const y = chart.yun;
+  const age = ageOf(chart);
+  const kong = B.xunKong(chart.pillars[2]).map(b => ZHI[b]).join("");
+  const jiaoExtra = y.jiaoJieName === "立春" ? "" : `（立春後${y.jiaoDaysAfterLichun}天）`;
+  return `<div class="pinfo">
+    <div class="pinfo-lines">
+      <div><span class="k">起運：</span>出生後 ${y.Y}年${y.M}月${y.D}天${y.H}時 起運</div>
+      <div><span class="k">交運：</span>逢${GAN[y.jiaoStems[0]]}、${GAN[y.jiaoStems[1]]}年 ${y.jiaoJieName}後${y.jiaoDaysAfterJie}天 交大運${jiaoExtra}</div>
+      <div><span class="k">日柱旬空：</span>${kong}（日）　<span class="k">首次交運：</span>${fmtDate(y.jiao)}</div>
+    </div>
+    <div class="pinfo-side">
+      <div class="row"><span>${age.zhou < 0 ? "未出生" : `虛歲 ${age.xu} · 周歲 ${age.zhou}`}</span></div>
+      <div class="row"><span class="siling">司令：<b class="w${B.ganWx(chart.siling)}">${GAN[chart.siling]}</b></span><button type="button" class="todaybtn" data-act="today" data-pid="${pid}" aria-label="回到今天">回到今天</button></div>
+    </div>
+    <p class="algo">起運算法：出生到${y.forward ? "下一個" : "上一個"}節（${y.target.name}）的時間，三天折一年、一天折四個月、一個時辰折十天（一年按 360 天、一月按 30 天）。交運日期是出生時刻依序加上這些年月日時。歲數按公曆年份計虛歲；小運從時柱起，與大運同向。司令以出生所在節令、按入節後天數分配。</p>
+  </div>`;
+}
+function tmsHTML(chart) {
+  const e = chart.extra;
+  const cols = [["胎元", e.taiyuan], ["命宮", e.minggong], ["身宮", e.shengong]].map(([t, idx]) => ({ title: t, idx, kind: "extra" }));
+  return `<div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:6px">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "cangss", "xy", "zz", "kong", "ny"], "胎命身")}</div>`;
+}
+function proPanelHTML(pid, chart, sel) {
+  const cols = proCols(chart, sel);
+  const left = `<div class="card pro-left">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "cangss", "xy", "zz", "kong", "ny", "sha"], "專業細盤")}${S.prefs.tms ? tmsHTML(chart) : ""}</div>`;
+  const right = `<div class="card pro-right">${proInfoHTML(pid, chart)}${stripsHTML(pid, chart, sel)}<p class="swipe-hint">干支條可左右滑動，或拖動下方捲軸、按 ◀ ▶。點一格即選中，左側對應的列與下方清單會跟著換；點流月後出現流日，點流日後出現流時。格子頂端有<span class="today-dot" aria-hidden="true"></span>小紅點的是今天所在的一格。</p>${wbarHTML(chart)}</div>`;
+  return { html: `<div class="pro" data-pid="${pid}"><div class="pro-body">${left}${right}</div></div>`, cols };
+}
+function renderPro() {
+  const root = $("#page-pro");
+  if (!S.cur) { root.innerHTML = emptyChartHTML("還沒有排盤。先到排盤頁輸入出生資料，或按即時起局。"); return; }
+  const { chart } = S.cur;
+  if (chart.pillarsOnly) {
+    root.innerHTML = headerHTML(S.cur, "pro") + `<div class="card empty"><p>這是四柱直排的盤，沒有出生日期，排不出大運、流年、流月、流日與流時。到排盤頁的四柱模式選一個符合的時間，就能看專業細盤。</p><div class="row-actions"><button class="btn btn-gold" type="button" data-act="edit-cur">選擇時間</button></div></div>`;
+    return;
+  }
+  if (!S.proSel) S.proSel = selNow(chart);
+  const { html, cols } = proPanelHTML("pro", chart, S.proSel);
+  const items = natalItems(chart).concat(dynItems(cols));
+  const raw = B.findRelations(items);
+  root.innerHTML = headerHTML(S.cur, "pro") + html + attnHTML(raw) + relSectionHTML("pro", { mode: "single", items, raw, charts: { A: chart } });
+  setupStrips(root);
+}
+
+/* ---------- 干支條捲軸 ---------- */
+const stripPos = new Map();
+function setupStrips(root) {
+  $$(".strip", root).forEach(st => {
+    const track = $(".strip-track", st), rail = $(".sbar-rail", st), thumb = $(".sbar-thumb", st);
+    const [bl, br] = $$(".sbar-btn", st);
+    const id = st.dataset.strip, key = st.dataset.key;
+    const prev = stripPos.get(id);
+    const selCell = $('.cell[aria-pressed="true"]', track);
+    const center = el => Math.max(0, el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2);
+    if (prev && prev.key === key) track.scrollLeft = prev.left;
+    else if (selCell) track.scrollLeft = center(selCell);
+    else { const td = $(".cell.today", track); track.scrollLeft = td ? center(td) : 0; }
+    const update = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      st.classList.toggle("fits", max <= 1);
+      const rw = rail.clientWidth;
+      const tw = Math.max(28, rw * track.clientWidth / Math.max(1, track.scrollWidth));
+      const x = max > 0 ? (track.scrollLeft / max) * (rw - tw) : 0;
+      thumb.style.width = tw + "px"; thumb.style.transform = `translateX(${x}px)`;
+      bl.disabled = track.scrollLeft <= 1; br.disabled = track.scrollLeft >= max - 1;
+      stripPos.set(id, { key, left: track.scrollLeft });
+    };
+    track.addEventListener("scroll", update, { passive: true });
+    const step = () => Math.max(120, track.clientWidth * 0.8);
+    bl.addEventListener("click", () => track.scrollBy({ left: -step(), behavior: "smooth" }));
+    br.addEventListener("click", () => track.scrollBy({ left: step(), behavior: "smooth" }));
+    let drag = null;
+    thumb.addEventListener("pointerdown", e => { e.preventDefault(); e.stopPropagation(); try { thumb.setPointerCapture(e.pointerId); } catch (x) { /* 舊瀏覽器 */ } drag = { x: e.clientX, left: track.scrollLeft }; });
+    thumb.addEventListener("pointermove", e => {
+      if (!drag) return;
+      const max = track.scrollWidth - track.clientWidth, room = rail.clientWidth - thumb.offsetWidth;
+      track.scrollLeft = drag.left + (e.clientX - drag.x) * (max / Math.max(1, room));
+    });
+    const end = () => { drag = null; };
+    thumb.addEventListener("pointerup", end); thumb.addEventListener("pointercancel", end); thumb.addEventListener("lostpointercapture", end);
+    rail.addEventListener("pointerdown", e => {
+      if (e.target === thumb) return;
+      const r = rail.getBoundingClientRect(), max = track.scrollWidth - track.clientWidth;
+      const ratio = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      track.scrollTo({ left: ratio * max, behavior: "smooth" });
+    });
+    if (window.ResizeObserver) new ResizeObserver(update).observe(track);
+    update();
+  });
+}
+
+/* ---------- 選擇 ---------- */
+function panelState(pid) {
+  if (pid === "pro") return { chart: S.cur && S.cur.chart, sel: S.proSel };
+  const id = pid === "A" ? S.hepan.a : S.hepan.b;
+  const c = Store.get(id);
+  return { chart: c ? chartOf(c) : null, sel: S.hpSel[pid] };
+}
+function applySel(pid, level, v) {
+  const st = panelState(pid); if (!st.chart || !st.sel) return;
+  const sel = st.sel, chart = st.chart, now = nowMoment();
+  if (level === "dayun") {
+    sel.dk = v; const [a, b] = yearRange(chart, v);
+    sel.year = now.Y >= a && now.Y <= b ? now.Y : a; sel.mk = sel.dn = sel.hb = null;
+  } else if (level === "year") { sel.year = v; sel.mk = sel.dn = sel.hb = null; }
+  else if (level === "month") { sel.mk = v; sel.dn = sel.hb = null; }
+  else if (level === "day") { sel.dn = v; sel.hb = null; }
+  else if (level === "hour") { sel.hb = v; }
+  if (pid !== "pro") syncOther(pid);
+  rerenderPanels(pid);
+}
+function syncOther(pid) {
+  const other = pid === "A" ? "B" : "A";
+  const src = S.hpSel[pid], st = panelState(other);
+  if (!src || !st.chart) return;
+  S.hpSel[other] = { dk: B.dayunIndexForYear(st.chart, src.year), year: src.year, mk: src.mk, dn: src.dn, hb: src.hb };
+}
+function rerenderPanels(pid) {
+  const y = window.scrollY;
+  if (pid === "pro") renderPro(); else renderHepan();
+  window.scrollTo(0, y);
+}
+
+/* =========================================================
+   關係清單
+   ========================================================= */
+const LAYER_NAME = { dayun: "大運", xiaoyun: "小運", liunian: "流年", liuyue: "流月", liuri: "流日", liushi: "流時" };
+function memberText(m, cat, mode) {
+  const ch = cat === "gan" ? GAN[m.idx % 10] : ZHI[m.idx % 12];
+  if (mode === "pair") {
+    const side = m.side === "T" ? "" : m.side + " ";
+    const pos = m.kind === "natal" ? ["年", "月", "日", "時"][m.pos] + (cat === "gan" ? "干" : "支") : LAYER_NAME[m.layer];
+    return `${side}${pos} ${ch}`;
+  }
+  return `${ch}（${m.label}）`;
+}
+function relItemHTML(r, top, mode) {
+  const W = S.W;
+  const chips = [`<span class="chip">${B.TYPE_LABEL[r.type]}</span>`];
+  if (r.hua != null) {
+    if (r.type === "ganhe" || r.type === "liuhe") chips.push(`<span class="chip gold">合，理論化${WX[r.hua]}</span>`);
+    else if (r.type === "sanhui") chips.push(`<span class="chip gold">理論成${WX[r.hua]}方</span>`);
+    else chips.push(`<span class="chip gold">理論成${WX[r.hua]}局</span>`);
+  }
+  r.notes.forEach(n => chips.push(`<span class="chip${n === "旬空" ? " warn" : ""}">${n}</span>`));
+  const src = r.members.map(m => memberText(m, r.cat, mode)).join(" × ");
+  return `<li class="ritem${top ? " top" : ""}"><span class="sc">${r.score.toFixed(1)}</span><div>
+    <div class="rt"><span class="tl">${esc(r.text)}</span>${chips.join("")}</div>
+    <div class="src">${esc(src)}</div>
+    <div class="calc">${B.TYPE_LABEL[r.type]} ${fmtN(r.typeScore)} × 位置 ${fmtN(r.pos)} × 力量 ${fmtN(r.power)}</div></div></li>`;
+}
+const fmtN = v => (Math.round(v * 100) / 100).toString();
+function relColHTML(sid, key, title, sub, list, mode) {
+  const W = S.W, topN = Math.round(W.view.top), th = W.view.fold;
+  if (!list.length) return `<div class="rel-col"><h3>${title}<small>${sub}</small></h3><p class="rel-none">沒有任何刑沖合害。</p></div>`;
+  const tops = list.slice(0, topN), rest = list.slice(topN);
+  const strong = rest.filter(r => r.score >= th), weak = rest.filter(r => r.score < th);
+  const fk = `${sid}:${key}`, open = !!S.fold[fk];
+  let h = `<div class="rel-col"><h3>${title}<small>${sub}・共 ${list.length} 條</small></h3>`;
+  h += `<span class="toplabel">分數最高的 ${tops.length} 條</span><ol class="rlist">${tops.map(r => relItemHTML(r, true, mode)).join("")}</ol>`;
+  if (strong.length) h += `<ol class="rlist">${strong.map(r => relItemHTML(r, false, mode)).join("")}</ol>`;
+  if (weak.length) {
+    h += `<button type="button" class="btn btn-sm foldbtn" data-act="fold" data-key="${fk}" aria-expanded="${open}">${open ? "收起" : "展開"}較弱的 ${weak.length} 條（分數低於 ${fmtN(th)}）</button>`;
+    h += `<ol class="rlist"${open ? "" : " hidden"}>${weak.map(r => relItemHTML(r, false, mode)).join("")}</ol>`;
+  }
+  return h + "</div>";
+}
+function relBodyHTML(sid, ctx) {
+  const scored = B.scoreRelations(ctx.raw, ctx.items, { mode: ctx.mode, charts: ctx.charts }, S.W);
+  const base = scored.filter(r => !r.now), now = scored.filter(r => r.now);
+  const pair = ctx.mode === "pair";
+  return `<div class="rel-cols">${relColHTML(sid, "base", "底色", pair ? "兩人原局之間" : "原局內部", base, ctx.mode)}${relColHTML(sid, "now", "此刻", pair ? "大運與所選流年月日時，跨兩人" : "大運、流年、流月、流日、流時與原局", now, ctx.mode)}</div>`;
+}
+const relCtx = {};
+function relSectionHTML(sid, ctx) {
+  relCtx[sid] = ctx;
+  return `<section class="card rel" aria-labelledby="rel-t-${sid}">
+    <div class="rel-head"><h2 class="card-title" id="rel-t-${sid}">關係清單<small>分數＝類型分 × 位置係數 × 力量係數，每條都列出</small></h2>
+      <button type="button" class="btn btn-sm" data-act="wtoggle" aria-expanded="${S.prefs.wOpen}" aria-controls="w-${sid}">${S.prefs.wOpen ? "收起權重" : "調整權重"}</button></div>
+    <div class="weights" id="w-${sid}"${S.prefs.wOpen ? "" : " hidden"}>${weightsHTML(sid)}</div>
+    <div class="rel-body" id="rb-${sid}">${relBodyHTML(sid, ctx)}</div>
+  </section>`;
+}
+function weightsHTML(sid) {
+  const D = B.DEFAULT_WEIGHTS, W = S.W;
+  const groups = WMETA.map(gm => `<div class="wgroup"><h4>${gm.title}</h4>${gm.items.map(it => {
+    const [k, label, mn, mx, st] = it;
+    const min = mn != null ? mn : gm.min, max = mx != null ? mx : gm.max, step = st != null ? st : gm.step;
+    const v = W[gm.g][k], d = D[gm.g][k];
+    const id = `w-${sid}-${gm.g}-${k}`;
+    return `<div class="wslider${v !== d ? " changed" : ""}"><label class="wl" for="${id}">${label}<small>預設 ${fmtN(d)}</small></label><input type="range" id="${id}" data-wg="${gm.g}" data-wk="${k}" min="${min}" max="${max}" step="${step}" value="${v}"><output for="${id}">${fmtN(v)}</output></div>`;
+  }).join("")}</div>`).join("");
+  return `<div class="wgroups">${groups}</div><div class="row-actions" style="justify-content:flex-start;align-items:center"><button type="button" class="btn btn-sm" data-act="wreset">全部恢復預設</button><span class="hint">拖動即時重排，設定記在這個瀏覽器。合盤位置係數只用在合盤；日柱加權套用在牽到日柱的關係。</span></div>`;
+}
+let wSaveTimer = null;
+function onWeightInput(inp) {
+  const g = inp.dataset.wg, k = inp.dataset.wk, v = parseFloat(inp.value);
+  S.W[g][k] = v;
+  const box = inp.closest(".wslider");
+  box.querySelector("output").textContent = fmtN(v);
+  box.classList.toggle("changed", v !== B.DEFAULT_WEIGHTS[g][k]);
+  // 同步另一頁的同名滑桿
+  $$(`input[data-wg="${g}"][data-wk="${k}"]`).forEach(o => { if (o !== inp) { o.value = v; const b2 = o.closest(".wslider"); b2.querySelector("output").textContent = fmtN(v); b2.classList.toggle("changed", v !== B.DEFAULT_WEIGHTS[g][k]); } });
+  for (const sid in relCtx) { const el = document.getElementById("rb-" + sid); if (el) el.innerHTML = relBodyHTML(sid, relCtx[sid]); }
+  clearTimeout(wSaveTimer); wSaveTimer = setTimeout(() => LS.set("bazi.weights.v1", S.W), 300);
+}
+
+/* =========================================================
+   案例列表
+   ========================================================= */
+function caseSummary(c) {
+  const ch = chartOf(c);
+  const date = c.solar ? `公曆 ${fmtDash(c.solar)}` : "四柱直排";
+  const lun = ch.lunar ? ` · 農曆 ${B.lunarText(ch.lunar)}` : "";
+  return { ch, date, lun };
+}
+function renderCases() {
+  const root = $("#cases-card");
+  const list = Store.cases.filter(c => !S.ui.filter || (c.name || "").includes(S.ui.filter));
+  const where = Store.status === "cloud" ? "案例存在你的帳戶，換裝置打開也看得到。" : "案例存在這個瀏覽器。";
+  let h = `<div class="listhead"><div><h1 class="card-title">案例列表<small>共 ${Store.cases.length} 個</small></h1><p class="hint" style="margin:4px 0 0">${where}</p></div>
+    <input class="field" id="case-filter" type="search" placeholder="按姓名篩選" value="${esc(S.ui.filter)}" aria-label="按姓名篩選"></div>`;
+  if (!Store.cases.length) {
+    h += `<div class="empty"><p>還沒有存檔的案例。排盤後按抬頭的「存檔」，或在排盤頁打開「排盤後存入案例」。</p><div class="row-actions"><button class="btn btn-gold" type="button" data-act="go" data-page="input">去排盤</button></div></div>`;
+    root.innerHTML = h; return;
+  }
+  if (!list.length) { h += `<div class="empty"><p>沒有名字含「${esc(S.ui.filter)}」的案例。</p></div>`; root.innerHTML = h; return; }
+  h += `<div class="caselist">` + list.map(c => {
+    const { ch, date, lun } = caseSummary(c);
+    const inHp = [S.hepan.a === c.id ? "合盤 A" : "", S.hepan.b === c.id ? "合盤 B" : ""].filter(Boolean);
+    let extra = "";
+    if (S.ui.editing === c.id) extra = `<div class="case-edit"><label class="sr-only" for="rn-${c.id}">新名字</label><input class="field" id="rn-${c.id}" value="${esc(c.name)}" maxlength="30"><button class="btn btn-sm btn-gold" type="button" data-act="case-rename-save" data-id="${c.id}">儲存名字</button><button class="btn btn-sm" type="button" data-act="case-rename-cancel">取消</button></div>`;
+    if (S.ui.confirming === c.id) extra = `<div class="case-confirm"><span>確定刪除「${esc(c.name)}」？刪除後無法復原。</span><button class="btn btn-sm btn-danger solid" type="button" data-act="case-del-yes" data-id="${c.id}">刪除</button><button class="btn btn-sm" type="button" data-act="case-del-no">取消</button></div>`;
+    return `<div class="case">
+      <div><div class="case-name">${esc(c.name)} <span class="chip">${ch.male ? "乾造" : "坤造"}</span>${inHp.map(t => `<span class="chip gold">${t}</span>`).join("")}</div>
+        <div class="case-gz">${ch.pillars.map(gzH).join(" ")}</div>
+        <div class="case-meta">${esc(date)}${esc(lun)} · ${c.mode === "lunar" ? "農曆輸入" : c.mode === "sizhu" ? "四柱輸入" : "公曆輸入"}</div></div>
+      <div class="case-acts"><button class="btn btn-sm btn-gold" type="button" data-act="case-open" data-id="${c.id}">打開</button><button class="btn btn-sm" type="button" data-act="case-pro" data-id="${c.id}">專業細盤</button><button class="btn btn-sm" type="button" data-act="case-rename" data-id="${c.id}">改名</button><button class="btn btn-sm btn-danger" type="button" data-act="case-del" data-id="${c.id}">刪除</button></div>
+      ${extra}</div>`;
+  }).join("") + `</div>`;
+  root.innerHTML = h;
+  if (S.ui.editing) { const i = document.getElementById("rn-" + S.ui.editing); if (i) { i.focus(); i.select(); } }
+}
+
+/* =========================================================
+   合盤
+   ========================================================= */
+function hpSideHTML(side) {
+  const id = S.hepan[side], c = id ? Store.get(id) : null;
+  const L = side.toUpperCase();
+  if (!c) return `<div class="hp-side"><h3>${L} 方</h3><button class="btn btn-gold" type="button" data-act="hp-pick" data-side="${side}">從案例列表選擇</button><button class="btn btn-gray" type="button" data-act="hp-new" data-side="${side}">新增案例</button></div>`;
+  const ch = chartOf(c);
+  return `<div class="hp-side"><h3>${L} 方</h3><div class="hp-chosen"><span class="nm">${esc(c.name)} <span class="chip">${ch.male ? "乾造" : "坤造"}</span></span><span class="gz">${ch.pillars.map(gzH).join(" ")}</span><span class="hint">${c.solar ? "公曆 " + fmtDash(c.solar) : "四柱直排"}</span></div>
+    <div class="row-actions"><button class="btn btn-sm" type="button" data-act="hp-pick" data-side="${side}">換一個</button><button class="btn btn-sm" type="button" data-act="hp-new" data-side="${side}">新增案例</button></div></div>`;
+}
+function renderHepan() {
+  const root = $("#page-hepan");
+  ["a", "b"].forEach(s => { if (S.hepan[s] && !Store.get(S.hepan[s])) S.hepan[s] = null; });
+  const ready = S.hepan.a && S.hepan.b;
+  let h = `<div class="card hp-setup"><div class="hp-sides">${hpSideHTML("a")}<div class="hp-div"></div>${hpSideHTML("b")}</div>
+    <div class="hp-go"><button class="btn btn-dark gobtn" type="button" data-act="hp-start"${ready ? "" : " disabled"}>開始合盤</button>${ready ? "" : '<p class="hint" style="text-align:center;margin:8px 0 0">兩邊都選好案例後才能開始合盤。</p>'}</div></div>`;
+  if (!(ready && S.hepan.started)) { root.innerHTML = h; return; }
+  const cA = Store.get(S.hepan.a), cB = Store.get(S.hepan.b);
+  const A = chartOf(cA), Bc = chartOf(cB);
+  if (A.pillarsOnly || Bc.pillarsOnly) {
+    root.innerHTML = h + `<div class="card empty"><p>${A.pillarsOnly ? esc(cA.name) : esc(cB.name)} 是四柱直排、沒有日期的盤，只能比較原局。</p></div>` + pairStaticHTML(cA, cB, A, Bc, null, null);
+    return;
+  }
+  if (!S.hpSel.A) S.hpSel.A = selNow(A);
+  if (!S.hpSel.B) S.hpSel.B = selNow(Bc);
+  const pa = proPanelHTML("A", A, S.hpSel.A), pb = proPanelHTML("B", Bc, S.hpSel.B);
+  const mini = (c, ch, L) => `<div class="hp-mini"><span class="sx-ring">${ch.shengxiao}</span><div><div class="nm">${esc(c.name)}</div><div class="ln">${esc(B.lunarText(ch.lunar))} ${ZHI[ch.pillars[3] % 12]}時（${ch.male ? "乾造" : "坤造"}）· ${fmtCN(ch.civil)}</div></div><span class="side-tag">${L}</span></div>`;
+  const attnOf = (ch, cols) => attnHTML(B.findRelations(natalItems(ch).concat(dynItems(cols))));
+  h += `<div class="hp-panels"><div class="hp-panel">${mini(cA, A, "A")}${pa.html}${attnOf(A, pa.cols)}</div><div class="hp-panel">${mini(cB, Bc, "B")}${pb.html}${attnOf(Bc, pb.cols)}</div></div>`;
+  h += pairStaticHTML(cA, cB, A, Bc, pa.cols, pb.cols);
+  root.innerHTML = h;
+  setupStrips(root);
+}
+function pairStaticHTML(cA, cB, A, Bc, colsA, colsB) {
+  // 互看十神
+  const dA = A.dm, dB = Bc.dm;
+  const look = `<div class="card"><div class="card-pad" style="padding-bottom:6px"><h2 class="card-title">互看十神</h2></div><div class="duo">
+    <div>A 日主 ${gS(dA)}（${esc(cA.name)}）在 B 日主 ${gS(dB)} 眼裡是 <b class="gold">${B.tenGod(dB, dA)}</b></div>
+    <div>B 日主 ${gS(dB)}（${esc(cB.name)}）在 A 日主 ${gS(dA)} 眼裡是 <b class="gold">${B.tenGod(dA, dB)}</b></div></div></div>`;
+  // 五行互補
+  const count = ch => { const n = [0, 0, 0, 0, 0]; ch.pillars.forEach(p => { n[B.ganWx(p % 10)]++; n[B.zhiWx(p % 12)]++; }); return n; };
+  const nA = count(A), nB = count(Bc);
+  const rows = WX.map((w, i) => {
+    let note = "";
+    if (!nA[i] && !nB[i]) note = "兩人都缺";
+    else if (!nA[i]) note = `A 缺${w}，B 有 ${nB[i]} 個，可補`;
+    else if (!nB[i]) note = `B 缺${w}，A 有 ${nA[i]} 個，可補`;
+    return `<tr><th scope="row" class="w${i}">${w}</th><td class="num">${nA[i]}</td><td class="num">${nB[i]}</td><td class="note">${note || "—"}</td></tr>`;
+  }).join("");
+  const wx = `<div class="card"><div class="card-pad" style="padding-bottom:6px"><h2 class="card-title">五行互補<small>各自數原局天干地支八個字（地支按本身五行）</small></h2></div>
+    <div style="padding:0 20px 16px;overflow-x:auto"><table class="wxtable"><thead><tr><th scope="col">五行</th><th scope="col">A ${esc(cA.name)}</th><th scope="col">B ${esc(cB.name)}</th><th scope="col" style="text-align:left">缺的對方有沒有</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  // 關係
+  const items = natalItems(A, "A").concat(natalItems(Bc, "B"));
+  if (colsA && colsB) {
+    colsA.filter(c => c.kind === "dyn" && c.idx != null && (c.layer === "dayun" || c.layer === "xiaoyun")).forEach(c => items.push({ label: "A " + c.label, short: c.label, kind: "dyn", layer: c.layer, idx: c.idx, side: "A" }));
+    colsB.filter(c => c.kind === "dyn" && c.idx != null && (c.layer === "dayun" || c.layer === "xiaoyun")).forEach(c => items.push({ label: "B " + c.label, short: c.label, kind: "dyn", layer: c.layer, idx: c.idx, side: "B" }));
+    colsA.filter(c => c.kind === "dyn" && c.idx != null && !(c.layer === "dayun" || c.layer === "xiaoyun")).forEach(c => items.push({ label: c.label, short: c.label, kind: "dyn", layer: c.layer, idx: c.idx, side: "T" }));
+  }
+  const raw = B.findRelations(items);
+  return look + wx + relSectionHTML("hp", { mode: "pair", items, raw, charts: { A, B: Bc } });
+}
+
+/* ---------- 對話框 ---------- */
+let modalReturn = null;
+function openPicker(side) {
+  const m = $("#modal");
+  const list = Store.cases;
+  const other = side === "a" ? S.hepan.b : S.hepan.a;
+  const body = list.length ? list.map(c => {
+    const { ch, date } = caseSummary(c);
+    return `<button type="button" class="pick" data-act="hp-choose" data-side="${side}" data-id="${c.id}"><span class="nm">${esc(c.name)} <span class="chip">${ch.male ? "乾造" : "坤造"}</span>${c.id === other ? ' <span class="chip gold">已在另一方</span>' : ""}</span><span class="gz">${ch.pillars.map(gzH).join(" ")}</span><span class="mt">${esc(date)}</span></button>`;
+  }).join("") : `<div class="empty"><p>還沒有存檔的案例。</p><button class="btn btn-gold" type="button" data-act="hp-new" data-side="${side}">新增案例</button></div>`;
+  m.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-t"><div class="modal-head"><h2 class="card-title" id="modal-t">為 ${side.toUpperCase()} 方選擇案例</h2><button type="button" class="btn btn-sm" data-act="modal-close">關閉</button></div><div class="modal-body">${body}</div></div>`;
+  modalReturn = document.activeElement;
+  m.hidden = false;
+  const first = $(".pick, .modal-body .btn", m) || $('[data-act="modal-close"]', m);
+  if (first) first.focus();
+}
+function closeModal() { const m = $("#modal"); m.hidden = true; m.innerHTML = ""; if (modalReturn && modalReturn.focus) modalReturn.focus(); modalReturn = null; }
+
+/* =========================================================
+   事件
+   ========================================================= */
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-act]");
+  if (!t) { if (e.target.id === "modal") closeModal(); return; }
+  const act = t.dataset.act;
+  switch (act) {
+    case "go": go(t.dataset.page); break;
+    case "mode": setMode(t.dataset.mode); break;
+    case "now": { const c = nowCase(); setCurrent(c, false); go("basic"); break; }
+    case "save-cur": if (S.cur && !S.cur.saved) { Store.put(S.cur.c); S.cur.saved = true; LS.set("bazi.cur.v1", { c: S.cur.c, saved: true }); render(S.page); toast(`已存入案例列表：「${S.cur.c.name}」。`); } break;
+    case "edit-cur": if (S.cur) { S.flow = { type: "edit", id: S.cur.c.id, name: S.cur.c.name, saved: S.cur.saved, back: S.page === "pro" ? "pro" : "basic" }; fillFormFromCase(S.cur.c); go("input"); } break;
+    case "flow-cancel": { const f = S.flow; S.flow = null; updateBanner(); fillFormNow(); setMode("solar"); go(f && f.type === "hepan" ? "hepan" : (f && f.back) || "basic"); break; }
+    case "sha": S.prefs.sha = !S.prefs.sha; savePrefs(); rerenderPanels(S.page === "hepan" ? "A" : "pro"); if (S.page === "basic") renderBasic(); break;
+    case "sel": applySel(t.dataset.pid, t.dataset.level, +t.dataset.v); break;
+    case "today": {
+      const pid = t.dataset.pid, st = panelState(pid); if (!st.chart) break;
+      if (pid === "pro") S.proSel = selNow(st.chart); else { S.hpSel.A = null; S.hpSel.B = null; }
+      stripPos.clear(); rerenderPanels(pid); toast("已回到今天。"); break;
+    }
+    case "wtoggle": S.prefs.wOpen = !S.prefs.wOpen; savePrefs();
+      $$(".weights").forEach(w => { w.hidden = !S.prefs.wOpen; });
+      $$('[data-act="wtoggle"]').forEach(b => { b.setAttribute("aria-expanded", S.prefs.wOpen); b.textContent = S.prefs.wOpen ? "收起權重" : "調整權重"; });
+      break;
+    case "wreset": S.W = JSON.parse(JSON.stringify(B.DEFAULT_WEIGHTS)); LS.set("bazi.weights.v1", S.W);
+      for (const sid in relCtx) { const w = document.getElementById("w-" + sid); if (w) w.innerHTML = weightsHTML(sid); const el = document.getElementById("rb-" + sid); if (el) el.innerHTML = relBodyHTML(sid, relCtx[sid]); }
+      toast("權重已恢復預設。"); break;
+    case "fold": { const k = t.dataset.key; S.fold[k] = !S.fold[k]; const sid = k.split(":")[0]; const el = document.getElementById("rb-" + sid); if (el) el.innerHTML = relBodyHTML(sid, relCtx[sid]); const nb = document.querySelector(`[data-act="fold"][data-key="${k}"]`); if (nb) nb.focus(); break; }
+    case "case-open": case "case-pro": { const c = Store.get(t.dataset.id); if (c) { setCurrent(c, true); go(act === "case-pro" ? "pro" : "basic"); } break; }
+    case "case-rename": S.ui.editing = t.dataset.id; S.ui.confirming = null; renderCases(); break;
+    case "case-rename-cancel": S.ui.editing = null; renderCases(); break;
+    case "case-rename-save": {
+      const c = Store.get(t.dataset.id); const inp = document.getElementById("rn-" + t.dataset.id);
+      const nm = inp ? inp.value.trim() : "";
+      if (!nm) { toast("名字不能空白。"); break; }
+      if (c) { const n2 = Object.assign({}, c, { name: nm }); Store.put(n2); if (S.cur && S.cur.c.id === c.id) { S.cur.c = n2; LS.set("bazi.cur.v1", { c: n2, saved: true }); } }
+      S.ui.editing = null; renderCases(); toast("名字已更新。"); break;
+    }
+    case "case-del": S.ui.confirming = t.dataset.id; S.ui.editing = null; renderCases(); break;
+    case "case-del-no": S.ui.confirming = null; renderCases(); break;
+    case "case-del-yes": {
+      const id = t.dataset.id, c = Store.get(id);
+      Store.remove(id); S.ui.confirming = null;
+      if (S.cur && S.cur.c.id === id) { S.cur.saved = false; LS.set("bazi.cur.v1", { c: S.cur.c, saved: false }); }
+      if (S.hepan.a === id) S.hepan.a = null; if (S.hepan.b === id) S.hepan.b = null; saveHepan();
+      renderCases(); toast(`已刪除「${c ? c.name : ""}」。`); break;
+    }
+    case "hp-pick": openPicker(t.dataset.side); break;
+    case "hp-choose": { S.hepan[t.dataset.side] = t.dataset.id; S.hepan.started = false; S.hpSel = { A: null, B: null }; saveHepan(); closeModal(); renderHepan(); break; }
+    case "hp-new": closeModal(); S.flow = { type: "hepan", side: t.dataset.side }; fillFormNow(); $("#f-name").value = ""; setMode("solar"); go("input"); break;
+    case "hp-start": if (S.hepan.a && S.hepan.b) { S.hepan.started = true; S.hpSel = { A: null, B: null }; saveHepan(); renderHepan(); const p = $(".hp-panels"); if (p) p.scrollIntoView({ block: "start", behavior: "smooth" }); } break;
+    case "modal-close": closeModal(); break;
+    case "theme": {
+      const id = t.dataset.id;
+      S.theme.id = id; applyTheme(); renderTheme();
+      const nm = id === "auto" ? "跟隨系統" : id === "custom" ? "自訂" : (THEMES.find(x => x.id === id) || {}).name;
+      toast(`已套用「${nm}」。`);
+      const nb = document.querySelector(`.theme-card[data-id="${id}"]`); if (nb) nb.focus();
+      break;
+    }
+    case "cp-copy": {
+      const cur = themeNow();
+      S.theme.custom = { name: "自訂", bg: cur.bg, card: cur.card, ink: cur.ink, accent: cur.accent, bar: cur.bar, barInk: cur.barInk };
+      S.theme.id = "custom"; applyTheme(); renderTheme();
+      toast(`已把「${cur.name}」複製到自訂，可以逐一微調。`);
+      break;
+    }
+  }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.matches('[data-act="tms"]')) { S.prefs.tms = t.checked; savePrefs(); rerenderPanels("pro"); return; }
+  if (!t.closest("#f-form")) return;
+  if (t.id === "f-sy" || t.id === "f-sm") rebuildDays();
+  if (t.id === "f-ly") rebuildLunarMonths();
+  if (t.id === "f-lm") rebuildLunarDays();
+  if (t.id === "f-place") { if (t.value !== "custom") setPlaceByIndex(+t.value); }
+  if (t.id === "f-lon" || t.id === "f-lat") $("#f-place").value = "custom";
+  if (t.id === "f-save") { S.prefs.autosave = t.checked; savePrefs(); }
+  if (/^f-p\d$/.test(t.id) || t.id === "f-tz") { S.candPick = null; if (S.mode === "sizhu") renderCands(); }
+  if (t.name === "f-cand") S.candPick = +t.value;
+  updatePreview();
+});
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.matches('input[type="range"][data-wg]')) { onWeightInput(t); return; }
+  if (t.matches('input[type="color"][data-cp]')) { onCustomColor(t); return; }
+  if (t.id === "case-filter") { S.ui.filter = t.value.trim(); const pos = t.selectionStart; renderCases(); const f = $("#case-filter"); if (f) { f.focus(); try { f.setSelectionRange(pos, pos); } catch (x) { /* 無妨 */ } } return; }
+  if (t.id === "f-lon" || t.id === "f-lat" || t.id === "f-name") { if (t.id !== "f-name") $("#f-place").value = "custom"; updatePreview(); }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !$("#modal").hidden) closeModal();
+  if (e.key === "Enter" && e.target.id && e.target.id.startsWith("rn-")) { const b = document.querySelector(`[data-act="case-rename-save"][data-id="${e.target.id.slice(3)}"]`); if (b) b.click(); }
+});
+$("#f-form").addEventListener("submit", e => { e.preventDefault(); submitForm(); });
+
+/* ---------- 啟動 ---------- */
+function init() {
+  applyTheme();
+  buildFormOptions();
+  fillFormNow();
+  rebuildLunarMonths();
+  setModeNoSync("solar");
+  const saved = LS.get("bazi.cur.v1", null);
+  if (saved && saved.c) { try { setCurrent(saved.c, saved.saved); } catch (e) { S.cur = null; } }
+  Store.sort();
+  Store.subs.add(() => {
+    if (S.cur && S.cur.saved && !Store.get(S.cur.c.id) && Store.status === "cloud") { /* 雲端尚未有，保持 */ }
+    if (S.page === "cases") renderCases();
+    if (S.page === "hepan" && !S.hepan.started) renderHepan();
+  });
+  let page = (location.hash || "").replace("#", "");
+  if (!PAGES.includes(page)) page = LS.get("bazi.page", "input");
+  if ((page === "basic" || page === "pro") && !S.cur) page = "input";
+  go(page);
+  updatePreview();
+  tickNow(true);
+  setInterval(() => tickNow(false), 1000);
+  Store.initCloud();
+}
+init();
+})();
+
+</script>
+</body>
+</html>

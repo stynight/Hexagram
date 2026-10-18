@@ -1,0 +1,108 @@
+<title>八字排盤合盤</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="八字排盤與合盤：公曆、農曆、四柱輸入，基本排盤、專業細盤（大運流年流月流日流時）與兩人合盤關係清單。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap">
+<style>
+/*__CSS__*/
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+<script>
+/* 先套用上次選的主題，避免畫面閃一下預設色 */
+try { var tv = JSON.parse(localStorage.getItem("bazi.theme.vars") || "null"); if (tv) for (var tk in tv) document.documentElement.style.setProperty(tk, tv[tk]); } catch (e) { /* 無痕或封鎖 */ }
+</script>
+<div class="app">
+  <nav class="nav" aria-label="頁面">
+    <div class="nav-brand">八字排盤<small>排盤・細盤・合盤</small></div>
+    <button type="button" class="nav-item" data-act="go" data-page="input" aria-current="page">排盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="cases" aria-current="false">案例</button>
+    <button type="button" class="nav-item" data-act="go" data-page="basic" aria-current="false">基本排盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="pro" aria-current="false">專業細盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="hepan" aria-current="false">合盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="theme" aria-current="false">主題</button>
+  </nav>
+  <main class="main">
+    <section class="page" id="page-input" aria-label="排盤輸入">
+      <div class="banner" id="f-banner" hidden></div>
+      <form class="card card-pad form" id="f-form" novalidate>
+        <div class="frow"><label for="f-name">命主姓名</label><input class="field" id="f-name" placeholder="請輸入姓名（可留空）" maxlength="30" autocomplete="off"></div>
+        <div class="sexmode">
+          <div class="radios" role="radiogroup" aria-label="性別">
+            <label class="radio"><input type="radio" name="f-sex" id="f-sex-m" value="m" checked> 男</label>
+            <label class="radio"><input type="radio" name="f-sex" id="f-sex-f" value="f"> 女</label>
+          </div>
+          <div class="seg" role="group" aria-label="輸入方式">
+            <button type="button" data-act="mode" data-mode="solar" aria-pressed="true">公曆</button>
+            <button type="button" data-act="mode" data-mode="lunar" aria-pressed="false">農曆</button>
+            <button type="button" data-act="mode" data-mode="sizhu" aria-pressed="false">四柱</button>
+          </div>
+        </div>
+        <div class="frow" id="g-solar"><span class="flabel">出生日期</span>
+          <div class="fgroup"><select class="field" id="f-sy" aria-label="公曆年"></select><select class="field" id="f-sm" aria-label="公曆月"></select><select class="field" id="f-sd" aria-label="公曆日"></select></div>
+        </div>
+        <div class="frow" id="g-lunar" hidden><span class="flabel">農曆日期</span>
+          <div class="fgroup"><select class="field" id="f-ly" aria-label="農曆年"></select><select class="field" id="f-lm" aria-label="農曆月"></select><select class="field" id="f-ld" aria-label="農曆日"></select></div>
+        </div>
+        <div class="frow" id="g-time"><span class="flabel">出生時間</span>
+          <div class="fgroup"><select class="field" id="f-hh" aria-label="時"></select><select class="field" id="f-mi" aria-label="分"></select><span class="unit" id="f-shichen">子時</span></div>
+        </div>
+        <div class="frow" id="g-sizhu" hidden><span class="flabel">四柱</span>
+          <div class="fgroup"><select class="field" id="f-p0" aria-label="年柱"></select><select class="field" id="f-p1" aria-label="月柱"></select><select class="field" id="f-p2" aria-label="日柱"></select><select class="field" id="f-p3" aria-label="時柱"></select></div>
+        </div>
+        <div class="frow" id="g-sizhu-note" hidden><span class="flabel">符合時間</span>
+          <div style="min-width:0"><div class="cands" id="f-cands"></div><p class="hint" style="margin:6px 0 0">在 1801–2100 年間反查。按所選時區的標準時計，不套用真太陽時與夏令時；取時段中點起大運。預設選離今天最近的一筆。</p></div>
+        </div>
+        <div class="frow"><label for="f-place">出生地點</label>
+          <div class="placebox">
+            <select class="field" id="f-place"></select>
+            <div class="coords">
+              <label>經度 <input class="field num" id="f-lon" type="number" step="0.01" min="-180" max="180" inputmode="decimal"></label>
+              <label>緯度 <input class="field num" id="f-lat" type="number" step="0.01" min="-90" max="90" inputmode="decimal"></label>
+              <label>時區 <select class="field" id="f-tz"></select></label>
+            </div>
+            <p class="hint" style="margin:0">經度東正西負、緯度北正南負。只有勾選真太陽時才會用到經度。</p>
+          </div>
+        </div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="f-dst"> 夏令時</label>
+          <label class="check"><input type="checkbox" id="f-ts"> 真太陽時</label>
+          <label class="check"><input type="checkbox" id="f-zs"> 早晚子時</label>
+          <label class="switch" style="margin-left:auto"><input type="checkbox" id="f-save"> 排盤後存入案例</label>
+        </div>
+        <p class="hint" style="margin:-8px 0 0">夏令時：輸入的時間減一小時。真太陽時：依經度修正，再加均時差。早晚子時：勾選後 23:00–24:00 不換日（日柱用當天、時干用次日）；不勾則 23:00 起換日。</p>
+        <div class="preview" id="f-preview" aria-live="polite"></div>
+        <button class="btn btn-dark gobtn" id="f-go" type="submit">開始排盤</button>
+      </form>
+      <button class="now-card" id="nowcard" type="button" data-act="now">
+        <svg class="now-clock" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="46" fill="var(--card)" stroke="var(--line)" stroke-width="2"></circle>
+          <g stroke="var(--dim)" stroke-width="2" stroke-linecap="round">
+            <line x1="50" y1="9" x2="50" y2="14"></line><line x1="91" y1="50" x2="86" y2="50"></line><line x1="50" y1="91" x2="50" y2="86"></line><line x1="9" y1="50" x2="14" y2="50"></line>
+          </g>
+          <g fill="var(--dim)"><circle cx="70.5" cy="14.5" r="1.3"></circle><circle cx="85.5" cy="29.5" r="1.3"></circle><circle cx="85.5" cy="70.5" r="1.3"></circle><circle cx="70.5" cy="85.5" r="1.3"></circle><circle cx="29.5" cy="85.5" r="1.3"></circle><circle cx="14.5" cy="70.5" r="1.3"></circle><circle cx="14.5" cy="29.5" r="1.3"></circle><circle cx="29.5" cy="14.5" r="1.3"></circle></g>
+          <line id="nc-h" x1="50" y1="50" x2="50" y2="28" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"></line>
+          <line id="nc-m" x1="50" y1="50" x2="50" y2="16" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"></line>
+          <line id="nc-s" x1="50" y1="56" x2="50" y2="14" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round"></line>
+          <circle cx="50" cy="50" r="3" fill="var(--gold)"></circle>
+        </svg>
+        <span class="now-gz" id="nc-gz"></span>
+        <span class="now-side"><span class="now-pill">即時起局</span><span id="nc-lunar"></span><span id="nc-solar"></span></span>
+      </button>
+    </section>
+    <section class="page" id="page-cases" aria-label="案例列表" hidden><div class="card" id="cases-card"></div></section>
+    <section class="page" id="page-basic" aria-label="基本排盤" hidden></section>
+    <section class="page" id="page-pro" aria-label="專業細盤" hidden></section>
+    <section class="page" id="page-hepan" aria-label="合盤" hidden></section>
+    <section class="page" id="page-theme" aria-label="主題配色" hidden></section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="modal" id="modal" hidden></div>
+<script>
+/* ===== ENGINE BEGIN ===== */
+/*__ENGINE__*/
+/* ===== ENGINE END ===== */
+/*__APP__*/
+</script>
