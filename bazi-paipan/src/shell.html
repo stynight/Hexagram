@@ -1,9 +1,6 @@
 <title>八字排盤合盤</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="八字排盤與合盤：公曆、農曆、四柱輸入，基本排盤、專業細盤（大運流年流月流日流時）與兩人合盤關係清單。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap">
 <style>
 /*__CSS__*/
 [hidden] { display: none !important; }
@@ -21,7 +18,7 @@ try { var tv = JSON.parse(localStorage.getItem("bazi.theme.vars") || "null"); if
     <button type="button" class="nav-item" data-act="go" data-page="basic" aria-current="false">基本排盤</button>
     <button type="button" class="nav-item" data-act="go" data-page="pro" aria-current="false">專業細盤</button>
     <button type="button" class="nav-item" data-act="go" data-page="hepan" aria-current="false">合盤</button>
-    <button type="button" class="nav-item" data-act="go" data-page="theme" aria-current="false">主題</button>
+    <button type="button" class="nav-item" data-act="go" data-page="theme" aria-current="false">設定</button>
   </nav>
   <main class="main">
     <section class="page" id="page-input" aria-label="排盤輸入">
@@ -95,7 +92,8 @@ try { var tv = JSON.parse(localStorage.getItem("bazi.theme.vars") || "null"); if
     <section class="page" id="page-basic" aria-label="基本排盤" hidden></section>
     <section class="page" id="page-pro" aria-label="專業細盤" hidden></section>
     <section class="page" id="page-hepan" aria-label="合盤" hidden></section>
-    <section class="page" id="page-theme" aria-label="主題配色" hidden></section>
+    <section class="page" id="page-theme" aria-label="顯示與主題設定" hidden></section>
+    <button type="button" class="hide-note" id="hide-note" data-act="go" data-page="theme" hidden></button>
   </main>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

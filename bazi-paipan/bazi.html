@@ -7,9 +7,6 @@
 <title>八字排盤合盤</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="八字排盤與合盤：公曆、農曆、四柱輸入，基本排盤、專業細盤（大運流年流月流日流時）與兩人合盤關係清單。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap">
 <style>
 /* 版面：桌面左側導覽＋右側內容；手機頂部分頁。
    配色：每個主題只給底色、卡片、文字、主色、抬頭帶幾個基礎色，其餘全部由 color-mix 混出。淺色預設「月白」，深色預設「墨夜」，主題頁可換。 */
@@ -41,7 +38,7 @@
   --btn: var(--bar);
   --btn-ink: var(--bar-accent);
   --r: 14px;
-  --f-serif: "Noto Serif TC", "Songti TC", "STSong", "SimSun", "PMingLiU", serif;
+  --f-serif: "Songti TC", "STSong", "Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "PMingLiU", "SimSun", serif;
   --f-sans: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Hiragino Sans", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -523,6 +520,33 @@ table.pan col.c-dyn { background: transparent; }
   .theme-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 }
 
+/* ---------- 整柱標記（天剋地沖、天合地合、伏吟） ---------- */
+.mk { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; line-height: 1.3; font-weight: 600; white-space: nowrap; padding: 0 4px 0 3px; border-radius: 8px; vertical-align: 1px; }
+.mk::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+.mk.mk-day::before { width: 9px; height: 9px; }
+.mk.mk-day { font-weight: 800; }
+.mk-tkdc { color: var(--huo); background: color-mix(in srgb, var(--huo) 12%, transparent); }
+.mk-thdh { color: var(--mu); background: color-mix(in srgb, var(--mu) 12%, transparent); }
+.mk-fuyin { color: var(--jin); background: color-mix(in srgb, var(--jin) 14%, transparent); }
+.cell .c-mk { display: flex; flex-direction: column; align-items: center; gap: 1px; min-height: 15px; margin-top: 2px; }
+.cell .c-mk:empty { min-height: 15px; }
+table.pan tr.r-mk td { padding: 4px 1px; line-height: 1.5; }
+table.pan tr.r-mk td .mk { margin: 1px 0; flex-direction: column; gap: 1px; padding: 2px 3px 1px; border-radius: 6px; }
+.swipe-hint .mk { margin: 0 1px; }
+.hp-zhu { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 4px 20px 16px; font-size: 13.5px; align-items: baseline; }
+.hp-zhu .k { color: var(--gold-ink); font-weight: 600; }
+.hp-zhu .hz { display: inline-flex; align-items: baseline; gap: 6px; }
+
+/* ---------- 顯示項目設定 ---------- */
+.show-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-top: 12px; }
+.show-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-top: 12px; }
+.show-group { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px 10px; margin: 0; min-width: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0 10px; align-items: start; }
+.show-group legend { padding: 0 6px; color: var(--gold-ink); font-weight: 600; font-size: 13.5px; }
+.show-group .check { min-height: 34px; }
+.hide-note { display: block; margin: 4px auto 0; border: 1px dashed var(--line); background: transparent; color: var(--dim); border-radius: 8px; min-height: 36px; padding: 4px 14px; font-size: 13px; }
+.hide-note:hover { border-color: var(--gold); color: var(--gold-ink); }
+.hide-note[hidden] { display: none; }
+
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
@@ -540,7 +564,7 @@ try { var tv = JSON.parse(localStorage.getItem("bazi.theme.vars") || "null"); if
     <button type="button" class="nav-item" data-act="go" data-page="basic" aria-current="false">基本排盤</button>
     <button type="button" class="nav-item" data-act="go" data-page="pro" aria-current="false">專業細盤</button>
     <button type="button" class="nav-item" data-act="go" data-page="hepan" aria-current="false">合盤</button>
-    <button type="button" class="nav-item" data-act="go" data-page="theme" aria-current="false">主題</button>
+    <button type="button" class="nav-item" data-act="go" data-page="theme" aria-current="false">設定</button>
   </nav>
   <main class="main">
     <section class="page" id="page-input" aria-label="排盤輸入">
@@ -614,7 +638,8 @@ try { var tv = JSON.parse(localStorage.getItem("bazi.theme.vars") || "null"); if
     <section class="page" id="page-basic" aria-label="基本排盤" hidden></section>
     <section class="page" id="page-pro" aria-label="專業細盤" hidden></section>
     <section class="page" id="page-hepan" aria-label="合盤" hidden></section>
-    <section class="page" id="page-theme" aria-label="主題配色" hidden></section>
+    <section class="page" id="page-theme" aria-label="顯示與主題設定" hidden></section>
+    <button type="button" class="hide-note" id="hide-note" data-act="go" data-page="theme" hidden></button>
   </main>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
@@ -1172,8 +1197,17 @@ const juRole = b => mod(b - juStart(juGroup(b)), 12) / 4;     // 0 生 1 旺 2 �
 
 const TYPE_LABEL = {
   sanhui: "三會", sanhe: "三合", chong: "沖", liuhe: "六合", sanxing: "三刑", xing: "刑", banhe: "半合",
-  gonghe: "拱合", hai: "害", po: "破", anhe: "暗合", ganhe: "天干五合", ganchong: "天干四沖", ganke: "天干相剋"
+  gonghe: "拱合", hai: "害", po: "破", anhe: "暗合", ganhe: "天干五合", ganchong: "天干四沖", ganke: "天干相剋",
+  tkdc: "天剋地沖", thdh: "天合地合", fuyin: "伏吟"
 };
+/* 整柱關係：天剋地沖（干相剋或相沖、支相沖）、天合地合（干五合、支六合）、伏吟（干支全同） */
+function pillarRel(x, y) {
+  const d = Math.abs(x % 10 - y % 10), a = x % 12, b = y % 12;
+  if (x === y) return "fuyin";
+  if (Math.abs(a - b) === 6 && (d === 4 || d === 6)) return "tkdc";
+  if (d === 5 && a !== b && mod(a + b, 12) === 1) return "thdh";
+  return null;
+}
 
 /* items: [{key,label,kind:'natal'|'dyn', pos?, layer?, side?, idx}] → 原始關係清單 */
 function findRelations(items) {
@@ -1217,6 +1251,12 @@ function findRelations(items) {
     }
     if (a !== b && ANHE.has(`${Math.min(a, b)}-${Math.max(a, b)}`)) rel.push({ cat: "zhi", type: "anhe", m: [sm, lg], text: `${S}${L}暗合` });
   }
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const t = pillarRel(items[i].idx, items[j].idx);
+    if (!t) continue;
+    const nm = x => GAN[G[x]] + ZHI[B[x]];
+    rel.push({ cat: "zhu", type: t, m: [i, j], text: t === "fuyin" ? `${nm(i)}伏吟` : `${nm(i)}${nm(j)}${TYPE_LABEL[t]}` });
+  }
   for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) for (let k = j + 1; k < n; k++) {
     const t = [i, j, k], bs = t.map(x => B[x]);
     if (new Set(bs).size !== 3) continue;
@@ -1240,7 +1280,7 @@ function findRelations(items) {
 
 /* 權重預設值 */
 const DEFAULT_WEIGHTS = {
-  type: { sanhui: 10, sanhe: 9, chong: 8, liuhe: 7, sanxing: 7, xing: 6, banhe: 5, gonghe: 4.5, hai: 4, po: 3, anhe: 2, ganhe: 8, ganchong: 8, ganke: 5 },
+  type: { sanhui: 10, sanhe: 9, chong: 8, liuhe: 7, sanxing: 7, xing: 6, banhe: 5, gonghe: 4.5, hai: 4, po: 3, anhe: 2, ganhe: 8, ganchong: 8, ganke: 5, tkdc: 9, thdh: 8, fuyin: 6 },
   pos: { adj: 1.0, gap1: 0.7, gap2: 0.5, day: 1.2 },
   layer: { dayun: 1.0, xiaoyun: 0.7, liunian: 0.85, liuyue: 0.6, liuri: 0.4, liushi: 0.25, dyndyn: 0.8 },
   he: { dayStem: 1.5, dayBranch: 1.3, oneDay: 1.0, same: 0.8, other: 0.6 },
@@ -1269,7 +1309,7 @@ function scoreRelations(raw, items, ctx, W) {
           const x = mem[i], y = mem[j];
           let f;
           if (x.side === y.side) f = distCoef(x.pos, y.pos) * ((x.pos === 2 || y.pos === 2) ? W.pos.day : 1);
-          else if (x.pos === 2 && y.pos === 2) f = r.cat === "gan" ? W.he.dayStem : W.he.dayBranch;
+          else if (x.pos === 2 && y.pos === 2) f = r.cat === "zhi" ? W.he.dayBranch : W.he.dayStem;
           else if (x.pos === 2 || y.pos === 2) f = W.he.oneDay;
           else if (x.pos === y.pos) f = W.he.same;
           else f = W.he.other;
@@ -1320,6 +1360,7 @@ function scoreRelations(raw, items, ctx, W) {
 
 /* 留意（精簡字串，去重） */
 const ORDER_GAN = ["ganhe", "ganchong", "ganke"];
+const ORDER_ZHU = ["tkdc", "thdh", "fuyin"];
 const ORDER_ZHI = ["sanhui", "sanhe", "liuhe", "banhe", "gonghe", "anhe", "chong", "sanxing", "xing", "hai", "po"];
 function relText(r) {
   if (r.type === "ganhe" || r.type === "liuhe") return `${r.text}（理論化${WX[r.hua]}）`;
@@ -1328,10 +1369,11 @@ function relText(r) {
   return r.text;
 }
 function attention(raw) {
-  const gan = [], zhi = [];
+  const gan = [], zhi = [], zhu = [];
+  for (const t of ORDER_ZHU) for (const r of raw) if (r.type === t) { const s = relText(r); if (!zhu.includes(s)) zhu.push(s); }
   for (const t of ORDER_GAN) for (const r of raw) if (r.type === t) { const s = relText(r); if (!gan.includes(s)) gan.push(s); }
   for (const t of ORDER_ZHI) for (const r of raw) if (r.type === t) { const s = relText(r); if (!zhi.includes(s)) zhi.push(s); }
-  return { gan, zhi };
+  return { gan, zhi, zhu };
 }
 
 /* ---------------- 10. 四柱反查日期 ---------------- */
@@ -1374,7 +1416,7 @@ return {
   suiMonths, lunarOfDay, lunarMonthsOfYear, lunarToDayNum, lunarText,
   jdToClock, clockToJD, jdNow, addCalendar, hourBranchOf, SHICHEN_RANGE, pad2,
   buildChart, chartFromPillars, taiMingShen, currentDayunIndex, dayunIndexForYear, xiaoYun, liuYue, liuRi, liuShi, momentOf,
-  shensha, findRelations, scoreRelations, attention, relText, xingTarget, searchPillars
+  shensha, findRelations, pillarRel, scoreRelations, attention, relText, xingTarget, searchPillars
 };
 })();
 if (typeof module !== "undefined") module.exports = Bazi;
@@ -1433,7 +1475,7 @@ const TZS = [-12, -11, -10, -9.5, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0, 1
 
 /* ---------- 權重 ---------- */
 const WMETA = [
-  { g: "type", title: "關係類型分", min: 0, max: 12, step: 0.5, items: [["sanhui", "三會"], ["sanhe", "三合"], ["chong", "沖"], ["liuhe", "六合"], ["sanxing", "三刑（三支全）"], ["xing", "刑（含自刑）"], ["banhe", "半合"], ["gonghe", "拱合（生墓）"], ["hai", "害"], ["po", "破"], ["anhe", "暗合"], ["ganhe", "天干五合"], ["ganchong", "天干四沖"], ["ganke", "天干相剋"]] },
+  { g: "type", title: "關係類型分", min: 0, max: 12, step: 0.5, items: [["sanhui", "三會"], ["sanhe", "三合"], ["chong", "沖"], ["liuhe", "六合"], ["sanxing", "三刑（三支全）"], ["xing", "刑（含自刑）"], ["banhe", "半合"], ["gonghe", "拱合（生墓）"], ["hai", "害"], ["po", "破"], ["anhe", "暗合"], ["ganhe", "天干五合"], ["ganchong", "天干四沖"], ["ganke", "天干相剋"], ["tkdc", "天剋地沖（整柱）"], ["thdh", "天合地合（整柱）"], ["fuyin", "伏吟（整柱相同）"]] },
   { g: "pos", title: "位置係數（原局）", min: 0, max: 2, step: 0.05, items: [["adj", "相鄰柱"], ["gap1", "隔一柱"], ["gap2", "隔兩柱"], ["day", "牽到日柱"]] },
   { g: "layer", title: "動態層係數", min: 0, max: 1.5, step: 0.05, items: [["dayun", "大運"], ["xiaoyun", "小運"], ["liunian", "流年"], ["liuyue", "流月"], ["liuri", "流日"], ["liushi", "流時"], ["dyndyn", "歲運之間"]] },
   { g: "he", title: "合盤位置係數", min: 0, max: 2, step: 0.05, items: [["dayStem", "日干×日干"], ["dayBranch", "日支×日支"], ["oneDay", "一方是日柱"], ["same", "同柱位"], ["other", "其他柱位"]] },
@@ -1499,6 +1541,48 @@ function themePreviewHTML(t, label) {
       <span class="tc-gz"><span style="color:${wx.mu}">甲</span><span style="color:${wx.huo}">丙</span><span style="color:${wx.tu}">戊</span><span style="color:${wx.jin}">庚</span><span style="color:${wx.shui}">壬</span></span>
       <span class="tc-sel" style="background:${t.accent}"></span></span></span></span>`;
 }
+/* ---------- 顯示項目（手機、電腦分開記） ---------- */
+const SHOW_GROUPS = [
+  { title: "命盤表的列", items: [["ss", "主星"], ["mk", "對原局（沖、合、伏）"], ["cang", "藏干"], ["fu", "副星（基本排盤）"], ["xy", "星運"], ["zz", "自坐"], ["kong", "空亡"], ["ny", "納音"], ["sha", "神煞"]] },
+  { title: "干支條", items: [["s-dayun", "大運條"], ["s-year", "流年條"], ["s-month", "流月條"], ["s-day", "流日條"], ["s-hour", "流時條"], ["cmk", "格子底部的沖合標記"]] },
+  { title: "資料與說明", items: [["info", "節氣與基本信息（基本排盤）"], ["pinfo", "起運、交運、旬空（專業細盤）"], ["algo", "起運算法說明"], ["hint", "干支條操作說明"], ["wbar", "旺相休囚死"], ["attn", "天干、地支、整柱留意"], ["rel", "關係清單"], ["hpx", "合盤的互看十神與五行互補"]] }
+];
+const HIDE_SEL = {
+  ss: 'table.pan tr[data-row="ss"]', mk: 'table.pan tr[data-row="mk"]', cang: 'table.pan tr[data-row="cang"]', fu: 'table.pan tr[data-row="fu"]',
+  xy: 'table.pan tr[data-row="xy"]', zz: 'table.pan tr[data-row="zz"]', kong: 'table.pan tr[data-row="kong"]', ny: 'table.pan tr[data-row="ny"]',
+  sha: 'table.pan tr[data-row="sha"], .sha-toggle', "s-dayun": ".strip.s-dayun", "s-year": ".strip.s-year", "s-month": ".strip.s-month",
+  "s-day": ".strip.s-day", "s-hour": ".strip.s-hour", cmk: ".cell .c-mk", info: "#page-basic .infobar, #page-basic .basic-extra",
+  pinfo: ".pinfo-lines", algo: ".algo", hint: ".swipe-hint", wbar: ".wbar", attn: ".attn", rel: "section.rel", hpx: ".hpx"
+};
+const LITE = ["fu", "zz", "kong", "ny", "sha", "algo", "hint", "pinfo"];
+const DEV_NAME = { phone: "手機版", desktop: "電腦版" };
+const devMQ = window.matchMedia ? window.matchMedia("(max-width: 899px)") : null;
+const devNow = () => (devMQ && devMQ.matches ? "phone" : "desktop");
+function hideList(dev) { const h = S.prefs.hide || {}; return Array.isArray(h[dev]) ? h[dev].filter(k => HIDE_SEL[k]) : []; }
+function applyHide() {
+  const list = hideList(devNow());
+  let st = document.getElementById("hide-style");
+  if (!st) { st = document.createElement("style"); st.id = "hide-style"; document.head.appendChild(st); }
+  st.textContent = list.length ? list.map(k => HIDE_SEL[k]).join(",\n") + " { display: none !important; }" : "";
+  updateHideNote();
+}
+function updateHideNote() {
+  const n = $("#hide-note"); if (!n) return;
+  const cnt = hideList(devNow()).length;
+  n.hidden = !(cnt && ["basic", "pro", "hepan"].includes(S.page));
+  n.textContent = `${DEV_NAME[devNow()]}隱藏了 ${cnt} 項，按這裡到「設定」調整`;
+}
+if (devMQ) { const f = () => { applyHide(); if (S.page === "theme") renderTheme(); }; if (devMQ.addEventListener) devMQ.addEventListener("change", f); else if (devMQ.addListener) devMQ.addListener(f); }
+function showCardHTML() {
+  const dev = S.ui.showDev || devNow(), hid = new Set(hideList(dev));
+  const segBtn = d => `<button type="button" data-act="show-dev" data-dev="${d}" aria-pressed="${dev === d}">${DEV_NAME[d]}${d === devNow() ? "（這台）" : ""}</button>`;
+  return `<div class="card card-pad" id="show-card"><h1 class="card-title">顯示項目<small>打勾的會顯示，取消就隱藏；手機版（寬度 900 以下）與電腦版分開記，設定存在這個瀏覽器</small></h1>
+    <div class="show-top"><div class="seg" role="group" aria-label="設定哪一種畫面">${segBtn("phone")}${segBtn("desktop")}</div>
+      <div class="row-actions" style="margin:0"><button type="button" class="btn btn-sm" data-act="show-lite">精簡模式</button><button type="button" class="btn btn-sm" data-act="show-all">全部顯示</button></div></div>
+    <p class="hint" style="margin:8px 0 0">精簡模式會收起副星、自坐、空亡、納音、神煞、起運交運資訊與兩段說明，只留下看盤最常用的部分。</p>
+    <div class="show-groups">${SHOW_GROUPS.map(g => `<fieldset class="show-group"><legend>${g.title}</legend>${g.items.map(([k, l]) => `<label class="check"><input type="checkbox" data-show="${k}"${hid.has(k) ? "" : " checked"}> ${l}</label>`).join("")}</fieldset>`).join("")}</div></div>`;
+}
+function setHide(dev, list) { S.prefs.hide = Object.assign({}, S.prefs.hide, { [dev]: list }); savePrefs(); applyHide(); }
 function renderTheme() {
   const root = $("#page-theme");
   const cur = S.theme.id;
@@ -1508,7 +1592,7 @@ function renderTheme() {
   THEMES.forEach(t => { h += card(t.id, t.name, themeIsDark(t) ? "深色" : "淺色", themePreviewHTML(t)); });
   const c = S.theme.custom;
   h += card("custom", "自訂", themeIsDark(c) ? "深色" : "淺色", themePreviewHTML(c, "自訂"));
-  root.innerHTML = `<div class="card card-pad"><h1 class="card-title">主題配色<small>點一下就套用，設定記在這個瀏覽器；淺色主題的五行字用深色版，深色主題用亮色版</small></h1><div class="theme-grid">${h}</div></div>
+  root.innerHTML = showCardHTML() + `<div class="card card-pad"><h2 class="card-title">主題配色<small>點一下就套用，設定記在這個瀏覽器；淺色主題的五行字用深色版，深色主題用亮色版</small></h2><div class="theme-grid">${h}</div></div>
     <div class="card card-pad"><h2 class="card-title">自訂色盤<small>改任何一個顏色就切換到「自訂」並立即套用</small></h2>
       <div class="cp-grid">${THEME_KEYS.map(([k, l, d]) => `<label class="cp" for="cp-${k}"><span class="cp-l">${l}<small>${d}</small></span><input type="color" id="cp-${k}" data-cp="${k}" value="${esc(c[k])}"><code id="cpv-${k}">${esc(c[k].toUpperCase())}</code></label>`).join("")}</div>
       <div class="row-actions" style="justify-content:flex-start"><button type="button" class="btn btn-sm" data-act="cp-copy">把目前主題複製到自訂</button><button type="button" class="btn btn-sm" data-act="theme" data-id="auto">恢復跟隨系統</button></div>
@@ -1596,7 +1680,7 @@ const S = {
   hepan: Object.assign({ a: null, b: null, started: false }, LS.get("bazi.hepan.v1", {})),
   hpSel: { A: null, B: null },
   W: loadWeights(),
-  prefs: Object.assign({ tms: false, sha: true, wOpen: false, autosave: false }, LS.get("bazi.prefs.v1", {})),
+  prefs: Object.assign({ tms: false, sha: true, wOpen: false, autosave: false, hide: { phone: [], desktop: [] } }, LS.get("bazi.prefs.v1", {})),
   mode: "solar",
   flow: null,
   fold: {},
@@ -1649,6 +1733,7 @@ function go(page, opt) {
   $$(".page").forEach(p => { p.hidden = p.id !== "page-" + page; });
   $$(".nav-item").forEach(b => b.setAttribute("aria-current", b.dataset.page === page ? "page" : "false"));
   render(page);
+  updateHideNote();
   if (!opt || !opt.keepScroll) window.scrollTo(0, 0);
   try { history.replaceState(null, "", "#" + page); } catch (e) { /* 無妨 */ }
   LS.set("bazi.page", page);
@@ -1947,6 +2032,21 @@ function emptyChartHTML(title) {
 /* =========================================================
    命盤表（基本排盤與專業細盤共用）
    ========================================================= */
+/* 整柱標記：天剋地沖紅點、天合地合綠點、伏吟金點；牽到日柱的點較大 */
+const MK_CH = { tkdc: "沖", thdh: "合", fuyin: "伏" };
+const MK_NAME = { tkdc: "天剋地沖", thdh: "天合地合", fuyin: "伏吟" };
+function marksOf(idx, pillars, skip) {
+  const by = {};
+  pillars.forEach((p, pos) => { if (pos === skip) return; const t = B.pillarRel(idx, p); if (t) (by[t] = by[t] || []).push(pos); });
+  return ["tkdc", "thdh", "fuyin"].filter(t => by[t]).map(t => ({ t, pos: by[t] }));
+}
+function marksHTML(ms) {
+  return ms.map(m => {
+    const where = m.pos.map(p => "年月日時"[p]).join("");
+    return `<span class="mk mk-${m.t}${m.pos.includes(2) ? " mk-day" : ""}" title="${MK_NAME[m.t]}：原局${where}柱">${MK_CH[m.t]}${where}</span>`;
+  }).join("");
+}
+const cellMk = (idx, chart) => `<span class="c-mk">${idx == null ? "" : marksHTML(marksOf(idx, chart.pillars))}</span>`;
 function cellsFor(col, chart, row) {
   const dm = chart.dm;
   if (col.idx == null) {
@@ -1968,6 +2068,10 @@ function cellsFor(col, chart, row) {
     case "zz": return `<td${cls}>${B.changSheng(g, b)}</td>`;
     case "kong": return `<td${cls}>${B.xunKong(col.idx).map(x => ZHI[x]).join("")}</td>`;
     case "ny": return `<td${cls}>${B.nayin(col.idx)}</td>`;
+    case "mk": {
+      const ms = marksOf(col.idx, chart.pillars, col.kind === "natal" ? col.pos : -1);
+      return `<td${cls}>${ms.length ? marksHTML(ms) : '<span class="dim">—</span>'}</td>`;
+    }
     case "sha": {
       const list = chart.pillarsOnly ? B.shensha(chart, g, b) : B.shensha(chart, g, b);
       if (!S.prefs.sha) return `<td${cls}><span class="dim">${list.length ? list.length + " 項" : "—"}</span></td>`;
@@ -1976,15 +2080,15 @@ function cellsFor(col, chart, row) {
   }
   return "<td></td>";
 }
-const ROW_LABEL = { head: "日期", ss: "主星", gan: "天干", zhi: "地支", cang: "藏干", fu: "副星", cangss: "藏干", xy: "星運", zz: "自坐", kong: "空亡", ny: "納音", sha: "神煞" };
-const ROW_CLASS = { head: "r-head", ss: "r-ss", gan: "r-big", zhi: "r-big", cang: "r-cang", fu: "r-fu", cangss: "r-cang", xy: "r-sm", zz: "r-sm", kong: "r-sm", ny: "r-sm", sha: "r-sha" };
+const ROW_LABEL = { head: "日期", ss: "主星", gan: "天干", zhi: "地支", cang: "藏干", fu: "副星", cangss: "藏干", xy: "星運", zz: "自坐", kong: "空亡", ny: "納音", sha: "神煞", mk: "沖合" };
+const ROW_CLASS = { head: "r-head", ss: "r-ss", gan: "r-big", zhi: "r-big", cang: "r-cang", fu: "r-fu", cangss: "r-cang", xy: "r-sm", zz: "r-sm", kong: "r-sm", ny: "r-sm", sha: "r-sha", mk: "r-mk" };
 function panTableHTML(cols, chart, rows, caption) {
   let h = `<div class="pan-wrap"><table class="pan">${caption ? `<caption class="sr-only">${esc(caption)}</caption>` : ""}<colgroup><col class="c-lab">${cols.map(() => "<col>").join("")}</colgroup>`;
   for (const row of rows) {
-    h += `<tr class="${ROW_CLASS[row]}"><th scope="row">${ROW_LABEL[row]}</th>${cols.map(col => cellsFor(col, chart, row)).join("")}</tr>`;
+    h += `<tr class="${ROW_CLASS[row]}" data-row="${row === "cangss" ? "cang" : row}"><th scope="row">${ROW_LABEL[row]}</th>${cols.map(col => cellsFor(col, chart, row)).join("")}</tr>`;
   }
   h += "</table></div>";
-  if (rows.includes("sha")) h += `<button type="button" class="sha-toggle" data-act="sha" aria-expanded="${S.prefs.sha}">${S.prefs.sha ? "收起神煞（只顯示每柱項數）" : "展開神煞"}</button>`;
+  if (rows.includes("sha")) h += `<button type="button" class="sha-toggle" data-row="sha" data-act="sha" aria-expanded="${S.prefs.sha}">${S.prefs.sha ? "收起神煞（只顯示每柱項數）" : "展開神煞"}</button>`;
   return h;
 }
 function natalCols(chart, wxs) {
@@ -1998,6 +2102,7 @@ function attnHTML(raw) {
   return `<div class="card attn">
     <div class="attn-row"><span class="k">天干留意</span><span class="v">${a.gan.length ? a.gan.join("，") : "無合沖關係"}</span></div>
     <div class="attn-row"><span class="k">地支留意</span><span class="v">${a.zhi.length ? a.zhi.join("，") : "無刑沖合害"}</span></div>
+    <div class="attn-row"><span class="k">整柱留意</span><span class="v">${a.zhu.length ? a.zhu.join("，") : "無天剋地沖、天合地合、伏吟"}</span></div>
   </div>`;
 }
 function natalItems(chart, side) {
@@ -2015,7 +2120,7 @@ function renderBasic() {
   const info = basicInfoHTML(chart);
   const raw = B.findRelations(natalItems(chart));
   root.innerHTML = headerHTML(S.cur, "basic") + info +
-    `<div class="card" style="padding:6px 12px 12px">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "cang", "fu", "xy", "zz", "kong", "ny", "sha"], "基本排盤")}</div>` +
+    `<div class="card" style="padding:6px 12px 12px">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "mk", "cang", "fu", "xy", "zz", "kong", "ny", "sha"], "基本排盤")}</div>` +
     wbarHTML(chart) + attnHTML(raw) + extraInfoHTML(chart);
 }
 function basicInfoHTML(chart) {
@@ -2041,7 +2146,7 @@ function extraInfoHTML(chart) {
     items.push(["起運", `出生後 ${y.Y}年${y.M}月${y.D}天${y.H}時`], ["交運", `${fmtDash(y.jiao)}，大運${y.forward ? "順" : "逆"}排`]);
     items.push(["地點", `${esc(chart.input.lon != null ? lonText(chart.lon) : "")} ${chart.lat != null ? latText(chart.lat) : ""}`]);
   }
-  return `<div class="card"><div class="card-pad" style="padding-bottom:8px"><h2 class="card-title">基本信息</h2></div><div class="infogrid">${items.map(([k, v]) => `<div><span class="k">${esc(k)}</span><span class="v">${v}</span></div>`).join("")}</div></div>`;
+  return `<div class="card basic-extra"><div class="card-pad" style="padding-bottom:8px"><h2 class="card-title">基本信息</h2></div><div class="infogrid">${items.map(([k, v]) => `<div><span class="k">${esc(k)}</span><span class="v">${v}</span></div>`).join("")}</div></div>`;
 }
 
 /* =========================================================
@@ -2086,11 +2191,11 @@ function stripsHTML(pid, chart, sel) {
   const pr = v => `aria-pressed="${v ? "true" : "false"}"`;
   // 大運
   let cells = `<button type="button" class="cell${cellToday("dayun", -1, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="dayun" data-v="-1" ${pr(sel.dk === -1)}>
-      <span class="c-top num">${y.xiaoYunFrom}</span><span class="c-sub">1~${Math.max(1, y.dayun[0].startAge - 1)}歲</span><span class="c-big">小</span><span class="c-big">運</span></button>`;
+      <span class="c-top num">${y.xiaoYunFrom}</span><span class="c-sub">1~${Math.max(1, y.dayun[0].startAge - 1)}歲</span><span class="c-big">小</span><span class="c-big">運</span>${cellMk(null, chart)}</button>`;
   y.dayun.forEach((d, k) => {
     cells += `<button type="button" class="cell${cellToday("dayun", k, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="dayun" data-v="${k}" ${pr(sel.dk === k)}>
       <span class="c-top num">${d.startYear}</span><span class="c-sub">${d.startAge}歲</span>
-      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span></button>`;
+      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span>${cellMk(d.idx, chart)}</button>`;
   });
   let h = stripHTML(pid, "dy", "s-dayun", "大<br>運", "", cells);
   // 流年
@@ -2101,14 +2206,14 @@ function stripsHTML(pid, chart, sel) {
     cells += `<button type="button" class="cell${cellToday("year", Y, now, chart) ? " today" : ""}${Y < chart.birthYear ? " unborn" : ""}" data-act="sel" data-pid="${pid}" data-level="year" data-v="${Y}" ${pr(sel.year === Y)}>
       <span class="c-top num">${Y}</span>
       <span class="c-gz">${gS(i % 10)}<i>${ssAbbr(dm, i % 10)}</i></span><span class="c-gz">${zS(i % 12)}<i>${zAbbr(dm, i % 12)}</i></span>
-      <span class="c-xy">${xy != null ? B.gzName(xy) : "未出生"}</span></button>`;
+      <span class="c-xy">${xy != null ? B.gzName(xy) : "未出生"}</span>${cellMk(i, chart)}</button>`;
   }
   h += stripHTML(pid, `ln${y0}`, "s-year", "流<br>年", "小運", cells);
   // 流月
   const months = B.liuYue(sel.year, localTz());
   cells = months.map(m => `<button type="button" class="cell${cellToday("month", { Y: sel.year, k: m.k }, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="month" data-v="${m.k}" ${pr(sel.mk === m.k)}>
       <span class="c-top">${m.name}</span><span class="c-sub num">${m.clock.m}/${m.clock.d}</span>
-      <span class="c-gz">${gS(m.idx % 10)}<i>${ssAbbr(dm, m.idx % 10)}</i></span><span class="c-gz">${zS(m.idx % 12)}<i>${zAbbr(dm, m.idx % 12)}</i></span></button>`).join("");
+      <span class="c-gz">${gS(m.idx % 10)}<i>${ssAbbr(dm, m.idx % 10)}</i></span><span class="c-gz">${zS(m.idx % 12)}<i>${zAbbr(dm, m.idx % 12)}</i></span>${cellMk(m.idx, chart)}</button>`).join("");
   h += stripHTML(pid, `ly${sel.year}`, "s-month", "流<br>月", "", cells);
   // 流日
   if (sel.mk != null) {
@@ -2117,7 +2222,7 @@ function stripsHTML(pid, chart, sel) {
       const l = B.lunarOfDay(d.dayNum);
       return `<button type="button" class="cell${cellToday("day", d.dayNum, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="day" data-v="${d.dayNum}" ${pr(sel.dn === d.dayNum)}>
       <span class="c-top num">${d.m}/${d.d}</span><span class="c-sub">${l ? (l.day === 1 ? (l.leap ? "閏" : "") + B.LUNAR_MONTH[l.month] : B.LUNAR_DAY[l.day]) : ""}</span>
-      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span></button>`;
+      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span>${cellMk(d.idx, chart)}</button>`;
     }).join("");
     h += stripHTML(pid, `lr${sel.year}-${sel.mk}`, "s-day", "流<br>日", "", cells);
   }
@@ -2125,7 +2230,7 @@ function stripsHTML(pid, chart, sel) {
   if (sel.dn != null) {
     cells = B.liuShi(sel.dn).map(t => `<button type="button" class="cell${cellToday("hour", { dn: sel.dn, b: t.branch }, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="hour" data-v="${t.branch}" ${pr(sel.hb === t.branch)}>
       <span class="c-top">${ZHI[t.branch]}時</span><span class="c-sub num">${t.range}</span>
-      <span class="c-gz">${gS(t.idx % 10)}<i>${ssAbbr(dm, t.idx % 10)}</i></span><span class="c-gz">${zS(t.idx % 12)}<i>${zAbbr(dm, t.idx % 12)}</i></span></button>`).join("");
+      <span class="c-gz">${gS(t.idx % 10)}<i>${ssAbbr(dm, t.idx % 10)}</i></span><span class="c-gz">${zS(t.idx % 12)}<i>${zAbbr(dm, t.idx % 12)}</i></span>${cellMk(t.idx, chart)}</button>`).join("");
     h += stripHTML(pid, `ls${sel.dn}`, "s-hour", "流<br>時", "", cells);
   }
   return h;
@@ -2159,12 +2264,12 @@ function proInfoHTML(pid, chart) {
 function tmsHTML(chart) {
   const e = chart.extra;
   const cols = [["胎元", e.taiyuan], ["命宮", e.minggong], ["身宮", e.shengong]].map(([t, idx]) => ({ title: t, idx, kind: "extra" }));
-  return `<div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:6px">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "cangss", "xy", "zz", "kong", "ny"], "胎命身")}</div>`;
+  return `<div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:6px">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "mk", "cangss", "xy", "zz", "kong", "ny"], "胎命身")}</div>`;
 }
 function proPanelHTML(pid, chart, sel) {
   const cols = proCols(chart, sel);
-  const left = `<div class="card pro-left">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "cangss", "xy", "zz", "kong", "ny", "sha"], "專業細盤")}${S.prefs.tms ? tmsHTML(chart) : ""}</div>`;
-  const right = `<div class="card pro-right">${proInfoHTML(pid, chart)}${stripsHTML(pid, chart, sel)}<p class="swipe-hint">干支條可左右滑動，或拖動下方捲軸、按 ◀ ▶。點一格即選中，左側對應的列與下方清單會跟著換；點流月後出現流日，點流日後出現流時。格子頂端有<span class="today-dot" aria-hidden="true"></span>小紅點的是今天所在的一格。</p>${wbarHTML(chart)}</div>`;
+  const left = `<div class="card pro-left">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "mk", "cangss", "xy", "zz", "kong", "ny", "sha"], "專業細盤")}${S.prefs.tms ? tmsHTML(chart) : ""}</div>`;
+  const right = `<div class="card pro-right">${proInfoHTML(pid, chart)}${stripsHTML(pid, chart, sel)}<p class="swipe-hint">干支條可左右滑動，或拖動下方捲軸、按 ◀ ▶。點一格即選中，左側對應的列與下方清單會跟著換；點流月後出現流日，點流日後出現流時。格子頂端有<span class="today-dot" aria-hidden="true"></span>小紅點的是今天所在的一格。格子底部的標記對照原局：<span class="mk mk-tkdc">沖</span>天剋地沖、<span class="mk mk-thdh">合</span>天合地合、<span class="mk mk-fuyin">伏</span>伏吟，後面的字是原局哪一柱，牽到日柱的點較大。</p>${wbarHTML(chart)}</div>`;
   return { html: `<div class="pro" data-pid="${pid}"><div class="pro-body">${left}${right}</div></div>`, cols };
 }
 function renderPro() {
@@ -2267,10 +2372,10 @@ function rerenderPanels(pid) {
    ========================================================= */
 const LAYER_NAME = { dayun: "大運", xiaoyun: "小運", liunian: "流年", liuyue: "流月", liuri: "流日", liushi: "流時" };
 function memberText(m, cat, mode) {
-  const ch = cat === "gan" ? GAN[m.idx % 10] : ZHI[m.idx % 12];
+  const ch = cat === "gan" ? GAN[m.idx % 10] : cat === "zhi" ? ZHI[m.idx % 12] : B.gzName(m.idx);
   if (mode === "pair") {
     const side = m.side === "T" ? "" : m.side + " ";
-    const pos = m.kind === "natal" ? ["年", "月", "日", "時"][m.pos] + (cat === "gan" ? "干" : "支") : LAYER_NAME[m.layer];
+    const pos = m.kind === "natal" ? ["年", "月", "日", "時"][m.pos] + (cat === "gan" ? "干" : cat === "zhi" ? "支" : "柱") : LAYER_NAME[m.layer];
     return `${side}${pos} ${ch}`;
   }
   return `${ch}（${m.label}）`;
@@ -2420,9 +2525,12 @@ function renderHepan() {
 function pairStaticHTML(cA, cB, A, Bc, colsA, colsB) {
   // 互看十神
   const dA = A.dm, dB = Bc.dm;
-  const look = `<div class="card"><div class="card-pad" style="padding-bottom:6px"><h2 class="card-title">互看十神</h2></div><div class="duo">
+  const zhu = [];
+  A.pillars.forEach((pa, i) => Bc.pillars.forEach((pb, j) => { const t = B.pillarRel(pa, pb); if (t) zhu.push(`<span class="mk mk-${t}${i === 2 && j === 2 ? " mk-day" : ""}">${MK_CH[t]}</span>A ${"年月日時"[i]}柱 ${B.gzName(pa)} 與 B ${"年月日時"[j]}柱 ${B.gzName(pb)} ${MK_NAME[t]}`); }));
+  const look = `<div class="card hpx"><div class="card-pad" style="padding-bottom:6px"><h2 class="card-title">互看十神</h2></div><div class="duo">
     <div>A 日主 ${gS(dA)}（${esc(cA.name)}）在 B 日主 ${gS(dB)} 眼裡是 <b class="gold">${B.tenGod(dB, dA)}</b></div>
-    <div>B 日主 ${gS(dB)}（${esc(cB.name)}）在 A 日主 ${gS(dA)} 眼裡是 <b class="gold">${B.tenGod(dA, dB)}</b></div></div></div>`;
+    <div>B 日主 ${gS(dB)}（${esc(cB.name)}）在 A 日主 ${gS(dA)} 眼裡是 <b class="gold">${B.tenGod(dA, dB)}</b></div></div>
+    <div class="hp-zhu"><span class="k">整柱對照</span>${zhu.length ? zhu.map(z => `<span class="hz">${z}</span>`).join("") : "<span>兩人原局之間沒有天剋地沖、天合地合或伏吟。</span>"}</div></div>`;
   // 五行互補
   const count = ch => { const n = [0, 0, 0, 0, 0]; ch.pillars.forEach(p => { n[B.ganWx(p % 10)]++; n[B.zhiWx(p % 12)]++; }); return n; };
   const nA = count(A), nB = count(Bc);
@@ -2433,7 +2541,7 @@ function pairStaticHTML(cA, cB, A, Bc, colsA, colsB) {
     else if (!nB[i]) note = `B 缺${w}，A 有 ${nA[i]} 個，可補`;
     return `<tr><th scope="row" class="w${i}">${w}</th><td class="num">${nA[i]}</td><td class="num">${nB[i]}</td><td class="note">${note || "—"}</td></tr>`;
   }).join("");
-  const wx = `<div class="card"><div class="card-pad" style="padding-bottom:6px"><h2 class="card-title">五行互補<small>各自數原局天干地支八個字（地支按本身五行）</small></h2></div>
+  const wx = `<div class="card hpx"><div class="card-pad" style="padding-bottom:6px"><h2 class="card-title">五行互補<small>各自數原局天干地支八個字（地支按本身五行）</small></h2></div>
     <div style="padding:0 20px 16px;overflow-x:auto"><table class="wxtable"><thead><tr><th scope="col">五行</th><th scope="col">A ${esc(cA.name)}</th><th scope="col">B ${esc(cB.name)}</th><th scope="col" style="text-align:left">缺的對方有沒有</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
   // 關係
   const items = natalItems(A, "A").concat(natalItems(Bc, "B"));
@@ -2525,6 +2633,13 @@ document.addEventListener("click", e => {
       const nb = document.querySelector(`.theme-card[data-id="${id}"]`); if (nb) nb.focus();
       break;
     }
+    case "show-dev": S.ui.showDev = t.dataset.dev; renderTheme(); { const b = document.querySelector(`[data-act="show-dev"][data-dev="${t.dataset.dev}"]`); if (b) b.focus(); } break;
+    case "show-lite": case "show-all": {
+      const dev = S.ui.showDev || devNow();
+      setHide(dev, act === "show-lite" ? LITE.slice() : []); renderTheme();
+      toast(`${DEV_NAME[dev]}已${act === "show-lite" ? "切換成精簡模式" : "恢復全部顯示"}。`);
+      const b = document.querySelector(`[data-act="${act}"]`); if (b) b.focus(); break;
+    }
     case "cp-copy": {
       const cur = themeNow();
       S.theme.custom = { name: "自訂", bg: cur.bg, card: cur.card, ink: cur.ink, accent: cur.accent, bar: cur.bar, barInk: cur.barInk };
@@ -2537,6 +2652,12 @@ document.addEventListener("click", e => {
 document.addEventListener("change", e => {
   const t = e.target;
   if (t.matches('[data-act="tms"]')) { S.prefs.tms = t.checked; savePrefs(); rerenderPanels("pro"); return; }
+  if (t.matches("input[data-show]")) {
+    const dev = S.ui.showDev || devNow(), set = new Set(hideList(dev)), k = t.dataset.show;
+    if (t.checked) set.delete(k); else set.add(k);
+    setHide(dev, SHOW_GROUPS.flatMap(g => g.items.map(i => i[0])).filter(x => set.has(x)));
+    return;
+  }
   if (!t.closest("#f-form")) return;
   if (t.id === "f-sy" || t.id === "f-sm") rebuildDays();
   if (t.id === "f-ly") rebuildLunarMonths();
@@ -2564,6 +2685,7 @@ $("#f-form").addEventListener("submit", e => { e.preventDefault(); submitForm();
 /* ---------- 啟動 ---------- */
 function init() {
   applyTheme();
+  applyHide();
   buildFormOptions();
   fillFormNow();
   rebuildLunarMonths();
