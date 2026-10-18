@@ -549,8 +549,17 @@ const juRole = b => mod(b - juStart(juGroup(b)), 12) / 4;     // 0 生 1 旺 2 �
 
 const TYPE_LABEL = {
   sanhui: "三會", sanhe: "三合", chong: "沖", liuhe: "六合", sanxing: "三刑", xing: "刑", banhe: "半合",
-  gonghe: "拱合", hai: "害", po: "破", anhe: "暗合", ganhe: "天干五合", ganchong: "天干四沖", ganke: "天干相剋"
+  gonghe: "拱合", hai: "害", po: "破", anhe: "暗合", ganhe: "天干五合", ganchong: "天干四沖", ganke: "天干相剋",
+  tkdc: "天剋地沖", thdh: "天合地合", fuyin: "伏吟"
 };
+/* 整柱關係：天剋地沖（干相剋或相沖、支相沖）、天合地合（干五合、支六合）、伏吟（干支全同） */
+function pillarRel(x, y) {
+  const d = Math.abs(x % 10 - y % 10), a = x % 12, b = y % 12;
+  if (x === y) return "fuyin";
+  if (Math.abs(a - b) === 6 && (d === 4 || d === 6)) return "tkdc";
+  if (d === 5 && a !== b && mod(a + b, 12) === 1) return "thdh";
+  return null;
+}
 
 /* items: [{key,label,kind:'natal'|'dyn', pos?, layer?, side?, idx}] → 原始關係清單 */
 function findRelations(items) {
@@ -594,6 +603,12 @@ function findRelations(items) {
     }
     if (a !== b && ANHE.has(`${Math.min(a, b)}-${Math.max(a, b)}`)) rel.push({ cat: "zhi", type: "anhe", m: [sm, lg], text: `${S}${L}暗合` });
   }
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const t = pillarRel(items[i].idx, items[j].idx);
+    if (!t) continue;
+    const nm = x => GAN[G[x]] + ZHI[B[x]];
+    rel.push({ cat: "zhu", type: t, m: [i, j], text: t === "fuyin" ? `${nm(i)}伏吟` : `${nm(i)}${nm(j)}${TYPE_LABEL[t]}` });
+  }
   for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) for (let k = j + 1; k < n; k++) {
     const t = [i, j, k], bs = t.map(x => B[x]);
     if (new Set(bs).size !== 3) continue;
@@ -617,7 +632,7 @@ function findRelations(items) {
 
 /* 權重預設值 */
 const DEFAULT_WEIGHTS = {
-  type: { sanhui: 10, sanhe: 9, chong: 8, liuhe: 7, sanxing: 7, xing: 6, banhe: 5, gonghe: 4.5, hai: 4, po: 3, anhe: 2, ganhe: 8, ganchong: 8, ganke: 5 },
+  type: { sanhui: 10, sanhe: 9, chong: 8, liuhe: 7, sanxing: 7, xing: 6, banhe: 5, gonghe: 4.5, hai: 4, po: 3, anhe: 2, ganhe: 8, ganchong: 8, ganke: 5, tkdc: 9, thdh: 8, fuyin: 6 },
   pos: { adj: 1.0, gap1: 0.7, gap2: 0.5, day: 1.2 },
   layer: { dayun: 1.0, xiaoyun: 0.7, liunian: 0.85, liuyue: 0.6, liuri: 0.4, liushi: 0.25, dyndyn: 0.8 },
   he: { dayStem: 1.5, dayBranch: 1.3, oneDay: 1.0, same: 0.8, other: 0.6 },
@@ -646,7 +661,7 @@ function scoreRelations(raw, items, ctx, W) {
           const x = mem[i], y = mem[j];
           let f;
           if (x.side === y.side) f = distCoef(x.pos, y.pos) * ((x.pos === 2 || y.pos === 2) ? W.pos.day : 1);
-          else if (x.pos === 2 && y.pos === 2) f = r.cat === "gan" ? W.he.dayStem : W.he.dayBranch;
+          else if (x.pos === 2 && y.pos === 2) f = r.cat === "zhi" ? W.he.dayBranch : W.he.dayStem;
           else if (x.pos === 2 || y.pos === 2) f = W.he.oneDay;
           else if (x.pos === y.pos) f = W.he.same;
           else f = W.he.other;
@@ -697,6 +712,7 @@ function scoreRelations(raw, items, ctx, W) {
 
 /* 留意（精簡字串，去重） */
 const ORDER_GAN = ["ganhe", "ganchong", "ganke"];
+const ORDER_ZHU = ["tkdc", "thdh", "fuyin"];
 const ORDER_ZHI = ["sanhui", "sanhe", "liuhe", "banhe", "gonghe", "anhe", "chong", "sanxing", "xing", "hai", "po"];
 function relText(r) {
   if (r.type === "ganhe" || r.type === "liuhe") return `${r.text}（理論化${WX[r.hua]}）`;
@@ -705,10 +721,11 @@ function relText(r) {
   return r.text;
 }
 function attention(raw) {
-  const gan = [], zhi = [];
+  const gan = [], zhi = [], zhu = [];
+  for (const t of ORDER_ZHU) for (const r of raw) if (r.type === t) { const s = relText(r); if (!zhu.includes(s)) zhu.push(s); }
   for (const t of ORDER_GAN) for (const r of raw) if (r.type === t) { const s = relText(r); if (!gan.includes(s)) gan.push(s); }
   for (const t of ORDER_ZHI) for (const r of raw) if (r.type === t) { const s = relText(r); if (!zhi.includes(s)) zhi.push(s); }
-  return { gan, zhi };
+  return { gan, zhi, zhu };
 }
 
 /* ---------------- 10. 四柱反查日期 ---------------- */
@@ -751,7 +768,7 @@ return {
   suiMonths, lunarOfDay, lunarMonthsOfYear, lunarToDayNum, lunarText,
   jdToClock, clockToJD, jdNow, addCalendar, hourBranchOf, SHICHEN_RANGE, pad2,
   buildChart, chartFromPillars, taiMingShen, currentDayunIndex, dayunIndexForYear, xiaoYun, liuYue, liuRi, liuShi, momentOf,
-  shensha, findRelations, scoreRelations, attention, relText, xingTarget, searchPillars
+  shensha, findRelations, pillarRel, scoreRelations, attention, relText, xingTarget, searchPillars
 };
 })();
 if (typeof module !== "undefined") module.exports = Bazi;
