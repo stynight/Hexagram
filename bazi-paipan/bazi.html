@@ -457,6 +457,11 @@ table.pan col.c-dyn { background: transparent; }
 .pick .nm { font-family: var(--f-serif); font-weight: 700; font-size: 16px; }
 .pick .gz { font-family: var(--f-serif); font-weight: 700; letter-spacing: .1em; }
 .pick .mt { grid-column: 1 / -1; font-size: 12.5px; color: var(--dim); }
+.cpf { padding: 10px 8px 12px; border-bottom: 1px solid var(--line-2); }
+.cpf-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 6px; }
+.cpf-name { font-size: 14px; color: var(--dim); }
+.cpf-text { margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--gold-softer); border: 1px solid var(--line-2); color: var(--ink); font-family: var(--f-serif); font-size: 15px; line-height: 1.75; letter-spacing: .04em; white-space: pre-wrap; overflow-wrap: anywhere; -webkit-user-select: all; user-select: all; }
+.cpf-hint { margin: 10px 8px 8px; line-height: 1.6; }
 .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; max-width: calc(100% - 32px); padding: 10px 18px; border-radius: 999px; background: var(--bar); color: var(--bar-ink); font-size: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
 
 /* ---------- 手機細節 ---------- */
@@ -2390,6 +2395,7 @@ function headerHTML(cur, page) {
   const acts = [];
   if (page === "pro") acts.push(`<label class="switch"><input type="checkbox" data-act="tms"${S.prefs.tms ? " checked" : ""}> 胎命身</label>`);
   acts.push(cur.saved ? `<span class="hdone">已存檔</span>` : `<button class="hbtn" type="button" data-act="save-cur">存檔</button>`);
+  acts.push(`<button class="hbtn" type="button" data-act="gz-copy-open" aria-haspopup="dialog">複製</button>`);
   acts.push(`<button class="hbtn" type="button" data-act="edit-cur">編輯</button>`);
   return `<header class="hbar">
     <div class="sx"><span class="sx-ring" aria-label="生肖${sx}">${sx}</span>${tag}</div>
@@ -2500,6 +2506,93 @@ function attnHTML(raw) {
 function natalItems(chart, side) {
   return ["年柱", "月柱", "日柱", "時柱"].map((label, pos) => ({ label, short: label[0], kind: "natal", pos, idx: chart.pillars[pos], side: side || "A" }));
 }
+
+/* =========================================================
+   複製
+   命盤表是一列天干、一列地支，瀏覽器照列複製會變成「丙庚壬甲 午寅辰辰」，還夾著五行小字與排版空白。
+   在表格裡拖選時改成按柱輸出，範圍取拖選起點與終點兩格圍出的長方形：
+   只圍到日期、主星、天干、地支這幾列時，得到「丙午 庚寅 壬辰 甲辰」一行；
+   圍到其他列時每列一行、格子用 Tab 隔開（可貼進試算表），天干地支合成「干支」一列。
+   還沒選的流日、流時欄（只有「—」）略過；設定裡隱藏的列不算。
+   起點與終點在同一格裡（只選一格裡的字）時照瀏覽器原本的方式複製。
+   ========================================================= */
+const PILLAR_ROWS = new Set(["head", "ss", "gan", "zhi"]);
+function cellText(td) {
+  if (!td) return "";
+  const c = td.cloneNode(true);
+  c.querySelectorAll(".sr-only, .ssa, .phhint, .wxs").forEach(n => n.remove());
+  const items = c.querySelectorAll(".cg, .sha, .mk");
+  if (items.length) return Array.from(items).map(n => n.textContent.replace(/\s+/g, "")).join("、");
+  return c.textContent.replace(/\s+/g, "");
+}
+function boundaryCell(node, off, isEnd) {
+  let el = node;
+  if (el && el.nodeType === 1 && el.childNodes.length) el = (isEnd ? el.childNodes[off - 1] : el.childNodes[off]) || el;
+  if (el && el.nodeType !== 1) el = el.parentElement;
+  return el && el.closest ? el.closest("table.pan td, table.pan th") : null;
+}
+function tableCopyText(sel) {
+  if (!sel || !sel.rangeCount || sel.isCollapsed) return null;
+  const cells = [];
+  for (let i = 0; i < sel.rangeCount; i++) {
+    const r = sel.getRangeAt(i);
+    cells.push(boundaryCell(r.startContainer, r.startOffset, false), boundaryCell(r.endContainer, r.endOffset, true));
+  }
+  if (cells.some(c => !c)) return null;
+  const table = cells[0].closest("table.pan");
+  if (cells.some(c => c.closest("table.pan") !== table)) return null;
+  if (cells.every(c => c === cells[0])) return null;
+  const rIdx = cells.map(c => c.parentElement.rowIndex), cIdx = cells.map(c => c.cellIndex);
+  const r0 = Math.min(...rIdx), r1 = Math.max(...rIdx);
+  const c0 = Math.max(1, Math.min(...cIdx)), c1 = Math.max(...cIdx);
+  if (c1 < c0) return null;                                          // 只選到左邊的列名
+  const rows = Array.from(table.rows).slice(r0, r1 + 1).filter(tr => tr.getClientRects().length);   // 設定裡隱藏的列不算
+  const keys = rows.map(tr => tr.dataset.row);
+  const ganRow = table.querySelector('tr[data-row="gan"]');
+  const cols = []; for (let i = c0; i <= c1; i++) if (!(ganRow && ganRow.cells[i] && ganRow.cells[i].classList.contains("ph"))) cols.push(i);   // 還沒選的流日、流時欄不算
+  if (!cols.length) return null;
+  const gan = rows.find(tr => tr.dataset.row === "gan"), zhi = rows.find(tr => tr.dataset.row === "zhi");
+  const gz = i => (gan ? cellText(gan.cells[i]) : "") + (zhi ? cellText(zhi.cells[i]) : "");
+  if ((gan || zhi) && keys.every(k => PILLAR_ROWS.has(k))) return cols.map(gz).join(" ");
+  const head = table.querySelector('tr[data-row="head"]');
+  const line = (label, vals) => [label].concat(vals).join("\t");
+  const out = head ? [line(cellText(head.cells[0]), cols.map(i => cellText(head.cells[i])))] : [];
+  for (const tr of rows) {
+    const k = tr.dataset.row;
+    if (k === "head" || (k === "zhi" && gan)) continue;
+    if (k === "gan" && zhi) { out.push(line("干支", cols.map(gz))); continue; }
+    out.push(line(cellText(tr.cells[0]), cols.map(i => cellText(tr.cells[i]))));
+  }
+  return out.join("\n");
+}
+/* 抬頭的「複製」：三種格式，都不含姓名 */
+function copyFormats(chart) {
+  const gz = chart.pillars.map(B.gzName).join(" ");
+  const zao = `${chart.male ? "乾造" : "坤造"} ${gz}`;
+  const lines = [zao];
+  if (chart.pillarsOnly) lines.push("日期未定（四柱直排）");
+  else {
+    lines.push(`公曆 ${fmtDash(chart.civil)}（${tzText(chart.tz)}${chart.dst ? "・夏令時" : ""}）`);
+    if (chart.trueSolar) lines.push(`真太陽時 ${fmtDash(chart.clock)}`);
+    lines.push(`農曆 ${B.lunarText(chart.lunar)} ${ZHI[chart.pillars[3] % 12]}時`);
+    const y = chart.yun;
+    lines.push(`起運 出生後 ${y.Y}年${y.M}月${y.D}天${y.H}時，大運${y.forward ? "順" : "逆"}排`);
+    lines.push(`大運 ${y.dayun.map(d => `${d.startAge}歲 ${B.gzName(d.idx)}`).join("、")}`);
+  }
+  return [["gz", "四柱", gz], ["zao", "乾坤造與四柱", zao], ["full", chart.pillarsOnly ? "完整資料" : "完整資料（公曆、農曆、起運、大運）", lines.join("\n")]];
+}
+async function copyText(text) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch (e) { /* 改用舊方法 */ }
+  const back = document.activeElement;
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.setAttribute("readonly", ""); ta.setAttribute("aria-hidden", "true");
+  ta.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none";
+  document.body.appendChild(ta); ta.select();
+  let done = false; try { done = document.execCommand("copy"); } catch (e) { done = false; }
+  ta.remove(); if (back && back.focus) back.focus();
+  return done;
+}
+function selectNode(el) { try { const s = getSelection(), r = document.createRange(); r.selectNodeContents(el); s.removeAllRanges(); s.addRange(r); } catch (e) { /* 無妨 */ } }
 
 /* =========================================================
    基本排盤
@@ -3022,6 +3115,17 @@ function openPicker(side) {
   const first = $(".pick, .modal-body .btn", m) || $('[data-act="modal-close"]', m);
   if (first) first.focus();
 }
+function openCopy() {
+  if (!S.cur) return;
+  const m = $("#modal");
+  const fm = copyFormats(S.cur.chart);
+  const body = fm.map(([k, name, text]) => `<div class="cpf"><div class="cpf-head"><span class="cpf-name" id="cpn-${k}">${esc(name)}</span><button type="button" class="btn btn-sm btn-gold" data-act="gz-copy" data-k="${k}" aria-describedby="cpn-${k}">複製</button></div><pre class="cpf-text" id="cpf-${k}">${esc(text)}</pre></div>`).join("") +
+    `<p class="hint cpf-hint">都不含姓名。在命盤表裡拖選也會按柱複製：只圍到日期、主星、天干、地支這幾列時，得到「${esc(fm[0][2])}」這樣一行；圍到其他列時每列一行、格子用 Tab 隔開，天干地支合成「干支」一列，可以貼進試算表。</p>`;
+  m.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-t"><div class="modal-head"><h2 class="card-title" id="modal-t">複製八字</h2><button type="button" class="btn btn-sm" data-act="modal-close">關閉</button></div><div class="modal-body">${body}</div></div>`;
+  modalReturn = document.activeElement;
+  m.hidden = false;
+  const first = $('[data-act="gz-copy"]', m); if (first) first.focus();
+}
 function closeModal() { const m = $("#modal"); m.hidden = true; m.innerHTML = ""; if (modalReturn && modalReturn.focus) modalReturn.focus(); modalReturn = null; }
 
 /* =========================================================
@@ -3077,6 +3181,16 @@ document.addEventListener("click", e => {
     case "hp-new": closeModal(); S.flow = { type: "hepan", side: t.dataset.side }; fillFormNow(); $("#f-name").value = ""; setMode("solar"); go("input"); break;
     case "hp-start": if (S.hepan.a && S.hepan.b) { S.hepan.started = true; S.hpSel = { A: null, B: null }; saveHepan(); renderHepan(); const p = $(".hp-panels"); if (p) p.scrollIntoView({ block: "start", behavior: "smooth" }); } break;
     case "modal-close": closeModal(); break;
+    case "gz-copy-open": openCopy(); break;
+    case "gz-copy": {
+      const pre = document.getElementById("cpf-" + t.dataset.k), nm = document.getElementById("cpn-" + t.dataset.k);
+      if (!pre) break;
+      copyText(pre.textContent).then(done => {
+        if (done) { closeModal(); toast(`已複製「${nm ? nm.textContent.replace(/（.*）/, "") : "八字"}」。`); }
+        else { selectNode(pre); toast("瀏覽器不讓網頁寫入剪貼簿，文字已經選好，請按 Ctrl+C（手機長按）複製。"); }
+      });
+      break;
+    }
     case "theme": {
       const id = t.dataset.id;
       S.theme.id = id; applyTheme(); renderTheme();
@@ -3149,6 +3263,12 @@ document.addEventListener("input", e => {
   if (t.matches('input[type="color"][data-cp]')) { onCustomColor(t); return; }
   if (t.id === "case-filter") { S.ui.filter = t.value.trim(); const pos = t.selectionStart; renderCases(); const f = $("#case-filter"); if (f) { f.focus(); try { f.setSelectionRange(pos, pos); } catch (x) { /* 無妨 */ } } return; }
   if (t.id === "f-lon" || t.id === "f-lat" || t.id === "f-name") { if (t.id !== "f-name") $("#f-place").value = "custom"; updatePreview(); }
+});
+document.addEventListener("copy", e => {
+  const text = tableCopyText(document.getSelection());
+  if (text == null || !e.clipboardData) return;
+  e.clipboardData.setData("text/plain", text);
+  e.preventDefault();
 });
 document.addEventListener("toggle", e => { if (e.target.matches && e.target.matches("details.sha-sw")) S.ui.shaOpen = e.target.open; }, true);
 document.addEventListener("keydown", e => {
