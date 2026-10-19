@@ -447,6 +447,11 @@ table.pan col.c-dyn { background: transparent; }
 .pick .nm { font-family: var(--f-serif); font-weight: 700; font-size: 16px; }
 .pick .gz { font-family: var(--f-serif); font-weight: 700; letter-spacing: .1em; }
 .pick .mt { grid-column: 1 / -1; font-size: 12.5px; color: var(--dim); }
+.cpf { padding: 10px 8px 12px; border-bottom: 1px solid var(--line-2); }
+.cpf-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 6px; }
+.cpf-name { font-size: 14px; color: var(--dim); }
+.cpf-text { margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--gold-softer); border: 1px solid var(--line-2); color: var(--ink); font-family: var(--f-serif); font-size: 15px; line-height: 1.75; letter-spacing: .04em; white-space: pre-wrap; overflow-wrap: anywhere; -webkit-user-select: all; user-select: all; }
+.cpf-hint { margin: 10px 8px 8px; line-height: 1.6; }
 .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; max-width: calc(100% - 32px); padding: 10px 18px; border-radius: 999px; background: var(--bar); color: var(--bar-ink); font-size: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
 
 /* ---------- 手機細節 ---------- */

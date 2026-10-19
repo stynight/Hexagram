@@ -31,6 +31,18 @@ async function run(vp) {
     ok(`[${T}] ${n} 無橫向溢出`, r.sw <= r.cw + 1, `${r.sw}/${r.cw}`);
   };
   const txt = async sel => (await page.locator(sel).first().innerText()).replace(/\s+/g, " ").trim();
+  // 在命盤表裡從 a 格選到 b 格（[列, 第幾格]，負數從右數），再送一次 copy 事件，回傳剪貼簿文字
+  const copyRect = async (root, a, b) => page.evaluate(([root, a, b]) => {
+    const t = document.querySelector(root + " table.pan");
+    const cell = ([row, col]) => { const tr = t.querySelector(`tr[data-row="${row}"]`); return tr.cells[col < 0 ? tr.cells.length + col : col]; };
+    const texts = n => { const w = document.createTreeWalker(n, NodeFilter.SHOW_TEXT), out = []; let x; while ((x = w.nextNode())) out.push(x); return out; };
+    const s = texts(cell(a))[0], e = texts(cell(b)).pop();
+    const r = document.createRange(); r.setStart(s, 0); r.setEnd(e, e.length);
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    const ev = new ClipboardEvent("copy", { clipboardData: new DataTransfer(), bubbles: true, cancelable: true });
+    document.dispatchEvent(ev); sel.removeAllRanges();
+    return { prevented: ev.defaultPrevented, text: ev.clipboardData.getData("text/plain") };
+  }, [root, a, b]);
 
   // 1 輸入頁
   await shot("01-input");
@@ -46,6 +58,27 @@ async function run(vp) {
   ok(`[${T}] 基本排盤 地支留意`, ["午戌半合", "酉丑半合", "丑戌相刑", "丑午相害", "酉戌相害"].every(s => basicText.includes(s)));
   ok(`[${T}] 基本排盤 星運`, /星運 長生 墓 衰 絕/.test(basicText));
   ok(`[${T}] 基本排盤 納音`, /納音 天河水 平地木 海中金 泉中水/.test(basicText));
+  // 2b 拖選命盤表複製：按柱輸出
+  const c1 = await copyRect("#page-basic", ["head", 1], ["zhi", 4]);
+  ok(`[${T}] 拖選四柱複製成一行`, c1.prevented && c1.text === "丙午 戊戌 乙丑 乙酉", JSON.stringify(c1.text));
+  const c2 = await copyRect("#page-basic", ["gan", 2], ["zhi", 3]);
+  ok(`[${T}] 只圍月、日兩柱`, c2.text === "戊戌 乙丑", JSON.stringify(c2.text));
+  const c3 = await copyRect("#page-basic", ["ss", 1], ["ny", 4]);
+  const l3 = c3.text.split("\n");
+  ok(`[${T}] 圍到其他列時每列一行、天干地支合成干支`, l3[0] === "日期\t年柱\t月柱\t日柱\t時柱" && l3.includes("干支\t丙午\t戊戌\t乙丑\t乙酉") && l3.includes("納音\t天河水\t平地木\t海中金\t泉中水") && l3.includes("藏干\t丁火、己土\t戊土、辛金、丁火\t己土、癸水、辛金\t辛金") && !l3.some(l => /^(天干|地支)\t/.test(l)), JSON.stringify(c3.text));
+  const c4 = await copyRect("#page-basic", ["ny", 1], ["ny", 1]);
+  ok(`[${T}] 只選一格裡的字照原本方式複製`, !c4.prevented);
+  if (!vp.mobile) {                                                  // 真的用滑鼠拖、按 Ctrl+C
+    await page.evaluate(() => { window.__copied = null; window.addEventListener("copy", e => { window.__copied = e.clipboardData.getData("text/plain"); }, { once: true }); });
+    const a = await page.locator('#page-basic table.pan tr[data-row="head"] td').first().boundingBox();
+    const b = await page.locator('#page-basic table.pan tr[data-row="zhi"] td').last().boundingBox();
+    await page.mouse.move(a.x + 4, a.y + a.height / 2); await page.mouse.down();
+    await page.mouse.move(b.x + b.width - 6, b.y + b.height / 2, { steps: 8 }); await page.mouse.up();
+    await page.keyboard.press("Control+C");
+    const dragged = await page.evaluate(() => window.__copied);
+    ok(`[${T}] 滑鼠拖選四柱、Ctrl+C`, dragged === "丙午 戊戌 乙丑 乙酉", JSON.stringify(dragged));
+    await page.evaluate(() => getSelection().removeAllRanges());
+  }
 
   // 3 專業細盤
   await page.click('.nav-item[data-page="pro"]');
@@ -103,6 +136,8 @@ async function run(vp) {
   const i2 = head2.indexOf("流年");
   ok(`[${T}] 點 2029 後流年列為己酉`, gan2[0][i2] + gan2[1][i2] === "己酉", gan2[0][i2] + gan2[1][i2]);
   ok(`[${T}] 點流年後流日條消失`, (await page.locator("#page-pro .strip.s-day").count()) === 0);
+  const pc = await copyRect("#page-pro", ["head", 1], ["zhi", -1]);
+  ok(`[${T}] 細盤拖選按柱複製、略過還沒選的欄`, pc.text.startsWith("己酉 ") && pc.text.endsWith(" 丙午 戊戌 乙丑 乙酉") && !pc.text.includes("—"), JSON.stringify(pc.text));
   const attn1 = await txt("#page-pro .attn");
   await page.click('#page-pro .strip.s-month .cell[data-v="3"]');
   ok(`[${T}] 點流月後流日條出現`, (await page.locator("#page-pro .strip.s-day").count()) === 1);
@@ -143,6 +178,14 @@ async function run(vp) {
   // 折疊
   const foldBtn = page.locator('#page-pro [data-act="fold"]').first();
   if (await foldBtn.count()) { await foldBtn.click(); ok(`[${T}] 較弱關係可展開`, (await foldBtn.getAttribute("aria-expanded")) === "true"); }
+  // 抬頭的「複製」
+  await page.click('#page-pro .hbar [data-act="gz-copy-open"]');
+  const fmts = await page.$$eval("#modal .cpf-text", ps => ps.map(p => p.textContent));
+  ok(`[${T}] 複製視窗有三種格式`, fmts.length === 3 && fmts[0] === "丙午 戊戌 乙丑 乙酉" && fmts[1] === "乾造 丙午 戊戌 乙丑 乙酉" && fmts[2].startsWith("乾造 丙午 戊戌 乙丑 乙酉\n公曆 2026-10-18 17:01（北京時間）\n農曆 ") && fmts[2].includes("\n大運 8歲 己亥、18歲 庚子"), JSON.stringify(fmts));
+  await shot("06b-copy");
+  await page.click('#modal [data-act="gz-copy"][data-k="zao"]');
+  await page.waitForFunction(() => document.getElementById("toast").textContent.includes("已複製"), null, { timeout: 5000 }).catch(() => {});
+  ok(`[${T}] 按複製後關閉視窗並提示`, (await page.locator("#modal").isHidden()) && (await txt("#toast")).includes("已複製「乾坤造與四柱」"), await txt("#toast"));
   // 存檔
   await page.click('#page-pro [data-act="save-cur"]');
   ok(`[${T}] 存檔後顯示已存檔`, (await page.locator("#page-pro .hdone").count()) === 1);
