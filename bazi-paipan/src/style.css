@@ -332,7 +332,7 @@ table.pan col.c-dyn { background: transparent; }
 .strip-track { position: relative; display: flex; overflow-x: auto; scrollbar-width: none; scroll-behavior: auto; overscroll-behavior-x: contain; }
 .strip-track::-webkit-scrollbar { display: none; }
 .cell {
-  flex: 0 0 auto; width: 58px; padding: 7px 0 6px; border: 0; border-right: 1px solid var(--line-2); background: transparent;
+  flex: 0 0 auto; width: 58px; padding: 9px 0 6px; border: 0; border-right: 1px solid var(--line-2); background: transparent;
   display: flex; flex-direction: column; align-items: center; gap: 0; line-height: 1.22; color: var(--ink); position: relative;
 }
 .cell:hover { background: var(--gold-softer); }
@@ -344,8 +344,10 @@ table.pan col.c-dyn { background: transparent; }
 .cell .c-gz i { font-style: normal; font-family: var(--f-sans); font-size: 12px; font-weight: 400; color: var(--ink-2); margin-left: 1px; }
 .cell .c-xy { font-size: 11.5px; color: var(--ink-2); margin-top: 2px; white-space: nowrap; }
 .cell .c-big { font-family: var(--f-serif); font-size: 20px; font-weight: 700; line-height: 1.2; }
-.cell.today::before { content: ""; position: absolute; top: 2px; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: var(--huo); }
-.today-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--huo); vertical-align: 2px; margin: 0 2px; }
+/* 今天：主題色小菱形；主色偏紅時改金色（沖是紅色圓點加字，在格子底部，兩者顏色、形狀、位置都不同） */
+.cell.today::before { content: ""; position: absolute; top: 2px; left: 50%; width: 6px; height: 6px; margin-left: -3px; transform: rotate(45deg); border-radius: 1px; background: var(--today, var(--accent)); box-shadow: 0 0 0 1.5px var(--card); }
+.cell.today[aria-pressed="true"]::before { box-shadow: 0 0 0 1.5px var(--gold-soft); }
+.today-dot { display: inline-block; width: 6px; height: 6px; transform: rotate(45deg); border-radius: 1px; background: var(--today, var(--accent)); vertical-align: 1px; margin: 0 4px; }
 .cell.unborn { opacity: .5; }
 .strip.s-day .cell { width: 54px; }
 .strip.s-hour .cell { width: 60px; }
@@ -536,3 +538,63 @@ table.pan tr.r-mk td .mk { margin: 1px 0; flex-direction: column; gap: 1px; padd
 .hide-note { display: block; margin: 4px auto 0; border: 1px dashed var(--line); background: transparent; color: var(--dim); border-radius: 8px; min-height: 36px; padding: 4px 14px; font-size: 13px; }
 .hide-note:hover { border-color: var(--gold); color: var(--gold-ink); }
 .hide-note[hidden] { display: none; }
+
+/* ---------- 合盤：對照對方原局 ---------- */
+.mk.mk-x { background: transparent; box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 45%, transparent); }
+.mk.mk-x::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
+.cell.hit2::after { content: ""; position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 13px 13px 0; border-color: transparent var(--huo) transparent transparent; }
+.cell.hit2-thdh::after { border-right-color: var(--mu); }
+.hp-tools { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 12px 18px; }
+.hp-tools .hint { flex: 1 1 280px; margin: 0; }
+.hp-both .yr-rows { display: flex; flex-direction: column; gap: 10px; padding: 0 20px 16px; }
+.yr-row { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 8px; align-items: start; }
+.yr-row > .k { display: inline-flex; gap: 6px; align-items: center; color: var(--ink-2); font-size: 13.5px; padding-top: 6px; }
+.yr-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.yr-chip { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 5px 10px 6px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); text-align: left; line-height: 1.3; }
+.yr-chip:hover { border-color: var(--gold); background: var(--gold-softer); }
+.yr-chip b { font-size: 13.5px; }
+.yr-chip .yr-gz { font-family: var(--f-serif); font-weight: 700; font-size: 16px; }
+.yr-chip .yr-w { font-size: 11.5px; color: var(--dim); }
+.yr-chip.yr-tkdc { border-left: 3px solid var(--huo); }
+.yr-chip.yr-thdh { border-left: 3px solid var(--mu); }
+.yr-chip.is-now { box-shadow: inset 0 0 0 1px var(--gold); }
+@media (max-width: 640px) { .yr-row { grid-template-columns: minmax(0, 1fr); } .yr-row > .k { padding-top: 0; } }
+
+/* ---------- 關係清單：整柱收進干支 ---------- */
+.ritem .rsub { font-size: 12px; color: var(--ink-2); padding: 2px 0 0; }
+.ritem.zhu .tl { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--gold) 45%, transparent); text-underline-offset: 3px; }
+
+/* ---------- 細盤表欄位、神煞 ---------- */
+.dyn-note { margin: 6px 4px 0; font-size: 11.5px; color: var(--dim); }
+table.pan tr.r-sha td .sha.bad { color: var(--ink-2); }
+.dyn-group .radio, .sha-opt .radio { font-size: 14px; min-height: 32px; align-items: center; }
+#sha-card .sha-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin-top: 12px; }
+.sha-opt { border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px 8px; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 0; }
+.sha-opt legend { padding: 0 6px; color: var(--gold-ink); font-weight: 600; font-size: 13px; }
+.sha-opt .dflt { margin-left: 6px; font-size: 11px; color: var(--dim); white-space: nowrap; }
+.sha-opt .radio > span, .dyn-group .radio > span { min-width: 0; }
+.sha-sw > summary { cursor: pointer; color: var(--gold-ink); font-weight: 600; font-size: 14px; margin-top: 10px; }
+.sha-rules { margin-top: 12px; border-top: 1px solid var(--line-2); padding-top: 10px; }
+.sha-rules summary { cursor: pointer; color: var(--gold-ink); font-weight: 600; font-size: 14px; }
+.sha-rules dl { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0 18px; }
+.sha-rules dl > div { display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 8px; padding: 6px 0; border-top: 1px dashed var(--line-2); font-size: 13px; }
+.sha-rules dt { font-weight: 600; color: var(--ink); }
+.sha-rules dd { margin: 0; color: var(--ink-2); overflow-wrap: anywhere; }
+
+/* ---------- 帳戶同步狀態 ---------- */
+.sync { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); }
+.sync > i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--dim); align-self: center; }
+.sync-cloud > i { background: var(--mu); }
+.sync-connecting > i, .sync-saving > i { background: var(--jin); animation: syncpulse 1.2s ease-in-out infinite; }
+.sync-error > i { background: var(--danger); }
+.sync-error .sync-a { color: var(--danger); font-weight: 600; }
+.sync .sync-b { color: var(--dim); }
+@keyframes syncpulse { 50% { opacity: .35; } }
+.cases-sync { margin-top: 4px; }
+.nav-sync { padding: 10px 14px 0; min-height: 22px; }
+.nav-sync .sync { font-size: 12px; }
+@media (max-width: 899px) { .nav-sync { display: none; } }
+/* 開頁先畫框架：重的頁面先放佔位，下一個畫面再算 */
+.loading { display: flex; flex-direction: column; gap: 12px; padding: 28px 22px; color: var(--dim); font-size: 13.5px; }
+.loading .ld-bar { display: block; height: 6px; width: 40%; border-radius: 3px; background: linear-gradient(90deg, var(--line-2), var(--line), var(--line-2)); background-size: 200% 100%; animation: ldbar 1s linear infinite; }
+@keyframes ldbar { to { background-position: -200% 0; } }
