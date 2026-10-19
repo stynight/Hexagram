@@ -90,12 +90,20 @@ function hueSat(h) {
   return { h: hh, s: d / (1 - Math.abs(mx + mn - 1)) };
 }
 const reddish = h => { const x = hueSat(h); return x.s > 0.25 && (x.h < 28 || x.h > 330); };
+/* 主色跟卡片顏色太像（例如自訂成白底白色主色）時，選中的格子、按鈕字、今天的菱形都會看不見：
+   逐步往文字色調，直到對卡片的對比到 3 為止；內建主題都在 3 以上，不受影響 */
+function mixHex(a, b, p) { const A = rgbOf(a), Bv = rgbOf(b); return "#" + A.map((v, i) => Math.round(v + (Bv[i] - v) * p).toString(16).padStart(2, "0")).join("").toUpperCase(); }
+function legibleAccent(t) {
+  if (contrastOf(t.accent, t.card) >= 3) return t.accent;
+  for (let k = 1; k <= 20; k++) { const m = mixHex(t.accent, t.ink, k / 20); if (contrastOf(m, t.card) >= 3) return m; }
+  return t.ink;
+}
 function themeVars(t) {
-  const dark = themeIsDark(t), wx = dark ? WX_DARK : WX_LIGHT;
+  const dark = themeIsDark(t), wx = dark ? WX_DARK : WX_LIGHT, acc = legibleAccent(t);
   return {
-    "--bg": t.bg, "--card": t.card, "--ink": t.ink, "--accent": t.accent,
-    "--on-accent": contrastOf(t.accent, "#FFFFFF") >= contrastOf(t.accent, "#111111") ? "#FFFFFF" : "#111111",
-    "--today": reddish(t.accent) ? (dark ? "#E8C25A" : "#B8860B") : t.accent,
+    "--bg": t.bg, "--card": t.card, "--ink": t.ink, "--accent": acc,
+    "--on-accent": contrastOf(acc, "#FFFFFF") >= contrastOf(acc, "#111111") ? "#FFFFFF" : "#111111",
+    "--today": reddish(acc) ? (dark ? "#E8C25A" : "#B8860B") : acc,
     "--bar": t.bar, "--bar-ink": t.barInk,
     "--mu": wx.mu, "--huo": wx.huo, "--tu": wx.tu, "--jin": wx.jin, "--shui": wx.shui,
     "--danger": dark ? "#FF7B6E" : "#B42318",
@@ -119,13 +127,13 @@ function applyTheme() {
   LS.set("bazi.theme.vars", vars);
 }
 function themePreviewHTML(t, label) {
-  const wx = themeIsDark(t) ? WX_DARK : WX_LIGHT;
+  const wx = themeIsDark(t) ? WX_DARK : WX_LIGHT, acc = legibleAccent(t);
   const mix = (a, p, b) => `color-mix(in srgb, ${a} ${p}%, ${b})`;
   return `<span class="tc-prev" style="background:${t.bg}">
-    <span class="tc-bar" style="background:${t.bar};color:${mix(t.accent, 50, t.barInk)}"><i></i>${esc(label || t.name)}</span>
+    <span class="tc-bar" style="background:${t.bar};color:${mix(acc, 50, t.barInk)}"><i></i>${esc(label || t.name)}</span>
     <span class="tc-body"><span class="tc-cardm" style="background:${t.card};border:1px solid ${mix(t.ink, 12, t.card)}">
       <span class="tc-gz"><span style="color:${wx.mu}">甲</span><span style="color:${wx.huo}">丙</span><span style="color:${wx.tu}">戊</span><span style="color:${wx.jin}">庚</span><span style="color:${wx.shui}">壬</span></span>
-      <span class="tc-sel" style="background:${t.accent}"></span></span></span></span>`;
+      <span class="tc-sel" style="background:${acc}"></span></span></span></span>`;
 }
 /* ---------- 顯示項目（手機、電腦分開記） ---------- */
 const SHOW_GROUPS = [
@@ -237,7 +245,7 @@ function renderTheme() {
     <div class="card card-pad"><h2 class="card-title">自訂色盤<small>改任何一個顏色就切換到「自訂」並立即套用</small></h2>
       <div class="cp-grid">${THEME_KEYS.map(([k, l, d]) => `<label class="cp" for="cp-${k}"><span class="cp-l">${l}<small>${d}</small></span><input type="color" id="cp-${k}" data-cp="${k}" value="${esc(c[k])}"><code id="cpv-${k}">${esc(c[k].toUpperCase())}</code></label>`).join("")}</div>
       <div class="row-actions" style="justify-content:flex-start"><button type="button" class="btn btn-sm" data-act="cp-copy">把目前主題複製到自訂</button><button type="button" class="btn btn-sm" data-act="theme" data-id="auto">恢復跟隨系統</button></div>
-      <p class="hint" style="margin:10px 0 0">深淺按卡片顏色自動判斷；按鈕上的字會自動選黑或白；其他線條、淺底與次要文字都由這幾個顏色混出。</p></div>`;
+      <p class="hint" style="margin:10px 0 0">深淺按卡片顏色自動判斷；按鈕上的字會自動選黑或白；其他線條、淺底與次要文字都由這幾個顏色混出。主色如果跟卡片顏色太像（例如都設成白色），畫面上會自動往文字色加深一些，選中的格子、按鈕與今天的小菱形才看得見；色盤裡記的仍是你選的顏色。</p></div>`;
 }
 function onCustomColor(inp) {
   const k = inp.dataset.cp;
@@ -705,6 +713,13 @@ function setCurrent(c, saved) {
   S.proSel = null;
   LS.set("bazi.cur.v1", { c, saved: !!saved });
 }
+/* 目前的盤標著「已存檔」，案例列表裡卻已經沒有（在別處刪掉，或帳戶紀錄顯示已刪除）：改回可以按「存檔」 */
+function checkCurSaved() {
+  if (!S.cur || !S.cur.saved || Store.status === "connecting" || Store.get(S.cur.c.id)) return;
+  S.cur.saved = false;
+  LS.set("bazi.cur.v1", { c: S.cur.c, saved: false });
+  $$(".hbar .hdone").forEach(el => { el.outerHTML = `<button class="hbtn" type="button" data-act="save-cur">存檔</button>`; });
+}
 const isNum = v => typeof v === "number" && isFinite(v);
 function validCase(c) {
   if (!c || typeof c !== "object" || !c.place || !isNum(+c.place.tz)) return false;
@@ -800,10 +815,14 @@ function hitBoth(idx, chart, x) {
 const HIT_TEXT = { tkdc: "兩人同時天剋地沖", thdh: "兩人同時天合地合" };
 const hitCls = (idx, chart, x) => { const h = hitBoth(idx, chart, x); return h ? ` hit2 hit2-${h}` : ""; };
 const hitSr = (idx, chart, x) => { const h = hitBoth(idx, chart, x); return h ? `<span class="sr-only">，${HIT_TEXT[h]}</span>` : ""; };
+const PH_SHORT = { 先選流日: "先選日", 先選流月: "先選月" };
 function cellsFor(col, chart, row, ctx) {
   const dm = chart.dm;
   if (col.idx == null) {
-    if (row === "ss") return `<td class="ph${col.sep ? " sep" : ""}">—<span class="phhint">${esc(col.ph || "")}</span></td>`;
+    if (row === "ss") {                                              // 窄表格改用三個字的短提示，免得擠成兩行
+      const ph = col.ph || "", short = PH_SHORT[ph];
+      return `<td class="ph${col.sep ? " sep" : ""}">—<span class="phhint">${short ? `<span class="ph-l">${esc(ph)}</span><span class="ph-s">${esc(short)}</span>` : esc(ph)}</span></td>`;
+    }
     if (row === "head") return `<td class="${col.sep ? "sep" : ""}">${esc(col.title)}</td>`;
     return `<td class="ph${col.sep ? " sep" : ""}">${row === "gan" || row === "zhi" ? "—" : ""}</td>`;
   }
@@ -1535,8 +1554,10 @@ function init() {
   const saved = LS.get("bazi.cur.v1", null);
   if (saved && validCase(saved.c)) setCurrent(saved.c, saved.saved);
   Store.sort();
+  checkCurSaved();
   Store.subs.add(() => {
     renderSync();
+    checkCurSaved();
     if (S.page === "cases" && S.ui.casesRev !== Store.rev) renderCases();
     if (S.page === "hepan" && !S.hepan.started) renderHepan();
   });
