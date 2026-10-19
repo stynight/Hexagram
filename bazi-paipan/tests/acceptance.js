@@ -172,5 +172,78 @@ console.log("\n=== 交叉檢查 ===");
   eq("真太陽時修正約 −133.2 分", Math.abs(cts.solarOffsetMin - (-129.6 - 3.3)) < 1.5, true);
 }
 
+/* ---------- 神煞（預設查法） ---------- */
+console.log("\n=== 神煞 ===");
+{
+  const P = s => B.gzIndex(B.GAN.indexOf(s[0]), B.ZHI.indexOf(s[1]));
+  const shaOf = (c, opt) => c.pillars.map((p, i) => B.shensha(c, p % 10, p % 12, i, opt).join("、"));
+  const c3 = B.buildChart({ sex: "m", y: 1990, m: 1, d: 1, hh: 0, mi: 0, tz: 8, lon: 120, trueSolar: false, zishi: "day23" });
+  eq("用例三 己巳 丙子 丙寅 戊子", shaOf(c3), ["天德貴人、天廚貴人、祿神、亡神", "天乙貴人、福星貴人", "國印貴人、福星貴人、學堂、劫煞、勾絞", "天乙貴人、福星貴人"]);
+  const c2 = B.buildChart({ sex: "m", y: 2026, m: 10, d: 18, hh: 17, mi: 1, tz: 8, lon: 120, trueSolar: false, zishi: "day23" });
+  eq("用例二 丙午 戊戌 乙丑 乙酉", shaOf(c2), ["太極貴人、天德貴人、月德貴人、文昌貴人、天廚貴人、學堂、桃花", "華蓋、空亡", "國印貴人、福星貴人、金神、元辰", "天乙貴人、太極貴人、天醫、將星、紅鸞、勾絞"]);
+  // 華蓋、將星：起查那一柱自己不算；歲運照算
+  const cs = B.chartFromPillars(["戊戌", "甲寅", "壬子", "庚子"].map(P), "m");
+  const yr = B.shensha(cs, 4, 10, 0), dy = B.shensha(cs, 8, 0, 2), hr = B.shensha(cs, 6, 0, 3), ln = B.shensha(cs, 4, 10, -1);
+  eq("年支戌查華蓋，年柱自己不算", yr.includes("華蓋"), false);
+  eq("日支子查將星，日柱自己不算", dy.includes("將星"), false);
+  eq("時柱子由日支查得將星", hr.includes("將星"), true);
+  eq("流年戊戌由年支查得華蓋", ln.includes("華蓋"), true);
+  // 亥月血刃：月柱自己不算
+  const cx = B.chartFromPillars(["甲子", "乙亥", "丙寅", "己亥"].map(P), "m");
+  eq("亥月血刃在亥：月柱不算、時柱算", [B.shensha(cx, 1, 11, 1).includes("血刃"), B.shensha(cx, 5, 11, 3).includes("血刃")], [false, true]);
+  // 只看日柱的神煞
+  const ck = B.chartFromPillars(["甲子", "丙寅", "庚辰", "癸酉"].map(P), "m");
+  eq("庚辰日：魁罡、十惡大敗、日德", ["魁罡", "十惡大敗", "日德"].map(n => B.shensha(ck, 6, 4, 2).includes(n)), [true, true, true]);
+  eq("癸酉時：金神", B.shensha(ck, 9, 9, 3).includes("金神"), true);
+  eq("庚辰作流年不算魁罡", B.shensha(ck, 6, 4, -1).includes("魁罡"), false);
+  const ct = B.chartFromPillars(["甲子", "丙寅", "戊寅", "甲寅"].map(P), "m");
+  eq("寅月戊寅日：天赦", B.shensha(ct, 4, 2, 2).includes("天赦"), true);
+  // 元辰、勾絞依男女陰陽
+  const cm = B.chartFromPillars(["甲子", "丙寅", "丙寅", "戊子"].map(P), "m"), cf = B.chartFromPillars(["甲子", "丙寅", "丙寅", "戊子"].map(P), "f");
+  eq("甲子年陽男元辰在未、陽女在巳", [B.shensha(cm, 9, 7, -1).includes("元辰"), B.shensha(cf, 9, 7, -1).includes("元辰"), B.shensha(cf, 9, 5, -1).includes("元辰")], [true, false, true]);
+  // 流派切換
+  const cg = B.chartFromPillars(["甲子", "丙寅", "庚寅", "戊寅"].map(P), "m");
+  eq("庚日天乙：預設丑未，切換後午寅", [B.shensha(cg, 4, 2, 3).includes("天乙貴人"), B.shensha(cg, 4, 2, 3, { tianyiGeng: "wu" }).includes("天乙貴人")], [false, true]);
+  const cy = B.chartFromPillars(["甲子", "丙寅", "乙卯", "戊寅"].map(P), "m");
+  eq("乙日羊刃：預設在辰，逆行在寅，陰干不取", [B.shensha(cy, 4, 4, -1).includes("羊刃"), B.shensha(cy, 4, 2, 3, { yangren: "rev" }).includes("羊刃"), B.shensha(cy, 4, 4, -1, { yangren: "none" }).includes("羊刃")], [true, true, false]);
+  eq("只用日干時，年干的天乙不算", [B.shensha(c3, 0, 0, 1).includes("天乙貴人"), B.shensha(c3, 0, 0, 1, { ganBase: "d" }).includes("天乙貴人")], [true, false]);
+  eq("學堂切年納音：己巳大林木見亥", B.shensha(c3, 9, 11, -1, { xuetang: "nayin" }).includes("學堂"), true);
+  eq("空亡只看日柱時，年柱旬空（丙午旬空寅卯）不算", [B.shensha(c2, 6, 2, -1).includes("空亡"), B.shensha(c2, 6, 2, -1, { kong: "d" }).includes("空亡")], [true, false]);
+  eq("不明的切換值回到預設", B.shaOpt({ yangren: "亂填" }).yangren, "next");
+}
+
+/* ---------- 關係清單：整柱收進干支 ---------- */
+console.log("\n=== 關係清單整柱折疊 ===");
+{
+  const P = s => B.gzIndex(B.GAN.indexOf(s[0]), B.ZHI.indexOf(s[1]));
+  const items = ["甲子", "庚午"].map((x, i) => ({ label: "柱" + i, kind: "natal", pos: i, idx: P(x), side: "A" }));
+  const raw = B.findRelations(items);
+  eq("甲子、庚午原始三條", raw.map(r => r.type).sort(), ["chong", "ganchong", "tkdc"]);
+  const f = B.foldZhu(raw);
+  eq("折疊後只剩天剋地沖一條，底下兩條", [f.length, f[0].type, f[0].sub.map(r => r.type).sort().join(",")], [1, "tkdc", "chong,ganchong"]);
+  const ch = B.chartFromPillars(["甲子", "庚午", "丙寅", "戊子"].map(P), "m");
+  const sc = B.scoreRelations(f, items, { mode: "single", charts: { A: ch } }, B.DEFAULT_WEIGHTS);
+  eq("只計一次分", sc.length, 1);
+  const raw2 = B.findRelations(["乙丑", "辛未"].map((x, i) => ({ label: "柱" + i, kind: "natal", pos: i, idx: P(x), side: "A" })));
+  eq("乙丑、辛未：沖與刑都收進天剋地沖", B.foldZhu(raw2).map(r => r.type + (r.sub ? ":" + r.sub.map(x => x.type).sort().join("+") : "")), ["tkdc:chong+ganchong+xing"]);
+  eq("留意清單維持原樣", B.attention(raw).gan.concat(B.attention(raw).zhi), ["甲庚相沖", "子午相沖"]);
+}
+
+/* ---------- 節氣存檔 ---------- */
+console.log("\n=== 節氣存檔 ===");
+{
+  const store = new Map(); let puts = 0, gets = 0;
+  B.setTermStore({ get(Y) { gets++; return store.get(Y) || null; }, put(Y, j) { puts++; store.set(Y, j.slice()); } });
+  const a = B.termsOfYear(2101).map(t => t.jd);
+  eq("新年份算完寫入存檔", [puts, store.has(2101)], [1, true]);
+  const B2 = loadEngine(target);
+  B2.setTermStore({ get(Y) { return store.get(Y) || null; }, put() { throw new Error("不該再算"); } });
+  eq("下次從存檔讀出，數值完全相同", B2.termsOfYear(2101).map(t => t.jd), a);
+  B2.setTermStore({ get() { return [1, 2, 3]; }, put() { } });
+  eq("存檔壞掉就重算", B2.termsOfYear(2102)[2].name, "立春");
+  eq("存檔版本號", typeof B.TERM_VERSION, "number");
+  B.setTermStore(null);
+}
+
 console.log(`\n通過 ${pass}，失敗 ${fail}`);
 process.exit(fail ? 1 : 0);

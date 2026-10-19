@@ -210,14 +210,23 @@ function equationOfTime(jdUT) {
 /* ---------------- 3. 節氣 ---------------- */
 const TERM_NAMES = ["小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至",
   "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"];
+/* 節氣時刻算一次就記住：記憶體裡一份；另可掛上外部存放（例如瀏覽器），下次打開就讀存檔。
+   TERM_VERSION 跟著曆算公式走，公式一改就換號，舊的存檔自動作廢。 */
+const TERM_VERSION = 1;
 const termCache = new Map();
+let termStore = null;                            // { get(Y) → 24 個 JD 或 null, put(Y, jds) }
+function setTermStore(st) { termStore = st && typeof st.get === "function" && typeof st.put === "function" ? st : null; }
 function termsOfYear(Y) {                       // 該公曆年的 24 節氣（小寒…冬至）
   if (termCache.has(Y)) return termCache.get(Y);
+  let jds = null;
+  if (termStore) { try { jds = termStore.get(Y); } catch (e) { jds = null; } }
+  if (!Array.isArray(jds) || jds.length !== 24 || !jds.every(Number.isFinite)) {
+    jds = TERM_NAMES.map((name, k) => solarTermJD(Y, mod360(285 + 15 * k)));
+    if (termStore) { try { termStore.put(Y, jds); } catch (e) { /* 存不了就算了 */ } }
+  }
   const arr = TERM_NAMES.map((name, k) => {
-    const lon = mod360(285 + 15 * k);
-    const jd = solarTermJD(Y, lon);
     const isJie = k % 2 === 0;
-    return { k, name, lon, jd, isJie, branch: isJie ? mod(1 + k / 2, 12) : null, year: Y };
+    return { k, name, lon: mod360(285 + 15 * k), jd: jds[k], isJie, branch: isJie ? mod(1 + k / 2, 12) : null, year: Y };
   });
   termCache.set(Y, arr);
   return arr;
@@ -259,7 +268,7 @@ const jdToCnDay = jd => Math.floor(jd + 0.5 + CN_TZ);
 const suiCache = new Map();
 function suiMonths(Y) {                         // 冬至(Y-1) 所在月 起，到冬至(Y) 所在月之前
   if (suiCache.has(Y)) return suiCache.get(Y);
-  const w1 = solarTermJD(Y - 1, 270), w2 = solarTermJD(Y, 270);
+  const w1 = termsOfYear(Y - 1)[23].jd, w2 = termsOfYear(Y)[23].jd;   // 冬至（與 solarTermJD(Y, 270) 同一算式）
   const ws1 = jdToCnDay(w1), ws2 = jdToCnDay(w2);
   const k0 = Math.floor((w1 - 2451550.09766) / 29.530588861) - 1;
   const nms = [];
@@ -505,34 +514,132 @@ function momentOf(jdUT, tzHours) {
 }
 
 /* ---------------- 8. 神煞 ---------------- */
+/*
+ shensha(chart, 干, 支, pos, opt)：pos 是原局第幾柱（0 年 1 月 2 日 3 時），歲運與胎命身傳 -1。
+ 以某柱地支起查的神煞（年支、月支、日支），不算該柱自己：華蓋、將星、亥月血刃會遇到這種情形。
+ 查日柱的神煞（魁罡、日德等）只看原局日柱；金神看日柱與時柱。
+ 流派有分歧的項目由 opt 切換，預設值見 SHA_DEFAULT，說明見 README。
+*/
+const gzOf = s => gzIndex(GAN.indexOf(s[0]), ZHI.indexOf(s[1]));
+const gzSet = list => new Set(list.split(" ").map(gzOf));
 const TIANYI = { 0: [1, 7], 4: [1, 7], 6: [1, 7], 1: [0, 8], 5: [0, 8], 2: [11, 9], 3: [11, 9], 8: [3, 5], 9: [3, 5], 7: [6, 2] };
 const TAIJI = { 0: [0, 6], 1: [0, 6], 2: [3, 9], 3: [3, 9], 4: [4, 10, 1, 7], 5: [4, 10, 1, 7], 6: [2, 11], 7: [2, 11], 8: [5, 8], 9: [5, 8] };
 const WENCHANG = [5, 6, 8, 9, 8, 9, 11, 0, 2, 3];
+const GUOYIN = [10, 11, 1, 2, 1, 2, 4, 5, 7, 8];                    // 甲戌 乙亥 丙丑 丁寅 戊丑 己寅 庚辰 辛巳 壬未 癸申
+const FUXING = {
+  sanming: [[2, 0], [1, 3], [2, 0], [11], [8], [7], [6], [5], [4], [1, 3]], // 甲丙寅子 乙癸丑卯 丁亥 戊申 己未 庚午 辛巳 壬辰
+  simple: [[2], [1], [0], [9], [8], [7], [6], [5], [4], [3]]               // 甲寅 乙丑 丙子 丁酉 戊申 己未 庚午 辛巳 壬辰 癸卯
+};
+const TIANCHU_OLD = [5, 6, 0, 5, 6, 8, 2, 6, 9, 11];                // 甲巳 乙午 丙子 丁巳 戊午 己申 庚寅 辛午 壬酉 癸亥
+const CIGUAN = "庚寅 辛卯 乙巳 戊午 丁巳 庚午 壬申 癸酉 癸亥 壬戌".split(" ").map(gzOf); // 依日干甲…癸
+const NY_XUETANG = [11, 2, 8, 5, 8];                                // 年納音 木亥 火寅 土申 金巳 水申
+const NY_CIGUAN = [2, 5, 11, 8, 11];                                // 年納音 木寅 火巳 土亥 金申 水亥
 const TIANDE = { 2: ["g", 3], 3: ["z", 8], 4: ["g", 8], 5: ["g", 7], 6: ["z", 11], 7: ["g", 0], 8: ["g", 9], 9: ["z", 2], 10: ["g", 2], 11: ["g", 1], 0: ["z", 5], 1: ["g", 6] };
+const XUEREN = { 2: 1, 3: 7, 4: 2, 5: 8, 6: 3, 7: 9, 8: 4, 9: 10, 10: 5, 11: 11, 0: 6, 1: 0 }; // 月支 → 血刃
 const juGroup = b => b % 4;                                   // 0 申子辰 1 巳酉丑 2 寅午戌 3 亥卯未
 const juStart = grp => mod(8 - 3 * grp, 12);                  // 長生位
 const JU_WX = [4, 3, 1, 0];                                   // 水 金 火 木
-const SHENSHA_ORDER = ["天乙貴人", "太極貴人", "文昌貴人", "天德貴人", "月德貴人", "祿神", "羊刃", "桃花", "紅鸞", "天喜", "驛馬", "華蓋", "空亡"];
-function shensha(chart, g, b) {
-  const p = chart.pillars, ds = chart.dm, ys = p[0] % 10, yb = p[0] % 12, dbr = p[2] % 12, mbr = p[1] % 12;
+const fangOf = b => Math.floor(mod(b + 1, 12) / 3);           // 0 亥子丑 1 寅卯辰 2 巳午未 3 申酉戌
+const KUIGANG = gzSet("庚辰 庚戌 壬辰 戊戌");
+const JINSHEN = gzSet("乙丑 己巳 癸酉");
+const YINCHA = gzSet("丙子 丁丑 戊寅 辛卯 壬辰 癸巳 丙午 丁未 戊申 辛酉 壬戌 癸亥");
+const SHIE = gzSet("甲辰 乙巳 壬申 丙申 丁亥 庚辰 戊戌 癸亥 辛巳 己丑");
+const RIDE = gzSet("甲寅 丙辰 戊辰 庚辰 壬戌");
+const TIANSHE = "戊寅 甲午 戊申 甲子".split(" ").map(gzOf);          // 春 夏 秋 冬
+
+const SHENSHA_ORDER = ["天乙貴人", "太極貴人", "天德貴人", "天德合", "月德貴人", "月德合", "文昌貴人", "國印貴人", "福星貴人", "天廚貴人",
+  "學堂", "詞館", "金輿", "祿神", "天醫", "將星", "華蓋", "驛馬", "桃花", "紅鸞", "天喜", "天赦", "日德", "魁罡", "金神",
+  "羊刃", "血刃", "劫煞", "亡神", "災煞", "孤辰", "寡宿", "勾絞", "元辰", "喪門", "弔客", "陰差陽錯", "十惡大敗", "空亡"];
+const SHENSHA_BAD = new Set(["羊刃", "血刃", "劫煞", "亡神", "災煞", "孤辰", "寡宿", "勾絞", "元辰", "喪門", "弔客", "陰差陽錯", "十惡大敗", "空亡"]);
+const SHA_DEFAULT = { ganBase: "dy", zhiBase: "dy", tianyiGeng: "chou", yangren: "next", xuetang: "gan", ciguan: "table", fuxing: "sanming", tianchu: "shishen", kong: "dy" };
+const SHA_OPTIONS = [
+  { k: "ganBase", title: "以干起查（天乙、太極、文昌、國印、福星、天廚、學堂、詞館）", items: [["dy", "日干與年干"], ["d", "只用日干"]] },
+  { k: "zhiBase", title: "以支起查（桃花、驛馬、華蓋、將星、劫煞、亡神）", items: [["dy", "年支與日支"], ["y", "只用年支"]] },
+  { k: "tianyiGeng", title: "庚日（年）的天乙貴人", items: [["chou", "丑、未（甲戊庚牛羊）"], ["wu", "午、寅（庚辛逢馬虎）"]] },
+  { k: "yangren", title: "陰干的羊刃", items: [["next", "祿前一位（乙辰丁己未辛戌癸丑）"], ["rev", "逆行（乙寅丁己巳辛申癸亥）"], ["none", "陰干不取"]] },
+  { k: "xuetang", title: "學堂", items: [["gan", "日干長生（甲亥乙午丙戊寅…）"], ["nayin", "年納音長生（金巳木亥水土申火寅）"]] },
+  { k: "ciguan", title: "詞館", items: [["table", "古表干支（甲見庚寅、乙見辛卯…）"], ["nayin", "年納音臨官（金申木寅水土亥火巳）"]] },
+  { k: "fuxing", title: "福星貴人", items: [["sanming", "甲丙寅子、乙癸丑卯、丁亥…（三命通會）"], ["simple", "甲寅乙丑丙子丁酉…（簡表）"]] },
+  { k: "tianchu", title: "天廚貴人", items: [["shishen", "食神之祿（甲巳乙午丙巳丁午…）"], ["old", "古表（丙子丁巳戊午己申…）"]] },
+  { k: "kong", title: "空亡", items: [["dy", "日柱與年柱旬空"], ["d", "只看日柱旬空"]] }
+];
+function shaOpt(o) {
+  const r = Object.assign({}, SHA_DEFAULT);
+  if (o) for (const it of SHA_OPTIONS) if (it.items.some(x => x[0] === o[it.k])) r[it.k] = o[it.k];
+  return r;
+}
+function shensha(chart, g, b, pos, opt) {
+  const o = shaOpt(opt);
+  if (pos == null) pos = -1;
+  const p = chart.pillars, ds = chart.dm, ys = p[0] % 10, yb = p[0] % 12, mb = p[1] % 12, db = p[2] % 12;
+  const idx = gzIndex(g, b);
+  const gans = o.ganBase === "d" || ys === ds ? [ds] : [ds, ys];
+  const zrefs = o.zhiBase === "y" ? [[yb, 0]] : [[yb, 0], [db, 2]];
   const out = new Set();
-  if (TIANYI[ds].includes(b) || TIANYI[ys].includes(b)) out.add("天乙貴人");
-  if (TAIJI[ds].includes(b) || TAIJI[ys].includes(b)) out.add("太極貴人");
-  if (WENCHANG[ds] === b || WENCHANG[ys] === b) out.add("文昌貴人");
-  const td = TIANDE[mbr];
-  if ((td[0] === "g" && g === td[1]) || (td[0] === "z" && b === td[1])) out.add("天德貴人");
-  if (g === 2 * JU_WX[juGroup(mbr)]) out.add("月德貴人");
-  if (b === luOf(ds)) out.add("祿神");
-  if (b === yangRenOf(ds)) out.add("羊刃");
-  for (const ref of [yb, dbr]) {
-    const st = juStart(juGroup(ref));
-    if (b === mod(st + 1, 12)) out.add("桃花");
-    if (b === mod(st + 6, 12)) out.add("驛馬");
-    if (b === mod(st + 8, 12)) out.add("華蓋");
+  const add = (n, ok) => { if (ok) out.add(n); };
+  // 以日干、年干查
+  const tianyi = x => (x === 6 && o.tianyiGeng === "wu") ? [6, 2] : TIANYI[x];
+  add("天乙貴人", gans.some(x => tianyi(x).includes(b)));
+  add("太極貴人", gans.some(x => TAIJI[x].includes(b)));
+  add("文昌貴人", gans.some(x => WENCHANG[x] === b));
+  add("國印貴人", gans.some(x => GUOYIN[x] === b));
+  add("福星貴人", gans.some(x => FUXING[o.fuxing][x].includes(b)));
+  add("天廚貴人", gans.some(x => (o.tianchu === "old" ? TIANCHU_OLD[x] : luOf(mod(x + 2, 10))) === b));
+  if (o.xuetang === "nayin") add("學堂", b === NY_XUETANG[nayinWx(p[0])]);
+  else add("學堂", gans.some(x => csStart(x) === b));
+  if (o.ciguan === "nayin") add("詞館", b === NY_CIGUAN[nayinWx(p[0])]);
+  else add("詞館", gans.some(x => CIGUAN[x] === idx));
+  // 只以日干查
+  add("祿神", b === luOf(ds));
+  add("金輿", b === mod(luOf(ds) + 2, 12));
+  if (ganYang(ds)) add("羊刃", b === yangRenOf(ds));
+  else if (o.yangren === "next") add("羊刃", b === yangRenOf(ds));
+  else if (o.yangren === "rev") add("羊刃", b === mod(luOf(ds) - 1, 12));
+  // 以月支查（不算月柱自己）
+  if (pos !== 1) {
+    const td = TIANDE[mb];
+    add("天德貴人", td[0] === "g" ? g === td[1] : b === td[1]);
+    add("天德合", td[0] === "g" ? g === mod(td[1] + 5, 10) : b === mod(1 - td[1], 12));
+    add("月德貴人", g === 2 * JU_WX[juGroup(mb)]);
+    add("月德合", g === mod(2 * JU_WX[juGroup(mb)] + 5, 10));
+    add("天醫", b === mod(mb - 1, 12));
+    add("血刃", b === XUEREN[mb]);
   }
-  if (b === mod(3 - yb, 12)) out.add("紅鸞");
-  if (b === mod(9 - yb, 12)) out.add("天喜");
-  if (xunKong(p[2]).includes(b) || xunKong(p[0]).includes(b)) out.add("空亡");
+  // 以年支、日支查（不算起查那一柱自己）
+  for (const [ref, rp] of zrefs) {
+    if (pos === rp) continue;
+    const st = juStart(juGroup(ref));
+    add("桃花", b === mod(st + 1, 12));
+    add("亡神", b === mod(st + 3, 12));
+    add("將星", b === mod(st + 4, 12));
+    add("驛馬", b === mod(st + 6, 12));
+    add("華蓋", b === mod(st + 8, 12));
+    add("劫煞", b === mod(st + 9, 12));
+  }
+  // 只以年支查
+  if (pos !== 0) {
+    add("災煞", b === mod(juStart(juGroup(yb)) + 10, 12));
+    add("紅鸞", b === mod(3 - yb, 12));
+    add("天喜", b === mod(9 - yb, 12));
+    const f = fangOf(yb);
+    add("孤辰", b === [2, 5, 8, 11][f]);
+    add("寡宿", b === [10, 1, 4, 7][f]);
+    add("喪門", b === mod(yb + 2, 12));
+    add("弔客", b === mod(yb - 2, 12));
+    add("勾絞", b === mod(yb + 3, 12) || b === mod(yb - 3, 12));
+    add("元辰", b === mod(yb + (chart.male === ganYang(ys) ? 7 : 5), 12));   // 陽男陰女沖後一位，陰男陽女沖前一位
+  }
+  // 查日柱、時柱
+  if (pos === 2) {
+    add("魁罡", KUIGANG.has(idx));
+    add("陰差陽錯", YINCHA.has(idx));
+    add("十惡大敗", SHIE.has(idx));
+    add("日德", RIDE.has(idx));
+    add("天赦", idx === TIANSHE[zhiSeason(mb)]);
+  }
+  if (pos === 2 || pos === 3) add("金神", JINSHEN.has(idx));
+  // 空亡
+  add("空亡", xunKong(p[2]).includes(b) || (o.kong === "dy" && xunKong(p[0]).includes(b)));
   return SHENSHA_ORDER.filter(n => out.has(n));
 }
 
@@ -630,6 +737,21 @@ function findRelations(items) {
   return rel;
 }
 
+/* 整柱關係成立時，同一對柱的天干、地支關係收進整柱那一條（sub），不另計分 */
+function foldZhu(raw) {
+  const key = r => r.m.slice().sort((a, b) => a - b).join(",");
+  const zhu = new Map();
+  for (const r of raw) if (r.cat === "zhu") zhu.set(key(r), Object.assign({}, r, { sub: [] }));
+  if (!zhu.size) return raw.slice();
+  const out = [];
+  for (const r of raw) {
+    if (r.cat === "zhu") { out.push(zhu.get(key(r))); continue; }
+    const host = r.m.length === 2 ? zhu.get(key(r)) : null;
+    if (host) host.sub.push(r); else out.push(r);
+  }
+  return out;
+}
+
 /* 權重預設值 */
 const DEFAULT_WEIGHTS = {
   type: { sanhui: 10, sanhe: 9, chong: 8, liuhe: 7, sanxing: 7, xing: 6, banhe: 5, gonghe: 4.5, hai: 4, po: 3, anhe: 2, ganhe: 8, ganchong: 8, ganke: 5, tkdc: 9, thdh: 8, fuyin: 6 },
@@ -694,7 +816,7 @@ function scoreRelations(raw, items, ctx, W) {
       }
       if (bonus > 0) { power *= 1 + bonus; notes.push(bonus >= W.power.ling - 1 - 1e-9 ? "化神得令" : "化神得相"); }
     }
-    if (r.cat === "zhi") {
+    if (r.cat === "zhi" || r.cat === "zhu") {                    // 整柱關係含地支，旬空同樣折減
       const kongHit = mem.some(x => {
         const c = ctx.charts[x.side === "B" ? "B" : "A"];
         if (x.side === "T") return [ctx.charts.A, ctx.charts.B].filter(Boolean).some(cc => xunKong(cc.pillars[2]).includes(x.idx % 12));
@@ -760,15 +882,15 @@ function searchPillars(p, opt) {
 
 /* ---------------- 匯出 ---------------- */
 return {
-  GAN, ZHI, WX, SHENGXIAO, CS, CANG, SS_ABBR, TERM_NAMES, LUNAR_MONTH, LUNAR_DAY, TYPE_LABEL, DEFAULT_WEIGHTS, SHENSHA_ORDER,
+  GAN, ZHI, WX, SHENGXIAO, CS, CANG, SS_ABBR, TERM_NAMES, LUNAR_MONTH, LUNAR_DAY, TYPE_LABEL, DEFAULT_WEIGHTS, SHENSHA_ORDER, SHENSHA_BAD, SHA_DEFAULT, SHA_OPTIONS, shaOpt,
   mod, ganWx, ganYang, zhiWx, zhiYang, zhiSeason, gzIndex, gzName, gOf, bOf, tenGod, zhiTenGod, changSheng, csStep, luOf, yangRenOf,
   xunKong, nayin, nayinWx, NAYIN_NAMES, wangXiang, siLing,
   toJD, fromJD, ymdToDayNum, dayNumToYMD, dayGZ, monthLen, deltaT, apparentSunLon, solarTermJD, newMoonJD, equationOfTime,
-  termsOfYear, jieAround, termAround, solarYearOf, yearGZ, monthGZ, hourGZ,
+  termsOfYear, setTermStore, TERM_VERSION, jieAround, termAround, solarYearOf, yearGZ, monthGZ, hourGZ,
   suiMonths, lunarOfDay, lunarMonthsOfYear, lunarToDayNum, lunarText,
   jdToClock, clockToJD, jdNow, addCalendar, hourBranchOf, SHICHEN_RANGE, pad2,
   buildChart, chartFromPillars, taiMingShen, currentDayunIndex, dayunIndexForYear, xiaoYun, liuYue, liuRi, liuShi, momentOf,
-  shensha, findRelations, pillarRel, scoreRelations, attention, relText, xingTarget, searchPillars
+  shensha, findRelations, foldZhu, pillarRel, scoreRelations, attention, relText, xingTarget, searchPillars
 };
 })();
 if (typeof module !== "undefined") module.exports = Bazi;

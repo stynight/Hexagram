@@ -342,7 +342,7 @@ table.pan col.c-dyn { background: transparent; }
 .strip-track { position: relative; display: flex; overflow-x: auto; scrollbar-width: none; scroll-behavior: auto; overscroll-behavior-x: contain; }
 .strip-track::-webkit-scrollbar { display: none; }
 .cell {
-  flex: 0 0 auto; width: 58px; padding: 7px 0 6px; border: 0; border-right: 1px solid var(--line-2); background: transparent;
+  flex: 0 0 auto; width: 58px; padding: 9px 0 6px; border: 0; border-right: 1px solid var(--line-2); background: transparent;
   display: flex; flex-direction: column; align-items: center; gap: 0; line-height: 1.22; color: var(--ink); position: relative;
 }
 .cell:hover { background: var(--gold-softer); }
@@ -354,8 +354,10 @@ table.pan col.c-dyn { background: transparent; }
 .cell .c-gz i { font-style: normal; font-family: var(--f-sans); font-size: 12px; font-weight: 400; color: var(--ink-2); margin-left: 1px; }
 .cell .c-xy { font-size: 11.5px; color: var(--ink-2); margin-top: 2px; white-space: nowrap; }
 .cell .c-big { font-family: var(--f-serif); font-size: 20px; font-weight: 700; line-height: 1.2; }
-.cell.today::before { content: ""; position: absolute; top: 2px; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: var(--huo); }
-.today-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--huo); vertical-align: 2px; margin: 0 2px; }
+/* 今天：主題色小菱形；主色偏紅時改金色（沖是紅色圓點加字，在格子底部，兩者顏色、形狀、位置都不同） */
+.cell.today::before { content: ""; position: absolute; top: 2px; left: 50%; width: 6px; height: 6px; margin-left: -3px; transform: rotate(45deg); border-radius: 1px; background: var(--today, var(--accent)); box-shadow: 0 0 0 1.5px var(--card); }
+.cell.today[aria-pressed="true"]::before { box-shadow: 0 0 0 1.5px var(--gold-soft); }
+.today-dot { display: inline-block; width: 6px; height: 6px; transform: rotate(45deg); border-radius: 1px; background: var(--today, var(--accent)); vertical-align: 1px; margin: 0 4px; }
 .cell.unborn { opacity: .5; }
 .strip.s-day .cell { width: 54px; }
 .strip.s-hour .cell { width: 60px; }
@@ -547,6 +549,66 @@ table.pan tr.r-mk td .mk { margin: 1px 0; flex-direction: column; gap: 1px; padd
 .hide-note:hover { border-color: var(--gold); color: var(--gold-ink); }
 .hide-note[hidden] { display: none; }
 
+/* ---------- 合盤：對照對方原局 ---------- */
+.mk.mk-x { background: transparent; box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 45%, transparent); }
+.mk.mk-x::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
+.cell.hit2::after { content: ""; position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 13px 13px 0; border-color: transparent var(--huo) transparent transparent; }
+.cell.hit2-thdh::after { border-right-color: var(--mu); }
+.hp-tools { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 12px 18px; }
+.hp-tools .hint { flex: 1 1 280px; margin: 0; }
+.hp-both .yr-rows { display: flex; flex-direction: column; gap: 10px; padding: 0 20px 16px; }
+.yr-row { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 8px; align-items: start; }
+.yr-row > .k { display: inline-flex; gap: 6px; align-items: center; color: var(--ink-2); font-size: 13.5px; padding-top: 6px; }
+.yr-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.yr-chip { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 5px 10px 6px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); text-align: left; line-height: 1.3; }
+.yr-chip:hover { border-color: var(--gold); background: var(--gold-softer); }
+.yr-chip b { font-size: 13.5px; }
+.yr-chip .yr-gz { font-family: var(--f-serif); font-weight: 700; font-size: 16px; }
+.yr-chip .yr-w { font-size: 11.5px; color: var(--dim); }
+.yr-chip.yr-tkdc { border-left: 3px solid var(--huo); }
+.yr-chip.yr-thdh { border-left: 3px solid var(--mu); }
+.yr-chip.is-now { box-shadow: inset 0 0 0 1px var(--gold); }
+@media (max-width: 640px) { .yr-row { grid-template-columns: minmax(0, 1fr); } .yr-row > .k { padding-top: 0; } }
+
+/* ---------- 關係清單：整柱收進干支 ---------- */
+.ritem .rsub { font-size: 12px; color: var(--ink-2); padding: 2px 0 0; }
+.ritem.zhu .tl { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--gold) 45%, transparent); text-underline-offset: 3px; }
+
+/* ---------- 細盤表欄位、神煞 ---------- */
+.dyn-note { margin: 6px 4px 0; font-size: 11.5px; color: var(--dim); }
+table.pan tr.r-sha td .sha.bad { color: var(--ink-2); }
+.dyn-group .radio, .sha-opt .radio { font-size: 14px; min-height: 32px; align-items: center; }
+#sha-card .sha-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin-top: 12px; }
+.sha-opt { border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px 8px; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 0; }
+.sha-opt legend { padding: 0 6px; color: var(--gold-ink); font-weight: 600; font-size: 13px; }
+.sha-opt .dflt { margin-left: 6px; font-size: 11px; color: var(--dim); white-space: nowrap; }
+.sha-opt .radio > span, .dyn-group .radio > span { min-width: 0; }
+.sha-sw > summary { cursor: pointer; color: var(--gold-ink); font-weight: 600; font-size: 14px; margin-top: 10px; }
+.sha-rules { margin-top: 12px; border-top: 1px solid var(--line-2); padding-top: 10px; }
+.sha-rules summary { cursor: pointer; color: var(--gold-ink); font-weight: 600; font-size: 14px; }
+.sha-rules dl { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0 18px; }
+.sha-rules dl > div { display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 8px; padding: 6px 0; border-top: 1px dashed var(--line-2); font-size: 13px; }
+.sha-rules dt { font-weight: 600; color: var(--ink); }
+.sha-rules dd { margin: 0; color: var(--ink-2); overflow-wrap: anywhere; }
+
+/* ---------- 帳戶同步狀態 ---------- */
+.sync { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); }
+.sync > i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--dim); align-self: center; }
+.sync-cloud > i { background: var(--mu); }
+.sync-connecting > i, .sync-saving > i { background: var(--jin); animation: syncpulse 1.2s ease-in-out infinite; }
+.sync-error > i { background: var(--danger); }
+.sync-error .sync-a { color: var(--danger); font-weight: 600; }
+.sync .sync-b { color: var(--dim); }
+@keyframes syncpulse { 50% { opacity: .35; } }
+.cases-sync { margin-top: 4px; }
+.nav-sync { padding: 10px 14px 0; min-height: 22px; }
+.nav-sync .sync { font-size: 12px; }
+@media (max-width: 899px) { .nav-sync { display: none; } }
+/* 開頁先畫框架：重的頁面先放佔位，下一個畫面再算 */
+.loading { display: flex; flex-direction: column; gap: 12px; padding: 28px 22px; color: var(--dim); font-size: 13.5px; }
+.loading .ld-bar { display: block; height: 6px; width: 40%; border-radius: 3px; background: linear-gradient(90deg, var(--line-2), var(--line), var(--line-2)); background-size: 200% 100%; animation: ldbar 1s linear infinite; }
+@keyframes ldbar { to { background-position: -200% 0; } }
+
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
@@ -565,9 +627,10 @@ try { var tv = JSON.parse(localStorage.getItem("bazi.theme.vars") || "null"); if
     <button type="button" class="nav-item" data-act="go" data-page="pro" aria-current="false">專業細盤</button>
     <button type="button" class="nav-item" data-act="go" data-page="hepan" aria-current="false">合盤</button>
     <button type="button" class="nav-item" data-act="go" data-page="theme" aria-current="false">設定</button>
+    <div class="nav-sync" id="nav-sync" aria-live="polite"></div>
   </nav>
   <main class="main">
-    <section class="page" id="page-input" aria-label="排盤輸入">
+    <section class="page" id="page-input" aria-label="排盤輸入" hidden>
       <div class="banner" id="f-banner" hidden></div>
       <form class="card card-pad form" id="f-form" novalidate>
         <div class="frow"><label for="f-name">命主姓名</label><input class="field" id="f-name" placeholder="請輸入姓名（可留空）" maxlength="30" autocomplete="off"></div>
@@ -858,14 +921,23 @@ function equationOfTime(jdUT) {
 /* ---------------- 3. 節氣 ---------------- */
 const TERM_NAMES = ["小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至",
   "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"];
+/* 節氣時刻算一次就記住：記憶體裡一份；另可掛上外部存放（例如瀏覽器），下次打開就讀存檔。
+   TERM_VERSION 跟著曆算公式走，公式一改就換號，舊的存檔自動作廢。 */
+const TERM_VERSION = 1;
 const termCache = new Map();
+let termStore = null;                            // { get(Y) → 24 個 JD 或 null, put(Y, jds) }
+function setTermStore(st) { termStore = st && typeof st.get === "function" && typeof st.put === "function" ? st : null; }
 function termsOfYear(Y) {                       // 該公曆年的 24 節氣（小寒…冬至）
   if (termCache.has(Y)) return termCache.get(Y);
+  let jds = null;
+  if (termStore) { try { jds = termStore.get(Y); } catch (e) { jds = null; } }
+  if (!Array.isArray(jds) || jds.length !== 24 || !jds.every(Number.isFinite)) {
+    jds = TERM_NAMES.map((name, k) => solarTermJD(Y, mod360(285 + 15 * k)));
+    if (termStore) { try { termStore.put(Y, jds); } catch (e) { /* 存不了就算了 */ } }
+  }
   const arr = TERM_NAMES.map((name, k) => {
-    const lon = mod360(285 + 15 * k);
-    const jd = solarTermJD(Y, lon);
     const isJie = k % 2 === 0;
-    return { k, name, lon, jd, isJie, branch: isJie ? mod(1 + k / 2, 12) : null, year: Y };
+    return { k, name, lon: mod360(285 + 15 * k), jd: jds[k], isJie, branch: isJie ? mod(1 + k / 2, 12) : null, year: Y };
   });
   termCache.set(Y, arr);
   return arr;
@@ -907,7 +979,7 @@ const jdToCnDay = jd => Math.floor(jd + 0.5 + CN_TZ);
 const suiCache = new Map();
 function suiMonths(Y) {                         // 冬至(Y-1) 所在月 起，到冬至(Y) 所在月之前
   if (suiCache.has(Y)) return suiCache.get(Y);
-  const w1 = solarTermJD(Y - 1, 270), w2 = solarTermJD(Y, 270);
+  const w1 = termsOfYear(Y - 1)[23].jd, w2 = termsOfYear(Y)[23].jd;   // 冬至（與 solarTermJD(Y, 270) 同一算式）
   const ws1 = jdToCnDay(w1), ws2 = jdToCnDay(w2);
   const k0 = Math.floor((w1 - 2451550.09766) / 29.530588861) - 1;
   const nms = [];
@@ -1153,34 +1225,132 @@ function momentOf(jdUT, tzHours) {
 }
 
 /* ---------------- 8. 神煞 ---------------- */
+/*
+ shensha(chart, 干, 支, pos, opt)：pos 是原局第幾柱（0 年 1 月 2 日 3 時），歲運與胎命身傳 -1。
+ 以某柱地支起查的神煞（年支、月支、日支），不算該柱自己：華蓋、將星、亥月血刃會遇到這種情形。
+ 查日柱的神煞（魁罡、日德等）只看原局日柱；金神看日柱與時柱。
+ 流派有分歧的項目由 opt 切換，預設值見 SHA_DEFAULT，說明見 README。
+*/
+const gzOf = s => gzIndex(GAN.indexOf(s[0]), ZHI.indexOf(s[1]));
+const gzSet = list => new Set(list.split(" ").map(gzOf));
 const TIANYI = { 0: [1, 7], 4: [1, 7], 6: [1, 7], 1: [0, 8], 5: [0, 8], 2: [11, 9], 3: [11, 9], 8: [3, 5], 9: [3, 5], 7: [6, 2] };
 const TAIJI = { 0: [0, 6], 1: [0, 6], 2: [3, 9], 3: [3, 9], 4: [4, 10, 1, 7], 5: [4, 10, 1, 7], 6: [2, 11], 7: [2, 11], 8: [5, 8], 9: [5, 8] };
 const WENCHANG = [5, 6, 8, 9, 8, 9, 11, 0, 2, 3];
+const GUOYIN = [10, 11, 1, 2, 1, 2, 4, 5, 7, 8];                    // 甲戌 乙亥 丙丑 丁寅 戊丑 己寅 庚辰 辛巳 壬未 癸申
+const FUXING = {
+  sanming: [[2, 0], [1, 3], [2, 0], [11], [8], [7], [6], [5], [4], [1, 3]], // 甲丙寅子 乙癸丑卯 丁亥 戊申 己未 庚午 辛巳 壬辰
+  simple: [[2], [1], [0], [9], [8], [7], [6], [5], [4], [3]]               // 甲寅 乙丑 丙子 丁酉 戊申 己未 庚午 辛巳 壬辰 癸卯
+};
+const TIANCHU_OLD = [5, 6, 0, 5, 6, 8, 2, 6, 9, 11];                // 甲巳 乙午 丙子 丁巳 戊午 己申 庚寅 辛午 壬酉 癸亥
+const CIGUAN = "庚寅 辛卯 乙巳 戊午 丁巳 庚午 壬申 癸酉 癸亥 壬戌".split(" ").map(gzOf); // 依日干甲…癸
+const NY_XUETANG = [11, 2, 8, 5, 8];                                // 年納音 木亥 火寅 土申 金巳 水申
+const NY_CIGUAN = [2, 5, 11, 8, 11];                                // 年納音 木寅 火巳 土亥 金申 水亥
 const TIANDE = { 2: ["g", 3], 3: ["z", 8], 4: ["g", 8], 5: ["g", 7], 6: ["z", 11], 7: ["g", 0], 8: ["g", 9], 9: ["z", 2], 10: ["g", 2], 11: ["g", 1], 0: ["z", 5], 1: ["g", 6] };
+const XUEREN = { 2: 1, 3: 7, 4: 2, 5: 8, 6: 3, 7: 9, 8: 4, 9: 10, 10: 5, 11: 11, 0: 6, 1: 0 }; // 月支 → 血刃
 const juGroup = b => b % 4;                                   // 0 申子辰 1 巳酉丑 2 寅午戌 3 亥卯未
 const juStart = grp => mod(8 - 3 * grp, 12);                  // 長生位
 const JU_WX = [4, 3, 1, 0];                                   // 水 金 火 木
-const SHENSHA_ORDER = ["天乙貴人", "太極貴人", "文昌貴人", "天德貴人", "月德貴人", "祿神", "羊刃", "桃花", "紅鸞", "天喜", "驛馬", "華蓋", "空亡"];
-function shensha(chart, g, b) {
-  const p = chart.pillars, ds = chart.dm, ys = p[0] % 10, yb = p[0] % 12, dbr = p[2] % 12, mbr = p[1] % 12;
+const fangOf = b => Math.floor(mod(b + 1, 12) / 3);           // 0 亥子丑 1 寅卯辰 2 巳午未 3 申酉戌
+const KUIGANG = gzSet("庚辰 庚戌 壬辰 戊戌");
+const JINSHEN = gzSet("乙丑 己巳 癸酉");
+const YINCHA = gzSet("丙子 丁丑 戊寅 辛卯 壬辰 癸巳 丙午 丁未 戊申 辛酉 壬戌 癸亥");
+const SHIE = gzSet("甲辰 乙巳 壬申 丙申 丁亥 庚辰 戊戌 癸亥 辛巳 己丑");
+const RIDE = gzSet("甲寅 丙辰 戊辰 庚辰 壬戌");
+const TIANSHE = "戊寅 甲午 戊申 甲子".split(" ").map(gzOf);          // 春 夏 秋 冬
+
+const SHENSHA_ORDER = ["天乙貴人", "太極貴人", "天德貴人", "天德合", "月德貴人", "月德合", "文昌貴人", "國印貴人", "福星貴人", "天廚貴人",
+  "學堂", "詞館", "金輿", "祿神", "天醫", "將星", "華蓋", "驛馬", "桃花", "紅鸞", "天喜", "天赦", "日德", "魁罡", "金神",
+  "羊刃", "血刃", "劫煞", "亡神", "災煞", "孤辰", "寡宿", "勾絞", "元辰", "喪門", "弔客", "陰差陽錯", "十惡大敗", "空亡"];
+const SHENSHA_BAD = new Set(["羊刃", "血刃", "劫煞", "亡神", "災煞", "孤辰", "寡宿", "勾絞", "元辰", "喪門", "弔客", "陰差陽錯", "十惡大敗", "空亡"]);
+const SHA_DEFAULT = { ganBase: "dy", zhiBase: "dy", tianyiGeng: "chou", yangren: "next", xuetang: "gan", ciguan: "table", fuxing: "sanming", tianchu: "shishen", kong: "dy" };
+const SHA_OPTIONS = [
+  { k: "ganBase", title: "以干起查（天乙、太極、文昌、國印、福星、天廚、學堂、詞館）", items: [["dy", "日干與年干"], ["d", "只用日干"]] },
+  { k: "zhiBase", title: "以支起查（桃花、驛馬、華蓋、將星、劫煞、亡神）", items: [["dy", "年支與日支"], ["y", "只用年支"]] },
+  { k: "tianyiGeng", title: "庚日（年）的天乙貴人", items: [["chou", "丑、未（甲戊庚牛羊）"], ["wu", "午、寅（庚辛逢馬虎）"]] },
+  { k: "yangren", title: "陰干的羊刃", items: [["next", "祿前一位（乙辰丁己未辛戌癸丑）"], ["rev", "逆行（乙寅丁己巳辛申癸亥）"], ["none", "陰干不取"]] },
+  { k: "xuetang", title: "學堂", items: [["gan", "日干長生（甲亥乙午丙戊寅…）"], ["nayin", "年納音長生（金巳木亥水土申火寅）"]] },
+  { k: "ciguan", title: "詞館", items: [["table", "古表干支（甲見庚寅、乙見辛卯…）"], ["nayin", "年納音臨官（金申木寅水土亥火巳）"]] },
+  { k: "fuxing", title: "福星貴人", items: [["sanming", "甲丙寅子、乙癸丑卯、丁亥…（三命通會）"], ["simple", "甲寅乙丑丙子丁酉…（簡表）"]] },
+  { k: "tianchu", title: "天廚貴人", items: [["shishen", "食神之祿（甲巳乙午丙巳丁午…）"], ["old", "古表（丙子丁巳戊午己申…）"]] },
+  { k: "kong", title: "空亡", items: [["dy", "日柱與年柱旬空"], ["d", "只看日柱旬空"]] }
+];
+function shaOpt(o) {
+  const r = Object.assign({}, SHA_DEFAULT);
+  if (o) for (const it of SHA_OPTIONS) if (it.items.some(x => x[0] === o[it.k])) r[it.k] = o[it.k];
+  return r;
+}
+function shensha(chart, g, b, pos, opt) {
+  const o = shaOpt(opt);
+  if (pos == null) pos = -1;
+  const p = chart.pillars, ds = chart.dm, ys = p[0] % 10, yb = p[0] % 12, mb = p[1] % 12, db = p[2] % 12;
+  const idx = gzIndex(g, b);
+  const gans = o.ganBase === "d" || ys === ds ? [ds] : [ds, ys];
+  const zrefs = o.zhiBase === "y" ? [[yb, 0]] : [[yb, 0], [db, 2]];
   const out = new Set();
-  if (TIANYI[ds].includes(b) || TIANYI[ys].includes(b)) out.add("天乙貴人");
-  if (TAIJI[ds].includes(b) || TAIJI[ys].includes(b)) out.add("太極貴人");
-  if (WENCHANG[ds] === b || WENCHANG[ys] === b) out.add("文昌貴人");
-  const td = TIANDE[mbr];
-  if ((td[0] === "g" && g === td[1]) || (td[0] === "z" && b === td[1])) out.add("天德貴人");
-  if (g === 2 * JU_WX[juGroup(mbr)]) out.add("月德貴人");
-  if (b === luOf(ds)) out.add("祿神");
-  if (b === yangRenOf(ds)) out.add("羊刃");
-  for (const ref of [yb, dbr]) {
-    const st = juStart(juGroup(ref));
-    if (b === mod(st + 1, 12)) out.add("桃花");
-    if (b === mod(st + 6, 12)) out.add("驛馬");
-    if (b === mod(st + 8, 12)) out.add("華蓋");
+  const add = (n, ok) => { if (ok) out.add(n); };
+  // 以日干、年干查
+  const tianyi = x => (x === 6 && o.tianyiGeng === "wu") ? [6, 2] : TIANYI[x];
+  add("天乙貴人", gans.some(x => tianyi(x).includes(b)));
+  add("太極貴人", gans.some(x => TAIJI[x].includes(b)));
+  add("文昌貴人", gans.some(x => WENCHANG[x] === b));
+  add("國印貴人", gans.some(x => GUOYIN[x] === b));
+  add("福星貴人", gans.some(x => FUXING[o.fuxing][x].includes(b)));
+  add("天廚貴人", gans.some(x => (o.tianchu === "old" ? TIANCHU_OLD[x] : luOf(mod(x + 2, 10))) === b));
+  if (o.xuetang === "nayin") add("學堂", b === NY_XUETANG[nayinWx(p[0])]);
+  else add("學堂", gans.some(x => csStart(x) === b));
+  if (o.ciguan === "nayin") add("詞館", b === NY_CIGUAN[nayinWx(p[0])]);
+  else add("詞館", gans.some(x => CIGUAN[x] === idx));
+  // 只以日干查
+  add("祿神", b === luOf(ds));
+  add("金輿", b === mod(luOf(ds) + 2, 12));
+  if (ganYang(ds)) add("羊刃", b === yangRenOf(ds));
+  else if (o.yangren === "next") add("羊刃", b === yangRenOf(ds));
+  else if (o.yangren === "rev") add("羊刃", b === mod(luOf(ds) - 1, 12));
+  // 以月支查（不算月柱自己）
+  if (pos !== 1) {
+    const td = TIANDE[mb];
+    add("天德貴人", td[0] === "g" ? g === td[1] : b === td[1]);
+    add("天德合", td[0] === "g" ? g === mod(td[1] + 5, 10) : b === mod(1 - td[1], 12));
+    add("月德貴人", g === 2 * JU_WX[juGroup(mb)]);
+    add("月德合", g === mod(2 * JU_WX[juGroup(mb)] + 5, 10));
+    add("天醫", b === mod(mb - 1, 12));
+    add("血刃", b === XUEREN[mb]);
   }
-  if (b === mod(3 - yb, 12)) out.add("紅鸞");
-  if (b === mod(9 - yb, 12)) out.add("天喜");
-  if (xunKong(p[2]).includes(b) || xunKong(p[0]).includes(b)) out.add("空亡");
+  // 以年支、日支查（不算起查那一柱自己）
+  for (const [ref, rp] of zrefs) {
+    if (pos === rp) continue;
+    const st = juStart(juGroup(ref));
+    add("桃花", b === mod(st + 1, 12));
+    add("亡神", b === mod(st + 3, 12));
+    add("將星", b === mod(st + 4, 12));
+    add("驛馬", b === mod(st + 6, 12));
+    add("華蓋", b === mod(st + 8, 12));
+    add("劫煞", b === mod(st + 9, 12));
+  }
+  // 只以年支查
+  if (pos !== 0) {
+    add("災煞", b === mod(juStart(juGroup(yb)) + 10, 12));
+    add("紅鸞", b === mod(3 - yb, 12));
+    add("天喜", b === mod(9 - yb, 12));
+    const f = fangOf(yb);
+    add("孤辰", b === [2, 5, 8, 11][f]);
+    add("寡宿", b === [10, 1, 4, 7][f]);
+    add("喪門", b === mod(yb + 2, 12));
+    add("弔客", b === mod(yb - 2, 12));
+    add("勾絞", b === mod(yb + 3, 12) || b === mod(yb - 3, 12));
+    add("元辰", b === mod(yb + (chart.male === ganYang(ys) ? 7 : 5), 12));   // 陽男陰女沖後一位，陰男陽女沖前一位
+  }
+  // 查日柱、時柱
+  if (pos === 2) {
+    add("魁罡", KUIGANG.has(idx));
+    add("陰差陽錯", YINCHA.has(idx));
+    add("十惡大敗", SHIE.has(idx));
+    add("日德", RIDE.has(idx));
+    add("天赦", idx === TIANSHE[zhiSeason(mb)]);
+  }
+  if (pos === 2 || pos === 3) add("金神", JINSHEN.has(idx));
+  // 空亡
+  add("空亡", xunKong(p[2]).includes(b) || (o.kong === "dy" && xunKong(p[0]).includes(b)));
   return SHENSHA_ORDER.filter(n => out.has(n));
 }
 
@@ -1278,6 +1448,21 @@ function findRelations(items) {
   return rel;
 }
 
+/* 整柱關係成立時，同一對柱的天干、地支關係收進整柱那一條（sub），不另計分 */
+function foldZhu(raw) {
+  const key = r => r.m.slice().sort((a, b) => a - b).join(",");
+  const zhu = new Map();
+  for (const r of raw) if (r.cat === "zhu") zhu.set(key(r), Object.assign({}, r, { sub: [] }));
+  if (!zhu.size) return raw.slice();
+  const out = [];
+  for (const r of raw) {
+    if (r.cat === "zhu") { out.push(zhu.get(key(r))); continue; }
+    const host = r.m.length === 2 ? zhu.get(key(r)) : null;
+    if (host) host.sub.push(r); else out.push(r);
+  }
+  return out;
+}
+
 /* 權重預設值 */
 const DEFAULT_WEIGHTS = {
   type: { sanhui: 10, sanhe: 9, chong: 8, liuhe: 7, sanxing: 7, xing: 6, banhe: 5, gonghe: 4.5, hai: 4, po: 3, anhe: 2, ganhe: 8, ganchong: 8, ganke: 5, tkdc: 9, thdh: 8, fuyin: 6 },
@@ -1342,7 +1527,7 @@ function scoreRelations(raw, items, ctx, W) {
       }
       if (bonus > 0) { power *= 1 + bonus; notes.push(bonus >= W.power.ling - 1 - 1e-9 ? "化神得令" : "化神得相"); }
     }
-    if (r.cat === "zhi") {
+    if (r.cat === "zhi" || r.cat === "zhu") {                    // 整柱關係含地支，旬空同樣折減
       const kongHit = mem.some(x => {
         const c = ctx.charts[x.side === "B" ? "B" : "A"];
         if (x.side === "T") return [ctx.charts.A, ctx.charts.B].filter(Boolean).some(cc => xunKong(cc.pillars[2]).includes(x.idx % 12));
@@ -1408,15 +1593,15 @@ function searchPillars(p, opt) {
 
 /* ---------------- 匯出 ---------------- */
 return {
-  GAN, ZHI, WX, SHENGXIAO, CS, CANG, SS_ABBR, TERM_NAMES, LUNAR_MONTH, LUNAR_DAY, TYPE_LABEL, DEFAULT_WEIGHTS, SHENSHA_ORDER,
+  GAN, ZHI, WX, SHENGXIAO, CS, CANG, SS_ABBR, TERM_NAMES, LUNAR_MONTH, LUNAR_DAY, TYPE_LABEL, DEFAULT_WEIGHTS, SHENSHA_ORDER, SHENSHA_BAD, SHA_DEFAULT, SHA_OPTIONS, shaOpt,
   mod, ganWx, ganYang, zhiWx, zhiYang, zhiSeason, gzIndex, gzName, gOf, bOf, tenGod, zhiTenGod, changSheng, csStep, luOf, yangRenOf,
   xunKong, nayin, nayinWx, NAYIN_NAMES, wangXiang, siLing,
   toJD, fromJD, ymdToDayNum, dayNumToYMD, dayGZ, monthLen, deltaT, apparentSunLon, solarTermJD, newMoonJD, equationOfTime,
-  termsOfYear, jieAround, termAround, solarYearOf, yearGZ, monthGZ, hourGZ,
+  termsOfYear, setTermStore, TERM_VERSION, jieAround, termAround, solarYearOf, yearGZ, monthGZ, hourGZ,
   suiMonths, lunarOfDay, lunarMonthsOfYear, lunarToDayNum, lunarText,
   jdToClock, clockToJD, jdNow, addCalendar, hourBranchOf, SHICHEN_RANGE, pad2,
   buildChart, chartFromPillars, taiMingShen, currentDayunIndex, dayunIndexForYear, xiaoYun, liuYue, liuRi, liuShi, momentOf,
-  shensha, findRelations, pillarRel, scoreRelations, attention, relText, xingTarget, searchPillars
+  shensha, findRelations, foldZhu, pillarRel, scoreRelations, attention, relText, xingTarget, searchPillars
 };
 })();
 if (typeof module !== "undefined") module.exports = Bazi;
@@ -1500,16 +1685,26 @@ const THEMES = [
   { id: "ziye", name: "紫夜", bg: "#13111C", card: "#1C1928", ink: "#ECE8F7", accent: "#B4A2FF", bar: "#0C0A14", barInk: "#E4DEFF" }
 ];
 const THEME_KEYS = [["bg", "底色", "頁面背景"], ["card", "卡片", "命盤與清單的底"], ["ink", "文字", "主要文字"], ["accent", "主色", "選中、按鈕與重點"], ["bar", "抬頭帶", "姓名那一列與手機分頁列"], ["barInk", "抬頭文字", "抬頭帶上的字"]];
-const THEME_PROPS = ["--bg", "--card", "--ink", "--accent", "--on-accent", "--bar", "--bar-ink", "--mu", "--huo", "--tu", "--jin", "--shui", "--danger", "--shadow", "color-scheme"];
+const THEME_PROPS = ["--bg", "--card", "--ink", "--accent", "--on-accent", "--today", "--bar", "--bar-ink", "--mu", "--huo", "--tu", "--jin", "--shui", "--danger", "--shadow", "color-scheme"];
 function rgbOf(h) { const m = /^#?([0-9a-f]{6})$/i.exec(h || ""); if (!m) return [128, 128, 128]; const n = parseInt(m[1], 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function lumOf(h) { const c = rgbOf(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
 const contrastOf = (a, b) => { const x = lumOf(a), y = lumOf(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 const themeIsDark = t => lumOf(t.card) < 0.3;
+/* 主色偏紅（胭脂、暖橙等）時，「今天」改用金色，免得與紅色的「沖」混在一起 */
+function hueSat(h) {
+  const [r, g, b] = rgbOf(h).map(v => v / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+  if (!d) return { h: 0, s: 0 };
+  let hh = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  hh = (hh * 60 + 360) % 360;
+  return { h: hh, s: d / (1 - Math.abs(mx + mn - 1)) };
+}
+const reddish = h => { const x = hueSat(h); return x.s > 0.25 && (x.h < 28 || x.h > 330); };
 function themeVars(t) {
   const dark = themeIsDark(t), wx = dark ? WX_DARK : WX_LIGHT;
   return {
     "--bg": t.bg, "--card": t.card, "--ink": t.ink, "--accent": t.accent,
     "--on-accent": contrastOf(t.accent, "#FFFFFF") >= contrastOf(t.accent, "#111111") ? "#FFFFFF" : "#111111",
+    "--today": reddish(t.accent) ? (dark ? "#E8C25A" : "#B8860B") : t.accent,
     "--bar": t.bar, "--bar-ink": t.barInk,
     "--mu": wx.mu, "--huo": wx.huo, "--tu": wx.tu, "--jin": wx.jin, "--shui": wx.shui,
     "--danger": dark ? "#FF7B6E" : "#B42318",
@@ -1572,15 +1767,70 @@ function updateHideNote() {
   n.hidden = !(cnt && ["basic", "pro", "hepan"].includes(S.page));
   n.textContent = `${DEV_NAME[devNow()]}隱藏了 ${cnt} 項，按這裡到「設定」調整`;
 }
-if (devMQ) { const f = () => { applyHide(); if (S.page === "theme") renderTheme(); }; if (devMQ.addEventListener) devMQ.addEventListener("change", f); else if (devMQ.addListener) devMQ.addListener(f); }
+if (devMQ) { const f = () => { applyHide(); if (S.page === "theme") renderTheme(); else if (S.page === "pro" || S.page === "hepan") rerenderPanels(S.page === "pro" ? "pro" : "A"); }; if (devMQ.addEventListener) devMQ.addEventListener("change", f); else if (devMQ.addListener) devMQ.addListener(f); }
 function showCardHTML() {
   const dev = S.ui.showDev || devNow(), hid = new Set(hideList(dev));
   const segBtn = d => `<button type="button" data-act="show-dev" data-dev="${d}" aria-pressed="${dev === d}">${DEV_NAME[d]}${d === devNow() ? "（這台）" : ""}</button>`;
   return `<div class="card card-pad" id="show-card"><h1 class="card-title">顯示項目<small>打勾的會顯示，取消就隱藏；手機版（寬度 900 以下）與電腦版分開記，設定存在這個瀏覽器</small></h1>
     <div class="show-top"><div class="seg" role="group" aria-label="設定哪一種畫面">${segBtn("phone")}${segBtn("desktop")}</div>
       <div class="row-actions" style="margin:0"><button type="button" class="btn btn-sm" data-act="show-lite">精簡模式</button><button type="button" class="btn btn-sm" data-act="show-all">全部顯示</button></div></div>
-    <p class="hint" style="margin:8px 0 0">精簡模式會收起副星、自坐、空亡、納音、神煞、起運交運資訊與兩段說明，只留下看盤最常用的部分。</p>
-    <div class="show-groups">${SHOW_GROUPS.map(g => `<fieldset class="show-group"><legend>${g.title}</legend>${g.items.map(([k, l]) => `<label class="check"><input type="checkbox" data-show="${k}"${hid.has(k) ? "" : " checked"}> ${l}</label>`).join("")}</fieldset>`).join("")}</div></div>`;
+    <p class="hint" style="margin:8px 0 0">精簡模式會收起副星、自坐、空亡、納音、神煞、起運交運資訊與兩段說明，只留下看盤最常用的部分；手機版另外把細盤表的動態欄減到大運與流年。</p>
+    <div class="show-groups">${SHOW_GROUPS.map((g, gi) => `<fieldset class="show-group"><legend>${g.title}</legend>${g.items.map(([k, l]) => `<label class="check"><input type="checkbox" data-show="${k}"${hid.has(k) ? "" : " checked"}> ${l}</label>`).join("")}</fieldset>${gi === 0 ? dynGroupHTML(dev) : ""}`).join("")}</div></div>`;
+}
+function dynGroupHTML(dev) {
+  return `<fieldset class="show-group dyn-group"><legend>細盤表的動態欄（專業細盤、合盤左邊的表）</legend>${DYN_LABEL.map(([v, l]) => `<label class="radio"><input type="radio" name="dyn-${dev}" data-dyn="${v}"${dynMode(dev) === v ? " checked" : ""}> <span>${l}</span></label>`).join("")}
+    <p class="hint" style="grid-column:1/-1;margin:2px 0 4px">手機上欄位太擠時，可以只留一兩個動態欄，其餘看干支條；關係清單照樣計算全部層級。</p></fieldset>`;
+}
+/* ---------- 神煞查法（全部裝置共用） ---------- */
+const SHA_RULES = [
+  ["天乙貴人", "日干、年干查地支：甲戊庚丑未，乙己子申，丙丁亥酉，壬癸卯巳，辛午寅；庚可切換為午寅。"],
+  ["太極貴人", "日干、年干查地支：甲乙子午，丙丁卯酉，戊己辰戌丑未，庚辛寅亥，壬癸巳申。"],
+  ["天德貴人", "月支查干或支：寅丁 卯申 辰壬 巳辛 午亥 未甲 申癸 酉寅 戌丙 亥乙 子巳 丑庚。"],
+  ["天德合", "天德的合：寅壬 卯巳 辰丁 巳丙 午寅 未己 申戊 酉亥 戌辛 亥庚 子申 丑乙。"],
+  ["月德貴人", "月支三合局查天干：寅午戌丙，申子辰壬，亥卯未甲，巳酉丑庚。"],
+  ["月德合", "月德的合：寅午戌辛，申子辰丁，亥卯未己，巳酉丑乙。"],
+  ["文昌貴人", "日干、年干查地支：甲巳 乙午 丙申 丁酉 戊申 己酉 庚亥 辛子 壬寅 癸卯。"],
+  ["國印貴人", "日干、年干查地支：甲戌 乙亥 丙丑 丁寅 戊丑 己寅 庚辰 辛巳 壬未 癸申。"],
+  ["福星貴人", "日干、年干查地支：甲丙寅子，乙癸丑卯，丁亥，戊申，己未，庚午，辛巳，壬辰；可切換簡表。"],
+  ["天廚貴人", "日干、年干查地支，取食神之祿：甲巳 乙午 丙巳 丁午 戊申 己酉 庚亥 辛子 壬寅 癸卯；可切換古表。"],
+  ["學堂", "日干、年干的長生位：甲亥 乙午 丙戊寅 丁己酉 庚巳 辛子 壬申 癸卯；可切換年納音長生。"],
+  ["詞館", "日干、年干查整柱干支：甲庚寅 乙辛卯 丙乙巳 丁戊午 戊丁巳 己庚午 庚壬申 辛癸酉 壬癸亥 癸壬戌；可切換年納音臨官。"],
+  ["金輿", "日干查地支，祿前二位：甲辰 乙巳 丙戊未 丁己申 庚戌 辛亥 壬丑 癸寅。"],
+  ["祿神", "日干的臨官：甲寅 乙卯 丙戊巳 丁己午 庚申 辛酉 壬亥 癸子。"],
+  ["天醫", "月支的前一位：寅月丑、卯月寅……丑月子。"],
+  ["將星", "年支、日支三合局的中神：申子辰子，寅午戌午，巳酉丑酉，亥卯未卯；起查那一柱自己不算。"],
+  ["華蓋", "年支、日支三合局的墓庫：申子辰辰，寅午戌戌，巳酉丑丑，亥卯未未；起查那一柱自己不算。"],
+  ["驛馬", "年支、日支：申子辰寅，寅午戌申，巳酉丑亥，亥卯未巳。"],
+  ["桃花", "年支、日支（咸池）：申子辰酉，寅午戌卯，巳酉丑午，亥卯未子。"],
+  ["紅鸞、天喜", "年支查：紅鸞子卯、丑寅、寅丑……逆行；天喜在紅鸞對沖。"],
+  ["天赦", "日柱配季節：春戊寅、夏甲午、秋戊申、冬甲子。"],
+  ["日德", "日柱為甲寅、丙辰、戊辰、庚辰、壬戌。"],
+  ["魁罡", "日柱為庚辰、庚戌、壬辰、戊戌。"],
+  ["金神", "日柱或時柱為乙丑、己巳、癸酉。"],
+  ["羊刃", "日干祿前一位：甲卯 丙戊午 庚酉 壬子；陰干可切換祿前一位、逆行或不取。"],
+  ["血刃", "月支查：寅丑 卯未 辰寅 巳申 午卯 未酉 申辰 酉戌 戌巳 亥亥 子午 丑子；月柱自己不算。"],
+  ["劫煞", "年支、日支三合局的絕位：申子辰巳，寅午戌亥，巳酉丑寅，亥卯未申。"],
+  ["亡神", "年支、日支三合局的臨官：申子辰亥，寅午戌巳，巳酉丑申，亥卯未寅。"],
+  ["災煞", "年支查，將星的對沖：申子辰午，寅午戌子，巳酉丑卯，亥卯未酉。"],
+  ["孤辰、寡宿", "年支查：亥子丑寅、戌；寅卯辰巳、丑；巳午未申、辰；申酉戌亥、未。"],
+  ["勾絞", "年支前後第三位（陽男陰女前為勾後為絞，陰男陽女相反），兩位都標「勾絞」。"],
+  ["元辰", "年支對沖的鄰位：陽男陰女取沖後一位（子年未），陰男陽女取沖前一位（子年巳）。"],
+  ["喪門、弔客", "年支前二位為喪門，後二位為弔客。"],
+  ["陰差陽錯", "日柱為丙子、丁丑、戊寅、辛卯、壬辰、癸巳、丙午、丁未、戊申、辛酉、壬戌、癸亥。"],
+  ["十惡大敗", "日柱為甲辰、乙巳、壬申、丙申、丁亥、庚辰、戊戌、癸亥、辛巳、己丑。"],
+  ["空亡", "日柱旬空；可切換是否也看年柱旬空。"]
+];
+function shaCardHTML() {
+  const o = B.shaOpt(S.prefs.shaOpt);
+  const changed = B.SHA_OPTIONS.some(it => o[it.k] !== B.SHA_DEFAULT[it.k]);
+  const nChanged = B.SHA_OPTIONS.filter(it => o[it.k] !== B.SHA_DEFAULT[it.k]).length;
+  return `<div class="card card-pad" id="sha-card"><h2 class="card-title">神煞查法<small>手機與電腦共用，設定存在這個瀏覽器</small></h2>
+    <details class="sha-sw"${S.ui.shaOpen ? " open" : ""}><summary>流派切換（${B.SHA_OPTIONS.length} 項，<span id="sha-state">${nChanged ? `已改 ${nChanged} 項` : "目前全用預設"}</span>）</summary>
+    <div class="sha-opts">${B.SHA_OPTIONS.map(it => `<fieldset class="sha-opt"><legend>${it.title}</legend>${it.items.map(([v, l], i) => `<label class="radio"><input type="radio" name="sha-${it.k}" data-sha="${it.k}" data-v="${v}"${o[it.k] === v ? " checked" : ""}> <span>${l}${i === 0 ? '<small class="dflt">預設</small>' : ""}</span></label>`).join("")}</fieldset>`).join("")}</div>
+    <div class="row-actions" style="justify-content:flex-start;margin-top:12px"><button type="button" class="btn btn-sm" data-act="sha-reset"${changed ? "" : " disabled"}>神煞查法恢復預設</button></div></details>
+    <details class="sha-rules"><summary>每個神煞怎麼查（共 ${B.SHENSHA_ORDER.length} 項）</summary>
+      <p class="hint" style="margin:8px 0">以某柱地支起查的神煞，不算該柱自己（例如年支辰查華蓋得辰，年柱本身不標）；查日柱的神煞只看原局日柱。歲運與胎命身也照同樣規則查，但不套用只看日柱的幾項。</p>
+      <dl>${SHA_RULES.map(([n, d]) => `<div><dt>${n}</dt><dd>${d}</dd></div>`).join("")}</dl></details></div>`;
 }
 function setHide(dev, list) { S.prefs.hide = Object.assign({}, S.prefs.hide, { [dev]: list }); savePrefs(); applyHide(); }
 function renderTheme() {
@@ -1592,7 +1842,7 @@ function renderTheme() {
   THEMES.forEach(t => { h += card(t.id, t.name, themeIsDark(t) ? "深色" : "淺色", themePreviewHTML(t)); });
   const c = S.theme.custom;
   h += card("custom", "自訂", themeIsDark(c) ? "深色" : "淺色", themePreviewHTML(c, "自訂"));
-  root.innerHTML = showCardHTML() + `<div class="card card-pad"><h2 class="card-title">主題配色<small>點一下就套用，設定記在這個瀏覽器；淺色主題的五行字用深色版，深色主題用亮色版</small></h2><div class="theme-grid">${h}</div></div>
+  root.innerHTML = showCardHTML() + shaCardHTML() + `<div class="card card-pad"><h2 class="card-title">主題配色<small>點一下就套用，設定記在這個瀏覽器；淺色主題的五行字用深色版，深色主題用亮色版</small></h2><div class="theme-grid">${h}</div></div>
     <div class="card card-pad"><h2 class="card-title">自訂色盤<small>改任何一個顏色就切換到「自訂」並立即套用</small></h2>
       <div class="cp-grid">${THEME_KEYS.map(([k, l, d]) => `<label class="cp" for="cp-${k}"><span class="cp-l">${l}<small>${d}</small></span><input type="color" id="cp-${k}" data-cp="${k}" value="${esc(c[k])}"><code id="cpv-${k}">${esc(c[k].toUpperCase())}</code></label>`).join("")}</div>
       <div class="row-actions" style="justify-content:flex-start"><button type="button" class="btn btn-sm" data-act="cp-copy">把目前主題複製到自訂</button><button type="button" class="btn btn-sm" data-act="theme" data-id="auto">恢復跟隨系統</button></div>
@@ -1616,61 +1866,138 @@ function loadWeights() {
   return W;
 }
 
-/* ---------- 案例存放：登入時存帳戶（私人），否則存瀏覽器 ---------- */
+/* ---------- 節氣存檔：算過的年份存進瀏覽器，下次打開就讀存檔 ---------- */
+const termDisk = (() => {
+  const KEY = "bazi.terms.v1";
+  let data = null, dirty = false, timer = null;
+  const load = () => {
+    if (data) return;
+    const v = LS.get(KEY, null);
+    data = v && v.v === B.TERM_VERSION && v.y && typeof v.y === "object" ? v.y : {};
+  };
+  const flush = () => {
+    clearTimeout(timer); timer = null;
+    if (!dirty || !data) return;
+    dirty = false;
+    const ys = Object.keys(data);
+    if (ys.length > 400) ys.sort((a, b) => (data[a].t || 0) - (data[b].t || 0)).slice(0, ys.length - 400).forEach(k => { delete data[k]; });
+    LS.set(KEY, { v: B.TERM_VERSION, y: data });
+  };
+  return {
+    get(Y) { load(); const r = data[Y]; return r && Array.isArray(r.j) ? r.j : null; },
+    put(Y, j) { load(); data[Y] = { j, t: Date.now() }; dirty = true; if (!timer) timer = setTimeout(flush, 1500); },
+    flush
+  };
+})();
+B.setTermStore(termDisk);
+window.addEventListener("pagehide", () => termDisk.flush());
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") termDisk.flush(); });
+
+/* ---------- 案例存放：登入時存帳戶（私人），否則存瀏覽器 ----------
+   status：local（沒有帳戶，只存這個瀏覽器）、connecting（讀取帳戶中）、cloud（已同步）、error（同步中斷）。
+   刪除時另寫一筆「已刪除」紀錄（含刪除時間），別台瀏覽器的舊快取就不會把它傳回帳戶。
+   判斷規則：案例最後修改時間不晚於刪除時間，就當作已刪除；帳戶裡若被舊版頁面傳回，也會順手清掉。
+   刪除之後又重新存檔（修改時間較晚）則算是新的，保留。 */
+const clone = o => JSON.parse(JSON.stringify(o));
 const Store = {
   cases: LS.get("bazi.cases.v1", []),
-  col: null, status: "local", subs: new Set(), ready: false,
+  col: null, tomb: null, status: "local", busy: 0, lastSync: 0, failed: 0, rev: 0, subs: new Set(),
+  dead: new Map(), purging: new Set(),
+  isDead(c) { return this.dead.has(c.id) && this.dead.get(c.id) >= (c.updatedAt || 0); },
   emit() { this.subs.forEach(f => { try { f(); } catch (e) { console.error(e); } }); },
   sort() { this.cases.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)); },
-  saveLocal() { LS.set("bazi.cases.v1", this.cases); },
+  saveLocal() { this.rev++; LS.set("bazi.cases.v1", this.cases); },
   get(id) { return this.cases.find(c => c.id === id) || null; },
+  async write(fn, failMsg) {
+    this.busy++; this.emit();
+    try { await fn(); this.lastSync = Date.now(); if (this.status === "error") this.status = "cloud"; }
+    catch (e) { this.failed++; if (this.status === "cloud") this.status = "error"; toast(failMsg); }
+    finally { this.busy--; this.emit(); }
+  },
   async put(c) {
     c.updatedAt = Date.now();
     const i = this.cases.findIndex(x => x.id === c.id);
     if (i >= 0) this.cases[i] = c; else this.cases.unshift(c);
     this.sort(); this.saveLocal(); this.emit();
-    if (this.col) {
-      try { await this.col.doc(c.id).set(JSON.parse(JSON.stringify(c))); }
-      catch (e) { toast("帳戶存檔沒有成功，這個案例先存在本瀏覽器。"); }
-    }
+    const col = this.col, tomb = this.tomb, revive = this.dead.has(c.id);
+    if (revive) this.dead.delete(c.id);                            // 刪除後又存檔：撤掉已刪除紀錄
+    if (col) await this.write(async () => { await col.doc(c.id).set(clone(c)); if (revive && tomb) await tomb.doc(c.id).delete(); }, "帳戶存檔沒有成功，這個案例先存在本瀏覽器。");
   },
   async remove(id) {
     this.cases = this.cases.filter(c => c.id !== id);
     this.saveLocal(); this.emit();
-    if (this.col) { try { await this.col.doc(id).delete(); } catch (e) { toast("帳戶裡的刪除沒有成功，稍後再試一次。"); } }
+    const col = this.col, tomb = this.tomb, at = Date.now();
+    this.dead.set(id, at);
+    if (col) await this.write(async () => { await col.doc(id).delete(); if (tomb) await tomb.doc(id).set({ id, at }); }, "帳戶裡的刪除沒有成功，稍後再試一次。");
+  },
+  purge(col, list) {                                              // 舊版頁面傳回帳戶的已刪除案例，安靜清掉
+    for (const c of list) {
+      if (this.purging.has(c.id)) continue;
+      this.purging.add(c.id);
+      Promise.resolve().then(() => col.doc(c.id).delete()).catch(() => { /* 下次打開再清 */ }).then(() => this.purging.delete(c.id));
+    }
   },
   async initCloud() {
     const cl = window.claude;
     if (!cl || typeof cl.use !== "function") return;
+    this.status = "connecting"; this.emit();
+    const giveUp = () => { this.status = "local"; this.emit(); };
     try {
       const [db, user] = await Promise.all([cl.use("db"), cl.use("user")]);
-      if (!db || !user) return;
+      if (!db || !user) return giveUp();
       const uid = await user.id();
-      if (!uid) return;
-      const col = db.doc("data/users/" + uid + "/bazi").collection("cases");
+      if (!uid) return giveUp();
+      const base = db.doc("data/users/" + uid + "/bazi");
+      const col = base.collection("cases"), tomb = base.collection("deleted");
+      try {
+        const ts = await tomb.get();
+        ts.docs.forEach(d => { const v = d.data ? d.data() : null; const at = v && Number.isFinite(v.at) ? v.at : Infinity; this.dead.set(d.id, Math.max(at, this.dead.get(d.id) || 0)); });
+      } catch (e) { /* 讀不到就當作沒有 */ }
       let synced = false;
+      this.col = col; this.tomb = tomb; this.known = new Set();
       col.onSnapshot(snap => {
         if (!synced && snap.metadata.fromCache) return;
-        const remote = snap.docs.map(d => d.data()).filter(x => x && x.id);
+        const all = snap.docs.map(d => d.data()).filter(x => x && x.id).map(clone);
+        const remote = all.filter(c => !this.isDead(c)), liveIds = new Set(remote.map(c => c.id));
         if (!synced) {
           synced = true;
-          const ids = new Set(remote.map(c => c.id));
-          const missing = this.cases.filter(c => !ids.has(c.id));
-          (async () => { for (const c of missing) { try { await col.doc(c.id).set(JSON.parse(JSON.stringify(c))); } catch (e) { /* 保留在本機 */ } } })();
-          this.cases = remote.map(x => JSON.parse(JSON.stringify(x))).concat(missing);
+          const localOnly = this.cases.filter(c => !liveIds.has(c.id));
+          const missing = localOnly.filter(c => !this.isDead(c));           // 新的，或刪除後又改過的
+          const dropped = localOnly.length - missing.length;
+          for (const c of missing) this.write(() => col.doc(c.id).set(clone(c)), "有案例沒能存上帳戶，先留在本瀏覽器。");
+          this.cases = remote.concat(missing);
+          if (dropped) setTimeout(() => toast(`帳戶紀錄顯示有 ${dropped} 個案例已經刪除，這裡也一併移除。`), 400);
         } else {
-          const pendingLocal = this.cases.filter(c => !remote.some(r => r.id === c.id) && !this.known.has(c.id));
-          this.cases = remote.map(x => JSON.parse(JSON.stringify(x))).concat(pendingLocal);
+          const pendingLocal = this.cases.filter(c => !liveIds.has(c.id) && !this.known.has(c.id));
+          this.cases = remote.concat(pendingLocal);
         }
-        this.known = new Set(remote.map(r => r.id));
-        this.sort(); this.saveLocal(); this.status = "cloud"; this.emit();
-      }, () => { this.col = null; this.status = "local"; this.emit(); });
-      this.known = new Set();
-      this.col = col;
-    } catch (e) { /* 留在本機 */ }
+        const keep = new Set(this.cases.map(c => c.id));                    // 本機有較新的一份正在補存，就不刪
+        const zombies = all.filter(c => this.isDead(c) && !keep.has(c.id));
+        if (zombies.length) this.purge(col, zombies);
+        this.known = liveIds;
+        this.sort(); this.saveLocal(); this.status = "cloud"; this.lastSync = Date.now(); this.emit();
+      }, () => { this.col = null; this.tomb = null; this.status = "error"; this.emit(); });
+    } catch (e) { this.col = null; this.tomb = null; this.status = "error"; this.emit(); }
   },
   known: new Set()
 };
+const SYNC_TEXT = {
+  local: ["案例存在這個瀏覽器", "沒有登入帳戶（或單獨打開 HTML 檔），換裝置看不到"],
+  connecting: ["正在讀取帳戶裡的案例…", "先顯示這個瀏覽器存的，讀完會自動合併"],
+  cloud: ["已同步到你的帳戶", "換裝置打開也看得到"],
+  saving: ["儲存中…", "正在寫入帳戶"],
+  error: ["帳戶同步中斷", "這段期間的變更先存在這個瀏覽器，重新打開頁面會再試"]
+};
+function syncState() { return Store.busy && Store.status === "cloud" ? "saving" : Store.status; }
+function syncHTML(full) {
+  const st = syncState(), [a, b] = SYNC_TEXT[st];
+  const t = st === "cloud" && Store.lastSync ? `・${pad2(new Date(Store.lastSync).getHours())}:${pad2(new Date(Store.lastSync).getMinutes())}` : "";
+  return `<span class="sync sync-${st}" role="status"><i aria-hidden="true"></i><span class="sync-a">${a}${t}</span>${full ? `<span class="sync-b">${b}</span>` : ""}</span>`;
+}
+function renderSync() {
+  const n = $("#nav-sync"); if (n) n.innerHTML = syncHTML(false);
+  const c = $("#cases-sync"); if (c) c.innerHTML = syncHTML(true);
+}
 
 /* ---------- 狀態 ---------- */
 const S = {
@@ -1680,7 +2007,7 @@ const S = {
   hepan: Object.assign({ a: null, b: null, started: false }, LS.get("bazi.hepan.v1", {})),
   hpSel: { A: null, B: null },
   W: loadWeights(),
-  prefs: Object.assign({ tms: false, sha: true, wOpen: false, autosave: false, hide: { phone: [], desktop: [] } }, LS.get("bazi.prefs.v1", {})),
+  prefs: Object.assign({ tms: false, sha: true, wOpen: false, autosave: false, hide: { phone: [], desktop: [] }, dyn: { phone: "all", desktop: "all" }, shaOpt: {}, hpCross: false }, LS.get("bazi.prefs.v1", {})),
   mode: "solar",
   flow: null,
   fold: {},
@@ -1729,6 +2056,7 @@ function yearRange(chart, dk, selYear) {
 const PAGES = ["input", "cases", "basic", "pro", "hepan", "theme"];
 function go(page, opt) {
   if (!PAGES.includes(page)) page = "input";
+  S.booted = true;
   S.page = page;
   $$(".page").forEach(p => { p.hidden = p.id !== "page-" + page; });
   $$(".nav-item").forEach(b => b.setAttribute("aria-current", b.dataset.page === page ? "page" : "false"));
@@ -1757,6 +2085,15 @@ function toast(msg) {
    輸入頁
    ========================================================= */
 function opt(v, t, sel) { return `<option value="${esc(v)}"${sel ? " selected" : ""}>${esc(t)}</option>`; }
+/* 表單的選單（近千個選項）到第一次用到排盤頁才建 */
+let formReady = false;
+function ensureForm() {
+  if (formReady) return;
+  formReady = true;
+  buildFormOptions();
+  fillFormNow();
+  setModeNoSync(S.mode);
+}
 function buildFormOptions() {
   let h = ""; for (let y = 1801; y <= 2100; y++) h += opt(y, y + "年"); $("#f-sy").innerHTML = h;
   h = ""; for (let m = 1; m <= 12; m++) h += opt(m, m + "月"); $("#f-sm").innerHTML = h;
@@ -1795,6 +2132,7 @@ function setPlaceByIndex(i) {
   $("#f-lon").value = p[1].toFixed(2); $("#f-lat").value = p[2].toFixed(2); $("#f-tz").value = String(p[3]);
 }
 function setMode(mode) {
+  ensureForm();
   S.mode = mode;
   $$('[data-act="mode"]').forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === mode ? "true" : "false"));
   $("#g-solar").hidden = mode !== "solar";
@@ -1828,6 +2166,7 @@ function fillSolar(o) {
   $("#f-hh").value = String(o.hh); $("#f-mi").value = String(o.mi);
 }
 function fillFormNow() {
+  ensureForm();
   const n = new Date();
   fillSolar({ y: n.getFullYear(), m: n.getMonth() + 1, d: n.getDate(), hh: n.getHours(), mi: n.getMinutes() });
   $("#f-place").value = "0"; setPlaceByIndex(0);
@@ -1885,6 +2224,7 @@ function readForm() {
   return base;
 }
 function updatePreview() {
+  if (!formReady) return;
   const box = $("#f-preview");
   const r = readForm();
   $("#f-shichen").textContent = ZHI[B.hourBranchOf(+$("#f-hh").value)] + "時";
@@ -1904,6 +2244,7 @@ function updatePreview() {
 const fmtSigned = v => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(1);
 
 function fillFormFromCase(c) {
+  ensureForm();
   $("#f-name").value = c.name || "";
   $("#f-sex-m").checked = c.sex !== "f"; $("#f-sex-f").checked = c.sex === "f";
   const pi = PLACES.findIndex(p => p[0] === c.place.name);
@@ -1938,7 +2279,7 @@ function updateBanner() {
     $("#f-go").textContent = f.saved ? "排盤並更新案例" : "重新排盤";
   }
 }
-function renderInputDynamic() { updateBanner(); updatePreview(); tickNow(true); }
+function renderInputDynamic() { ensureForm(); updateBanner(); updatePreview(); tickNow(true); }
 function submitForm() {
   const r = readForm();
   if (r.error) { updatePreview(); return; }
@@ -1969,9 +2310,15 @@ function submitForm() {
   if (save) toast(`已存入案例列表：「${c.name}」。`);
 }
 function setCurrent(c, saved) {
-  S.cur = { c, chart: chartOf(c), saved: !!saved };
-  S.proSel = selNow(S.cur.chart);
+  S.cur = { c, saved: !!saved, get chart() { return chartOf(this.c); } };   // 用到才算，算過就記在 chartCache
+  S.proSel = null;
   LS.set("bazi.cur.v1", { c, saved: !!saved });
+}
+const isNum = v => typeof v === "number" && isFinite(v);
+function validCase(c) {
+  if (!c || typeof c !== "object" || !c.place || !isNum(+c.place.tz)) return false;
+  if (c.solar) return ["y", "m", "d", "hh", "mi"].every(k => isNum(c.solar[k]));
+  return !!(c.sizhu && Array.isArray(c.sizhu.p) && c.sizhu.p.length === 4 && c.sizhu.p.every(isNum));
 }
 
 /* 即時起局 */
@@ -2032,7 +2379,8 @@ function emptyChartHTML(title) {
 /* =========================================================
    命盤表（基本排盤與專業細盤共用）
    ========================================================= */
-/* 整柱標記：天剋地沖紅點、天合地合綠點、伏吟金點；牽到日柱的點較大 */
+/* 整柱標記：天剋地沖紅點、天合地合綠點、伏吟金點；牽到日柱的點較大。
+   合盤打開「對照對方原局」時，x = { chart: 對方的盤, side: "A"|"B" }，對方原局的標記用空心點並加上對方代號。 */
 const MK_CH = { tkdc: "沖", thdh: "合", fuyin: "伏" };
 const MK_NAME = { tkdc: "天剋地沖", thdh: "天合地合", fuyin: "伏吟" };
 function marksOf(idx, pillars, skip) {
@@ -2040,14 +2388,28 @@ function marksOf(idx, pillars, skip) {
   pillars.forEach((p, pos) => { if (pos === skip) return; const t = B.pillarRel(idx, p); if (t) (by[t] = by[t] || []).push(pos); });
   return ["tkdc", "thdh", "fuyin"].filter(t => by[t]).map(t => ({ t, pos: by[t] }));
 }
-function marksHTML(ms) {
+function marksHTML(ms, side) {
   return ms.map(m => {
     const where = m.pos.map(p => "年月日時"[p]).join("");
-    return `<span class="mk mk-${m.t}${m.pos.includes(2) ? " mk-day" : ""}" title="${MK_NAME[m.t]}：原局${where}柱">${MK_CH[m.t]}${where}</span>`;
+    return `<span class="mk mk-${m.t}${m.pos.includes(2) ? " mk-day" : ""}${side ? " mk-x" : ""}" title="${MK_NAME[m.t]}：${side ? side + " 方" : ""}原局${where}柱">${side || ""}${MK_CH[m.t]}${where}</span>`;
   }).join("");
 }
-const cellMk = (idx, chart) => `<span class="c-mk">${idx == null ? "" : marksHTML(marksOf(idx, chart.pillars))}</span>`;
-function cellsFor(col, chart, row) {
+function cellMk(idx, chart, x) {
+  if (idx == null) return `<span class="c-mk"></span>`;
+  return `<span class="c-mk">${marksHTML(marksOf(idx, chart.pillars))}${x ? marksHTML(marksOf(idx, x.chart.pillars), x.side) : ""}</span>`;
+}
+/* 同一格同時沖到（或合到）兩人：格子右上角折角 */
+function hitBoth(idx, chart, x) {
+  if (!x || idx == null) return "";
+  const a = marksOf(idx, chart.pillars).map(m => m.t), b = marksOf(idx, x.chart.pillars).map(m => m.t);
+  if (a.includes("tkdc") && b.includes("tkdc")) return "tkdc";
+  if (a.includes("thdh") && b.includes("thdh")) return "thdh";
+  return "";
+}
+const HIT_TEXT = { tkdc: "兩人同時天剋地沖", thdh: "兩人同時天合地合" };
+const hitCls = (idx, chart, x) => { const h = hitBoth(idx, chart, x); return h ? ` hit2 hit2-${h}` : ""; };
+const hitSr = (idx, chart, x) => { const h = hitBoth(idx, chart, x); return h ? `<span class="sr-only">，${HIT_TEXT[h]}</span>` : ""; };
+function cellsFor(col, chart, row, ctx) {
   const dm = chart.dm;
   if (col.idx == null) {
     if (row === "ss") return `<td class="ph${col.sep ? " sep" : ""}">—<span class="phhint">${esc(col.ph || "")}</span></td>`;
@@ -2070,22 +2432,23 @@ function cellsFor(col, chart, row) {
     case "ny": return `<td${cls}>${B.nayin(col.idx)}</td>`;
     case "mk": {
       const ms = marksOf(col.idx, chart.pillars, col.kind === "natal" ? col.pos : -1);
-      return `<td${cls}>${ms.length ? marksHTML(ms) : '<span class="dim">—</span>'}</td>`;
+      const x = ctx && ctx.x, xs = x ? marksOf(col.idx, x.chart.pillars) : [];
+      return `<td${cls}>${ms.length || xs.length ? marksHTML(ms) + (x ? marksHTML(xs, x.side) : "") : '<span class="dim">—</span>'}</td>`;
     }
     case "sha": {
-      const list = chart.pillarsOnly ? B.shensha(chart, g, b) : B.shensha(chart, g, b);
+      const list = B.shensha(chart, g, b, col.kind === "natal" ? col.pos : -1, S.prefs.shaOpt);
       if (!S.prefs.sha) return `<td${cls}><span class="dim">${list.length ? list.length + " 項" : "—"}</span></td>`;
-      return `<td${cls}>${list.length ? list.map(s => `<span class="sha">${s.length === 4 ? `<span class="nw">${s.slice(0, 2)}</span><span class="nw">${s.slice(2)}</span>` : s}</span>`).join("") : '<span class="dim">—</span>'}</td>`;
+      return `<td${cls}>${list.length ? list.map(s => `<span class="sha${B.SHENSHA_BAD.has(s) ? " bad" : ""}">${s.length === 4 ? `<span class="nw">${s.slice(0, 2)}</span><span class="nw">${s.slice(2)}</span>` : s}</span>`).join("") : '<span class="dim">—</span>'}</td>`;
     }
   }
   return "<td></td>";
 }
 const ROW_LABEL = { head: "日期", ss: "主星", gan: "天干", zhi: "地支", cang: "藏干", fu: "副星", cangss: "藏干", xy: "星運", zz: "自坐", kong: "空亡", ny: "納音", sha: "神煞", mk: "沖合" };
 const ROW_CLASS = { head: "r-head", ss: "r-ss", gan: "r-big", zhi: "r-big", cang: "r-cang", fu: "r-fu", cangss: "r-cang", xy: "r-sm", zz: "r-sm", kong: "r-sm", ny: "r-sm", sha: "r-sha", mk: "r-mk" };
-function panTableHTML(cols, chart, rows, caption) {
-  let h = `<div class="pan-wrap"><table class="pan">${caption ? `<caption class="sr-only">${esc(caption)}</caption>` : ""}<colgroup><col class="c-lab">${cols.map(() => "<col>").join("")}</colgroup>`;
+function panTableHTML(cols, chart, rows, caption, ctx) {
+  let h = `<div class="pan-wrap"><table class="pan" data-cols="${cols.length}">${caption ? `<caption class="sr-only">${esc(caption)}</caption>` : ""}<colgroup><col class="c-lab">${cols.map(() => "<col>").join("")}</colgroup>`;
   for (const row of rows) {
-    h += `<tr class="${ROW_CLASS[row]}" data-row="${row === "cangss" ? "cang" : row}"><th scope="row">${ROW_LABEL[row]}</th>${cols.map(col => cellsFor(col, chart, row)).join("")}</tr>`;
+    h += `<tr class="${ROW_CLASS[row]}" data-row="${row === "cangss" ? "cang" : row}"><th scope="row">${ROW_LABEL[row]}</th>${cols.map(col => cellsFor(col, chart, row, ctx)).join("")}</tr>`;
   }
   h += "</table></div>";
   if (rows.includes("sha")) h += `<button type="button" class="sha-toggle" data-row="sha" data-act="sha" aria-expanded="${S.prefs.sha}">${S.prefs.sha ? "收起神煞（只顯示每柱項數）" : "展開神煞"}</button>`;
@@ -2156,13 +2519,13 @@ function proCols(chart, sel) {
   const cols = [];
   const months = B.liuYue(sel.year, localTz());
   const hasM = sel.mk != null, hasD = sel.dn != null, hasH = sel.hb != null;
-  cols.push(hasH && hasD ? { title: "流時", idx: B.hourGZ(B.dayGZ(sel.dn), sel.hb), kind: "dyn", layer: "liushi", label: "流時" } : { title: "流時", idx: null, ph: hasD ? "點流時" : "先選流日" });
-  cols.push(hasD ? { title: "流日", idx: B.dayGZ(sel.dn), kind: "dyn", layer: "liuri", label: "流日" } : { title: "流日", idx: null, ph: hasM ? "點流日" : "先選流月" });
-  cols.push(hasM ? { title: "流月", idx: months[sel.mk].idx, kind: "dyn", layer: "liuyue", label: "流月" } : { title: "流月", idx: null, ph: "點流月" });
+  cols.push(hasH && hasD ? { title: "流時", idx: B.hourGZ(B.dayGZ(sel.dn), sel.hb), kind: "dyn", layer: "liushi", label: "流時" } : { title: "流時", idx: null, layer: "liushi", ph: hasD ? "點流時" : "先選流日" });
+  cols.push(hasD ? { title: "流日", idx: B.dayGZ(sel.dn), kind: "dyn", layer: "liuri", label: "流日" } : { title: "流日", idx: null, layer: "liuri", ph: hasM ? "點流日" : "先選流月" });
+  cols.push(hasM ? { title: "流月", idx: months[sel.mk].idx, kind: "dyn", layer: "liuyue", label: "流月" } : { title: "流月", idx: null, layer: "liuyue", ph: "點流月" });
   cols.push({ title: "流年", idx: B.yearGZ(sel.year), kind: "dyn", layer: "liunian", label: "流年" });
   if (sel.dk >= 0) cols.push({ title: "大運", idx: chart.yun.dayun[sel.dk].idx, kind: "dyn", layer: "dayun", label: "大運" });
   else if (sel.year >= chart.birthYear) cols.push({ title: "小運", idx: B.xiaoYun(chart, sel.year), kind: "dyn", layer: "xiaoyun", label: "小運" });
-  else cols.push({ title: "大運", idx: null, ph: "未出生" });
+  else cols.push({ title: "大運", idx: null, layer: "dayun", ph: "未出生" });
   natalCols(chart, false).forEach((c, i) => { c.sep = i === 0; c.label = c.title; cols.push(c); });
   return cols;
 }
@@ -2186,16 +2549,20 @@ function stripHTML(pid, key, cls, title, sub, cells) {
     </div>
   </div>`;
 }
-function stripsHTML(pid, chart, sel) {
+const TODAY_SR = `<span class="sr-only">（今天）</span>`;
+function stripsHTML(pid, chart, sel, x) {
   const now = nowMoment(), dm = chart.dm, y = chart.yun;
   const pr = v => `aria-pressed="${v ? "true" : "false"}"`;
+  const td = (level, v) => cellToday(level, v, now, chart);
+  const extra = (level, v, idx) => `${td(level, v) ? " today" : ""}${hitCls(idx, chart, x)}`;
+  const tail = (level, v, idx) => `${cellMk(idx, chart, x)}${td(level, v) ? TODAY_SR : ""}${hitSr(idx, chart, x)}`;
   // 大運
-  let cells = `<button type="button" class="cell${cellToday("dayun", -1, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="dayun" data-v="-1" ${pr(sel.dk === -1)}>
-      <span class="c-top num">${y.xiaoYunFrom}</span><span class="c-sub">1~${Math.max(1, y.dayun[0].startAge - 1)}歲</span><span class="c-big">小</span><span class="c-big">運</span>${cellMk(null, chart)}</button>`;
+  let cells = `<button type="button" class="cell${td("dayun", -1) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="dayun" data-v="-1" ${pr(sel.dk === -1)}>
+      <span class="c-top num">${y.xiaoYunFrom}</span><span class="c-sub">1~${Math.max(1, y.dayun[0].startAge - 1)}歲</span><span class="c-big">小</span><span class="c-big">運</span>${tail("dayun", -1, null)}</button>`;
   y.dayun.forEach((d, k) => {
-    cells += `<button type="button" class="cell${cellToday("dayun", k, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="dayun" data-v="${k}" ${pr(sel.dk === k)}>
+    cells += `<button type="button" class="cell${extra("dayun", k, d.idx)}" data-act="sel" data-pid="${pid}" data-level="dayun" data-v="${k}" ${pr(sel.dk === k)}>
       <span class="c-top num">${d.startYear}</span><span class="c-sub">${d.startAge}歲</span>
-      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span>${cellMk(d.idx, chart)}</button>`;
+      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span>${tail("dayun", k, d.idx)}</button>`;
   });
   let h = stripHTML(pid, "dy", "s-dayun", "大<br>運", "", cells);
   // 流年
@@ -2203,34 +2570,34 @@ function stripsHTML(pid, chart, sel) {
   cells = "";
   for (let Y = y0; Y <= y1; Y++) {
     const i = B.yearGZ(Y), xy = Y >= chart.birthYear ? B.xiaoYun(chart, Y) : null;
-    cells += `<button type="button" class="cell${cellToday("year", Y, now, chart) ? " today" : ""}${Y < chart.birthYear ? " unborn" : ""}" data-act="sel" data-pid="${pid}" data-level="year" data-v="${Y}" ${pr(sel.year === Y)}>
+    cells += `<button type="button" class="cell${extra("year", Y, i)}${Y < chart.birthYear ? " unborn" : ""}" data-act="sel" data-pid="${pid}" data-level="year" data-v="${Y}" ${pr(sel.year === Y)}>
       <span class="c-top num">${Y}</span>
       <span class="c-gz">${gS(i % 10)}<i>${ssAbbr(dm, i % 10)}</i></span><span class="c-gz">${zS(i % 12)}<i>${zAbbr(dm, i % 12)}</i></span>
-      <span class="c-xy">${xy != null ? B.gzName(xy) : "未出生"}</span>${cellMk(i, chart)}</button>`;
+      <span class="c-xy">${xy != null ? B.gzName(xy) : "未出生"}</span>${tail("year", Y, i)}</button>`;
   }
   h += stripHTML(pid, `ln${y0}`, "s-year", "流<br>年", "小運", cells);
   // 流月
   const months = B.liuYue(sel.year, localTz());
-  cells = months.map(m => `<button type="button" class="cell${cellToday("month", { Y: sel.year, k: m.k }, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="month" data-v="${m.k}" ${pr(sel.mk === m.k)}>
+  cells = months.map(m => { const v = { Y: sel.year, k: m.k }; return `<button type="button" class="cell${extra("month", v, m.idx)}" data-act="sel" data-pid="${pid}" data-level="month" data-v="${m.k}" ${pr(sel.mk === m.k)}>
       <span class="c-top">${m.name}</span><span class="c-sub num">${m.clock.m}/${m.clock.d}</span>
-      <span class="c-gz">${gS(m.idx % 10)}<i>${ssAbbr(dm, m.idx % 10)}</i></span><span class="c-gz">${zS(m.idx % 12)}<i>${zAbbr(dm, m.idx % 12)}</i></span>${cellMk(m.idx, chart)}</button>`).join("");
+      <span class="c-gz">${gS(m.idx % 10)}<i>${ssAbbr(dm, m.idx % 10)}</i></span><span class="c-gz">${zS(m.idx % 12)}<i>${zAbbr(dm, m.idx % 12)}</i></span>${tail("month", v, m.idx)}</button>`; }).join("");
   h += stripHTML(pid, `ly${sel.year}`, "s-month", "流<br>月", "", cells);
   // 流日
   if (sel.mk != null) {
     const days = B.liuRi(months[sel.mk]);
     cells = days.map(d => {
       const l = B.lunarOfDay(d.dayNum);
-      return `<button type="button" class="cell${cellToday("day", d.dayNum, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="day" data-v="${d.dayNum}" ${pr(sel.dn === d.dayNum)}>
+      return `<button type="button" class="cell${extra("day", d.dayNum, d.idx)}" data-act="sel" data-pid="${pid}" data-level="day" data-v="${d.dayNum}" ${pr(sel.dn === d.dayNum)}>
       <span class="c-top num">${d.m}/${d.d}</span><span class="c-sub">${l ? (l.day === 1 ? (l.leap ? "閏" : "") + B.LUNAR_MONTH[l.month] : B.LUNAR_DAY[l.day]) : ""}</span>
-      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span>${cellMk(d.idx, chart)}</button>`;
+      <span class="c-gz">${gS(d.idx % 10)}<i>${ssAbbr(dm, d.idx % 10)}</i></span><span class="c-gz">${zS(d.idx % 12)}<i>${zAbbr(dm, d.idx % 12)}</i></span>${tail("day", d.dayNum, d.idx)}</button>`;
     }).join("");
     h += stripHTML(pid, `lr${sel.year}-${sel.mk}`, "s-day", "流<br>日", "", cells);
   }
   // 流時
   if (sel.dn != null) {
-    cells = B.liuShi(sel.dn).map(t => `<button type="button" class="cell${cellToday("hour", { dn: sel.dn, b: t.branch }, now, chart) ? " today" : ""}" data-act="sel" data-pid="${pid}" data-level="hour" data-v="${t.branch}" ${pr(sel.hb === t.branch)}>
+    cells = B.liuShi(sel.dn).map(t => { const v = { dn: sel.dn, b: t.branch }; return `<button type="button" class="cell${extra("hour", v, t.idx)}" data-act="sel" data-pid="${pid}" data-level="hour" data-v="${t.branch}" ${pr(sel.hb === t.branch)}>
       <span class="c-top">${ZHI[t.branch]}時</span><span class="c-sub num">${t.range}</span>
-      <span class="c-gz">${gS(t.idx % 10)}<i>${ssAbbr(dm, t.idx % 10)}</i></span><span class="c-gz">${zS(t.idx % 12)}<i>${zAbbr(dm, t.idx % 12)}</i></span>${cellMk(t.idx, chart)}</button>`).join("");
+      <span class="c-gz">${gS(t.idx % 10)}<i>${ssAbbr(dm, t.idx % 10)}</i></span><span class="c-gz">${zS(t.idx % 12)}<i>${zAbbr(dm, t.idx % 12)}</i></span>${tail("hour", v, t.idx)}</button>`; }).join("");
     h += stripHTML(pid, `ls${sel.dn}`, "s-hour", "流<br>時", "", cells);
   }
   return h;
@@ -2261,15 +2628,29 @@ function proInfoHTML(pid, chart) {
     <p class="algo">起運算法：出生到${y.forward ? "下一個" : "上一個"}節（${y.target.name}）的時間，三天折一年、一天折四個月、一個時辰折十天（一年按 360 天、一月按 30 天）。交運日期是出生時刻依序加上這些年月日時。歲數按公曆年份計虛歲；小運從時柱起，與大運同向。司令以出生所在節令、按入節後天數分配。</p>
   </div>`;
 }
-function tmsHTML(chart) {
+function tmsHTML(chart, ctx) {
   const e = chart.extra;
   const cols = [["胎元", e.taiyuan], ["命宮", e.minggong], ["身宮", e.shengong]].map(([t, idx]) => ({ title: t, idx, kind: "extra" }));
-  return `<div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:6px">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "mk", "cangss", "xy", "zz", "kong", "ny"], "胎命身")}</div>`;
+  return `<div class="tms" style="margin-top:12px;border-top:1px dashed var(--line);padding-top:6px">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "mk", "cangss", "xy", "zz", "kong", "ny"], "胎命身", ctx)}</div>`;
 }
-function proPanelHTML(pid, chart, sel) {
-  const cols = proCols(chart, sel);
-  const left = `<div class="card pro-left">${panTableHTML(cols, chart, ["head", "ss", "gan", "zhi", "mk", "cangss", "xy", "zz", "kong", "ny", "sha"], "專業細盤")}${S.prefs.tms ? tmsHTML(chart) : ""}</div>`;
-  const right = `<div class="card pro-right">${proInfoHTML(pid, chart)}${stripsHTML(pid, chart, sel)}<p class="swipe-hint">干支條可左右滑動，或拖動下方捲軸、按 ◀ ▶。點一格即選中，左側對應的列與下方清單會跟著換；點流月後出現流日，點流日後出現流時。格子頂端有<span class="today-dot" aria-hidden="true"></span>小紅點的是今天所在的一格。格子底部的標記對照原局：<span class="mk mk-tkdc">沖</span>天剋地沖、<span class="mk mk-thdh">合</span>天合地合、<span class="mk mk-fuyin">伏</span>伏吟，後面的字是原局哪一柱，牽到日柱的點較大。</p>${wbarHTML(chart)}</div>`;
+/* 細盤表的動態欄：全部、大運與流年、只留流年、只看原局（手機、電腦分開記；關係清單仍用全部層級） */
+const DYN_MODES = { all: null, dy: ["liunian", "dayun", "xiaoyun"], year: ["liunian"], none: [] };
+const DYN_LABEL = [["all", "全部五欄（流時到大運）"], ["dy", "大運與流年"], ["year", "只留流年"], ["none", "只看原局"]];
+function dynMode(dev) { const v = (S.prefs.dyn || {})[dev || devNow()]; return Object.prototype.hasOwnProperty.call(DYN_MODES, v) ? v : "all"; }
+function tableCols(cols) {
+  const keep = DYN_MODES[dynMode()];
+  if (!keep) return cols;
+  const out = cols.filter(c => c.kind === "natal" || keep.includes(c.layer));
+  const hasDyn = out.some(c => c.kind !== "natal");
+  return out.map(c => (c.kind === "natal" && c.pos === 0) ? Object.assign({}, c, { sep: hasDyn }) : c);
+}
+function proPanelHTML(pid, chart, sel, x) {
+  const cols = proCols(chart, sel), ctx = { x };
+  const tcols = tableCols(cols), hidden = cols.length - tcols.length;
+  const note = hidden ? `<p class="dyn-note">表裡只留${dynMode() === "none" ? "原局" : tcols.filter(c => c.kind !== "natal").map(c => c.title).join("、") + "與原局"}，其餘 ${hidden} 欄請看干支條（到「設定」可改）。</p>` : "";
+  const left = `<div class="card pro-left">${panTableHTML(tcols, chart, ["head", "ss", "gan", "zhi", "mk", "cangss", "xy", "zz", "kong", "ny", "sha"], "專業細盤", ctx)}${note}${S.prefs.tms ? tmsHTML(chart, ctx) : ""}</div>`;
+  const xHint = x ? `空心點<span class="mk mk-tkdc mk-x">${x.side}沖</span>是對照 ${x.side} 方的原局；同時沖到兩人的格子右上角有紅色折角，同時合到兩人的是綠色折角。` : "";
+  const right = `<div class="card pro-right">${proInfoHTML(pid, chart)}${stripsHTML(pid, chart, sel, x)}<p class="swipe-hint">干支條可左右滑動，或拖動下方捲軸、按 ◀ ▶。點一格即選中，左側對應的列與下方清單會跟著換；點流月後出現流日，點流日後出現流時。格子頂端有<span class="today-dot" aria-hidden="true"></span>小菱形的是今天所在的一格（用主題色，主色偏紅時改金色）。格子底部的標記對照原局：<span class="mk mk-tkdc">沖</span>天剋地沖、<span class="mk mk-thdh">合</span>天合地合、<span class="mk mk-fuyin">伏</span>伏吟，後面的字是原局哪一柱，牽到日柱的點較大。${xHint}</p>${wbarHTML(chart)}</div>`;
   return { html: `<div class="pro" data-pid="${pid}"><div class="pro-body">${left}${right}</div></div>`, cols };
 }
 function renderPro() {
@@ -2288,30 +2669,47 @@ function renderPro() {
   setupStrips(root);
 }
 
-/* ---------- 干支條捲軸 ---------- */
+/* ---------- 干支條捲軸 ----------
+   先一次量完所有條的位置，再一起設定捲動與捲軸（避免每條各自觸發一次整頁排版）。 */
 const stripPos = new Map();
+const thumbRO = window.ResizeObserver ? new ResizeObserver(entries => {
+  const list = entries.map(en => en.target.__strip).filter(Boolean);
+  const ms = list.map(measureStrip);
+  list.forEach((pl, i) => paintStrip(pl, ms[i]));
+}) : null;
+function measureStrip(pl) {
+  const t = pl.track;
+  return { max: t.scrollWidth - t.clientWidth, cw: t.clientWidth, sw: t.scrollWidth, left: t.scrollLeft, rw: pl.rail.clientWidth };
+}
+function paintStrip(pl, m) {
+  const max = Math.max(0, m.max);
+  pl.st.classList.toggle("fits", max <= 1);
+  const tw = Math.max(28, m.rw * m.cw / Math.max(1, m.sw));
+  const x = max > 0 ? (m.left / max) * (m.rw - tw) : 0;
+  pl.thumb.style.width = tw + "px"; pl.thumb.style.transform = `translateX(${x}px)`;
+  pl.bl.disabled = m.left <= 1; pl.br.disabled = m.left >= max - 1;
+  stripPos.set(pl.id, { key: pl.key, left: m.left });
+}
 function setupStrips(root) {
-  $$(".strip", root).forEach(st => {
-    const track = $(".strip-track", st), rail = $(".sbar-rail", st), thumb = $(".sbar-thumb", st);
+  // 1. 讀：位置一次量完
+  const plans = $$(".strip", root).map(st => {
+    const track = $(".strip-track", st), id = st.dataset.strip, key = st.dataset.key;
     const [bl, br] = $$(".sbar-btn", st);
-    const id = st.dataset.strip, key = st.dataset.key;
+    const pl = { st, track, id, key, rail: $(".sbar-rail", st), thumb: $(".sbar-thumb", st), bl, br, left: 0 };
     const prev = stripPos.get(id);
-    const selCell = $('.cell[aria-pressed="true"]', track);
-    const center = el => Math.max(0, el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2);
-    if (prev && prev.key === key) track.scrollLeft = prev.left;
-    else if (selCell) track.scrollLeft = center(selCell);
-    else { const td = $(".cell.today", track); track.scrollLeft = td ? center(td) : 0; }
-    const update = () => {
-      const max = track.scrollWidth - track.clientWidth;
-      st.classList.toggle("fits", max <= 1);
-      const rw = rail.clientWidth;
-      const tw = Math.max(28, rw * track.clientWidth / Math.max(1, track.scrollWidth));
-      const x = max > 0 ? (track.scrollLeft / max) * (rw - tw) : 0;
-      thumb.style.width = tw + "px"; thumb.style.transform = `translateX(${x}px)`;
-      bl.disabled = track.scrollLeft <= 1; br.disabled = track.scrollLeft >= max - 1;
-      stripPos.set(id, { key, left: track.scrollLeft });
-    };
-    track.addEventListener("scroll", update, { passive: true });
+    if (prev && prev.key === key) pl.left = prev.left;
+    else {
+      const el = $('.cell[aria-pressed="true"]', track) || $(".cell.today", track);
+      if (el) pl.left = Math.max(0, el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2);
+    }
+    return pl;
+  });
+  // 2. 寫：捲動位置與事件
+  for (const pl of plans) {
+    const { track, rail, thumb, bl, br } = pl;
+    track.scrollLeft = pl.left;
+    track.__strip = pl;
+    track.addEventListener("scroll", () => paintStrip(pl, measureStrip(pl)), { passive: true });
     const step = () => Math.max(120, track.clientWidth * 0.8);
     bl.addEventListener("click", () => track.scrollBy({ left: -step(), behavior: "smooth" }));
     br.addEventListener("click", () => track.scrollBy({ left: step(), behavior: "smooth" }));
@@ -2330,9 +2728,11 @@ function setupStrips(root) {
       const ratio = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
       track.scrollTo({ left: ratio * max, behavior: "smooth" });
     });
-    if (window.ResizeObserver) new ResizeObserver(update).observe(track);
-    update();
-  });
+  }
+  // 3. 捲軸：先全部量，再全部畫
+  const ms = plans.map(measureStrip);
+  plans.forEach((pl, i) => paintStrip(pl, ms[i]));
+  if (thumbRO) plans.forEach(pl => thumbRO.observe(pl.track));
 }
 
 /* ---------- 選擇 ---------- */
@@ -2390,9 +2790,10 @@ function relItemHTML(r, top, mode) {
   }
   r.notes.forEach(n => chips.push(`<span class="chip${n === "旬空" ? " warn" : ""}">${n}</span>`));
   const src = r.members.map(m => memberText(m, r.cat, mode)).join(" × ");
-  return `<li class="ritem${top ? " top" : ""}"><span class="sc">${r.score.toFixed(1)}</span><div>
+  const sub = r.sub && r.sub.length ? `<div class="rsub">含 ${r.sub.map(x => esc(B.relText(x))).join("、")}，併入這一條，不另計分</div>` : "";
+  return `<li class="ritem${top ? " top" : ""}${r.cat === "zhu" ? " zhu" : ""}"><span class="sc">${r.score.toFixed(1)}</span><div>
     <div class="rt"><span class="tl">${esc(r.text)}</span>${chips.join("")}</div>
-    <div class="src">${esc(src)}</div>
+    <div class="src">${esc(src)}</div>${sub}
     <div class="calc">${B.TYPE_LABEL[r.type]} ${fmtN(r.typeScore)} × 位置 ${fmtN(r.pos)} × 力量 ${fmtN(r.power)}</div></div></li>`;
 }
 const fmtN = v => (Math.round(v * 100) / 100).toString();
@@ -2412,7 +2813,7 @@ function relColHTML(sid, key, title, sub, list, mode) {
   return h + "</div>";
 }
 function relBodyHTML(sid, ctx) {
-  const scored = B.scoreRelations(ctx.raw, ctx.items, { mode: ctx.mode, charts: ctx.charts }, S.W);
+  const scored = B.scoreRelations(B.foldZhu(ctx.raw), ctx.items, { mode: ctx.mode, charts: ctx.charts }, S.W);
   const base = scored.filter(r => !r.now), now = scored.filter(r => r.now);
   const pair = ctx.mode === "pair";
   return `<div class="rel-cols">${relColHTML(sid, "base", "底色", pair ? "兩人原局之間" : "原局內部", base, ctx.mode)}${relColHTML(sid, "now", "此刻", pair ? "大運與所選流年月日時，跨兩人" : "大運、流年、流月、流日、流時與原局", now, ctx.mode)}</div>`;
@@ -2421,7 +2822,7 @@ const relCtx = {};
 function relSectionHTML(sid, ctx) {
   relCtx[sid] = ctx;
   return `<section class="card rel" aria-labelledby="rel-t-${sid}">
-    <div class="rel-head"><h2 class="card-title" id="rel-t-${sid}">關係清單<small>分數＝類型分 × 位置係數 × 力量係數，每條都列出</small></h2>
+    <div class="rel-head"><h2 class="card-title" id="rel-t-${sid}">關係清單<small>分數＝類型分 × 位置係數 × 力量係數，每條都列出；天剋地沖、天合地合、伏吟把同一對柱的干支關係收在底下，只計一次分</small></h2>
       <button type="button" class="btn btn-sm" data-act="wtoggle" aria-expanded="${S.prefs.wOpen}" aria-controls="w-${sid}">${S.prefs.wOpen ? "收起權重" : "調整權重"}</button></div>
     <div class="weights" id="w-${sid}"${S.prefs.wOpen ? "" : " hidden"}>${weightsHTML(sid)}</div>
     <div class="rel-body" id="rb-${sid}">${relBodyHTML(sid, ctx)}</div>
@@ -2462,9 +2863,9 @@ function caseSummary(c) {
 }
 function renderCases() {
   const root = $("#cases-card");
+  S.ui.casesRev = Store.rev;
   const list = Store.cases.filter(c => !S.ui.filter || (c.name || "").includes(S.ui.filter));
-  const where = Store.status === "cloud" ? "案例存在你的帳戶，換裝置打開也看得到。" : "案例存在這個瀏覽器。";
-  let h = `<div class="listhead"><div><h1 class="card-title">案例列表<small>共 ${Store.cases.length} 個</small></h1><p class="hint" style="margin:4px 0 0">${where}</p></div>
+  let h = `<div class="listhead"><div><h1 class="card-title">案例列表<small>共 ${Store.cases.length} 個</small></h1><div id="cases-sync" class="cases-sync">${syncHTML(true)}</div></div>
     <input class="field" id="case-filter" type="search" placeholder="按姓名篩選" value="${esc(S.ui.filter)}" aria-label="按姓名篩選"></div>`;
   if (!Store.cases.length) {
     h += `<div class="empty"><p>還沒有存檔的案例。排盤後按抬頭的「存檔」，或在排盤頁打開「排盤後存入案例」。</p><div class="row-actions"><button class="btn btn-gold" type="button" data-act="go" data-page="input">去排盤</button></div></div>`;
@@ -2514,13 +2915,35 @@ function renderHepan() {
   }
   if (!S.hpSel.A) S.hpSel.A = selNow(A);
   if (!S.hpSel.B) S.hpSel.B = selNow(Bc);
-  const pa = proPanelHTML("A", A, S.hpSel.A), pb = proPanelHTML("B", Bc, S.hpSel.B);
+  const cross = !!S.prefs.hpCross;
+  const pa = proPanelHTML("A", A, S.hpSel.A, cross ? { chart: Bc, side: "B" } : null), pb = proPanelHTML("B", Bc, S.hpSel.B, cross ? { chart: A, side: "A" } : null);
   const mini = (c, ch, L) => `<div class="hp-mini"><span class="sx-ring">${ch.shengxiao}</span><div><div class="nm">${esc(c.name)}</div><div class="ln">${esc(B.lunarText(ch.lunar))} ${ZHI[ch.pillars[3] % 12]}時（${ch.male ? "乾造" : "坤造"}）· ${fmtCN(ch.civil)}</div></div><span class="side-tag">${L}</span></div>`;
   const attnOf = (ch, cols) => attnHTML(B.findRelations(natalItems(ch).concat(dynItems(cols))));
+  h += `<div class="card hp-tools"><label class="switch"><input type="checkbox" data-act="hp-cross"${cross ? " checked" : ""}> 干支條也對照對方原局</label><span class="hint">${cross ? "每格除了對照自己的原局，也用空心點標出對方原局的沖、合、伏；下方列出前後年份裡同時沖到或合到兩人的流年。" : "打開後，A 的流年、大運等也拿來對照 B 的原局（B 那邊亦同），看哪一年同時沖到兩個人。"}</span></div>`;
   h += `<div class="hp-panels"><div class="hp-panel">${mini(cA, A, "A")}${pa.html}${attnOf(A, pa.cols)}</div><div class="hp-panel">${mini(cB, Bc, "B")}${pb.html}${attnOf(Bc, pb.cols)}</div></div>`;
+  if (cross) h += bothYearsHTML(A, Bc);
   h += pairStaticHTML(cA, cB, A, Bc, pa.cols, pb.cols);
   root.innerHTML = h;
   setupStrips(root);
+}
+/* 流年同時牽動兩人：今年前十年到後二十年，同一流年對兩人原局都是天剋地沖（或都是天合地合） */
+function bothYearsHTML(A, Bc) {
+  const now = nowMoment().Y, from = now - 10, to = now + 20;
+  const found = { tkdc: [], thdh: [] };
+  for (let Y = from; Y <= to; Y++) {
+    const i = B.yearGZ(Y), ma = marksOf(i, A.pillars), mb = marksOf(i, Bc.pillars);
+    for (const t of ["tkdc", "thdh"]) {
+      const a = ma.find(m => m.t === t), b = mb.find(m => m.t === t);
+      if (a && b) found[t].push({ Y, i, a, b });
+    }
+  }
+  const where = m => m.pos.map(p => "年月日時"[p]).join("、");
+  const chip = (t, r) => `<button type="button" class="yr-chip yr-${t}${r.Y === now ? " is-now" : ""}" data-act="hp-year" data-y="${r.Y}" title="點一下，兩邊一起跳到 ${r.Y} 年"><b class="num">${r.Y}</b><span class="yr-gz">${gzH(r.i)}</span><span class="yr-w">A ${where(r.a)}柱、B ${where(r.b)}柱</span></button>`;
+  const never = t => { for (let i = 0; i < 60; i++) if (marksOf(i, A.pillars).some(m => m.t === t) && marksOf(i, Bc.pillars).some(m => m.t === t)) return false; return true; };
+  const none = t => `<span class="dim">${never(t) ? `這段期間沒有；兩人原局的組合下，六十甲子裡沒有任何一年會同時${t === "tkdc" ? "沖" : "合"}到兩人` : "這段期間沒有"}</span>`;
+  const row = (t, label) => `<div class="yr-row"><span class="k"><span class="mk mk-${t}">${MK_CH[t]}</span>${label}</span><div class="yr-list">${found[t].length ? found[t].map(r => chip(t, r)).join("") : none(t)}</div></div>`;
+  return `<div class="card hpx hp-both"><div class="card-pad" style="padding-bottom:6px"><h2 class="card-title">流年同時牽動兩人<small>${from}–${to} 年；點年份，兩邊細盤一起跳到那一年</small></h2></div>
+    <div class="yr-rows">${row("tkdc", "同時天剋地沖")}${row("thdh", "同時天合地合")}</div></div>`;
 }
 function pairStaticHTML(cA, cB, A, Bc, colsA, colsB) {
   // 互看十神
@@ -2636,9 +3059,18 @@ document.addEventListener("click", e => {
     case "show-dev": S.ui.showDev = t.dataset.dev; renderTheme(); { const b = document.querySelector(`[data-act="show-dev"][data-dev="${t.dataset.dev}"]`); if (b) b.focus(); } break;
     case "show-lite": case "show-all": {
       const dev = S.ui.showDev || devNow();
+      S.prefs.dyn = Object.assign({}, S.prefs.dyn, { [dev]: act === "show-lite" && dev === "phone" ? "dy" : "all" });
       setHide(dev, act === "show-lite" ? LITE.slice() : []); renderTheme();
       toast(`${DEV_NAME[dev]}已${act === "show-lite" ? "切換成精簡模式" : "恢復全部顯示"}。`);
       const b = document.querySelector(`[data-act="${act}"]`); if (b) b.focus(); break;
+    }
+    case "sha-reset": S.prefs.shaOpt = {}; savePrefs(); S.ui.shaOpen = true; renderTheme(); toast("神煞查法已恢復預設。"); { const b = document.querySelector('.sha-sw summary'); if (b) b.focus(); } break;
+    case "hp-year": {
+      const Y = +t.dataset.y;
+      for (const pid of ["A", "B"]) { const st = panelState(pid); if (st.chart) S.hpSel[pid] = { dk: B.dayunIndexForYear(st.chart, Y), year: Y, mk: null, dn: null, hb: null }; }
+      stripPos.clear(); renderHepan();
+      const p = $(".hp-panels"); if (p) p.scrollIntoView({ block: "start" });
+      toast(`兩邊都跳到 ${Y} 年。`); break;
     }
     case "cp-copy": {
       const cur = themeNow();
@@ -2652,6 +3084,19 @@ document.addEventListener("click", e => {
 document.addEventListener("change", e => {
   const t = e.target;
   if (t.matches('[data-act="tms"]')) { S.prefs.tms = t.checked; savePrefs(); rerenderPanels("pro"); return; }
+  if (t.matches('[data-act="hp-cross"]')) { S.prefs.hpCross = t.checked; savePrefs(); stripPos.clear(); rerenderPanels("A"); const c = $('[data-act="hp-cross"]'); if (c) c.focus(); return; }
+  if (t.matches("input[data-dyn]")) {
+    const dev = S.ui.showDev || devNow();
+    S.prefs.dyn = Object.assign({}, S.prefs.dyn, { [dev]: t.dataset.dyn }); savePrefs();
+    toast(`${DEV_NAME[dev]}的細盤表改為「${(DYN_LABEL.find(x => x[0] === t.dataset.dyn) || [])[1]}」。`); return;
+  }
+  if (t.matches("input[data-sha]")) {
+    S.prefs.shaOpt = Object.assign({}, S.prefs.shaOpt, { [t.dataset.sha]: t.dataset.v }); savePrefs();
+    const o = B.shaOpt(S.prefs.shaOpt), n = B.SHA_OPTIONS.filter(it => o[it.k] !== B.SHA_DEFAULT[it.k]).length;
+    const b = $('[data-act="sha-reset"]'); if (b) b.disabled = !n;
+    const st = $("#sha-state"); if (st) st.textContent = n ? `已改 ${n} 項` : "目前全用預設";
+    return;
+  }
   if (t.matches("input[data-show]")) {
     const dev = S.ui.showDev || devNow(), set = new Set(hideList(dev)), k = t.dataset.show;
     if (t.checked) set.delete(k); else set.add(k);
@@ -2676,34 +3121,43 @@ document.addEventListener("input", e => {
   if (t.id === "case-filter") { S.ui.filter = t.value.trim(); const pos = t.selectionStart; renderCases(); const f = $("#case-filter"); if (f) { f.focus(); try { f.setSelectionRange(pos, pos); } catch (x) { /* 無妨 */ } } return; }
   if (t.id === "f-lon" || t.id === "f-lat" || t.id === "f-name") { if (t.id !== "f-name") $("#f-place").value = "custom"; updatePreview(); }
 });
+document.addEventListener("toggle", e => { if (e.target.matches && e.target.matches("details.sha-sw")) S.ui.shaOpen = e.target.open; }, true);
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && !$("#modal").hidden) closeModal();
   if (e.key === "Enter" && e.target.id && e.target.id.startsWith("rn-")) { const b = document.querySelector(`[data-act="case-rename-save"][data-id="${e.target.id.slice(3)}"]`); if (b) b.click(); }
 });
 $("#f-form").addEventListener("submit", e => { e.preventDefault(); submitForm(); });
 
-/* ---------- 啟動 ---------- */
+/* ---------- 啟動 ----------
+   先畫框架（導覽列與目前頁的佔位），下一個畫面再算命盤；看到哪頁才算哪頁。 */
+const HEAVY = ["basic", "pro", "hepan", "cases"];
+function showFrame(page) {
+  S.page = page;
+  $$(".page").forEach(p => { p.hidden = p.id !== "page-" + page; });
+  $$(".nav-item").forEach(b => b.setAttribute("aria-current", b.dataset.page === page ? "page" : "false"));
+  const box = page === "cases" ? $("#cases-card") : $("#page-" + page);
+  if (box) box.innerHTML = `<div class="${page === "cases" ? "" : "card "}loading" aria-busy="true"><span class="ld-bar"></span><span>${page === "cases" ? "正在讀取案例…" : "正在排盤…"}</span></div>`;
+}
 function init() {
   applyTheme();
   applyHide();
-  buildFormOptions();
-  fillFormNow();
-  rebuildLunarMonths();
-  setModeNoSync("solar");
   const saved = LS.get("bazi.cur.v1", null);
-  if (saved && saved.c) { try { setCurrent(saved.c, saved.saved); } catch (e) { S.cur = null; } }
+  if (saved && validCase(saved.c)) setCurrent(saved.c, saved.saved);
   Store.sort();
   Store.subs.add(() => {
-    if (S.cur && S.cur.saved && !Store.get(S.cur.c.id) && Store.status === "cloud") { /* 雲端尚未有，保持 */ }
-    if (S.page === "cases") renderCases();
+    renderSync();
+    if (S.page === "cases" && S.ui.casesRev !== Store.rev) renderCases();
     if (S.page === "hepan" && !S.hepan.started) renderHepan();
   });
+  renderSync();
   let page = (location.hash || "").replace("#", "");
   if (!PAGES.includes(page)) page = LS.get("bazi.page", "input");
-  if ((page === "basic" || page === "pro") && !S.cur) page = "input";
-  go(page);
-  updatePreview();
-  tickNow(true);
+  if (!PAGES.includes(page) || ((page === "basic" || page === "pro") && !S.cur)) page = "input";
+  if (HEAVY.includes(page)) {
+    showFrame(page);
+    const boot = () => { if (!S.booted) go(page, { keepScroll: true }); };
+    if (window.requestAnimationFrame) requestAnimationFrame(() => setTimeout(boot, 0)); else setTimeout(boot, 0);
+  } else go(page);
   setInterval(() => tickNow(false), 1000);
   Store.initCloud();
 }

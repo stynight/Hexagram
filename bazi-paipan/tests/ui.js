@@ -204,7 +204,7 @@ async function run(vp) {
   const lay = await page.$$eval(".hp-panels .hp-panel", ps => ps.map(p => { const r = p.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top)]; }));
   ok(`[${T}] 合盤排列（桌面左右／手機上下）`, vp.mobile ? lay[1][1] > lay[0][1] : (lay[1][0] > lay[0][0] || true), JSON.stringify(lay));
   ok(`[${T}] 合盤關係清單`, (await page.locator("#rb-hp .ritem").count()) > 0);
-  const hpText = await txt("#page-hepan");
+  const hpText = await page.$eval("#page-hepan", e => e.textContent);   // 畫面外的段落延後排版，用 textContent 讀
   ok(`[${T}] 合盤 互看十神、五行互補`, hpText.includes("互看十神") && hpText.includes("五行互補"));
   // 一邊點流年，另一邊跟著
   await page.locator('.hp-panels .pro[data-pid="A"] .strip.s-year .cell').first().click();
@@ -311,6 +311,38 @@ async function run(vp) {
   await page.click('[data-act="show-all"]');
   await page.click('.nav-item[data-page="pro"]');
   ok(`[${T}] 全部顯示後納音回來`, await page.locator('#page-pro tr[data-row="ny"]').isVisible() && !(await page.locator("#hide-note").isVisible()));
+  // 10c 今天標記、關係清單折疊、神煞流派、細盤欄位、存放狀態
+  const colorOf = v => page.evaluate(v => { const d = document.createElement("i"); d.style.color = `var(${v})`; document.body.appendChild(d); const c = getComputedStyle(d).color; d.remove(); return c; }, v);
+  const todayBg = await page.$eval("#page-pro .strip.s-year .cell.today", el => getComputedStyle(el, "::before").backgroundColor);
+  ok(`[${T}] 今天標記用主題色，與沖的紅色不同`, todayBg === (await colorOf("--accent")) && todayBg !== (await colorOf("--huo")), todayBg);
+  const relTxt = await page.$eval("#rb-pro", e => e.textContent);
+  ok(`[${T}] 伏吟把同一對柱的干支關係收在底下`, relTxt.includes("丙午伏吟") && relTxt.includes("含 午午相刑，併入這一條"));
+  const dupWu = await page.$$eval("#rb-pro .ritem", lis => lis.filter(li => li.querySelector(".tl").textContent === "午午相刑" && /年柱/.test(li.querySelector(".src").textContent) && /流年/.test(li.querySelector(".src").textContent)).length);
+  ok(`[${T}] 年柱與流年的午午相刑不另列一條`, dupWu === 0, String(dupWu));
+  const shaHour = () => page.$eval('#page-pro .pro-left table.pan tr[data-row="sha"]', tr => { const tds = tr.querySelectorAll("td"); return tds[tds.length - 1].textContent; });
+  const sha0 = await shaHour();
+  ok(`[${T}] 時柱乙酉有天醫、將星、紅鸞、勾絞等新神煞`, ["天醫", "將星", "紅鸞", "勾絞"].every(n => sha0.includes(n)), sha0);
+  await page.click('.nav-item[data-page="theme"]');
+  await page.click("#sha-card .sha-sw summary");
+  await page.check('input[data-sha="ganBase"][data-v="d"]');
+  ok(`[${T}] 改了流派後顯示已改 1 項`, (await txt("#sha-state")) === "已改 1 項");
+  await page.click('.nav-item[data-page="pro"]');
+  const sha1 = await shaHour();
+  ok(`[${T}] 神煞切成只用日干，時柱由年干查得的天乙消失`, sha0.includes("天乙") && !sha1.includes("天乙"), `${sha0} → ${sha1}`);
+  await page.click('.nav-item[data-page="theme"]');
+  await page.click('[data-act="sha-reset"]');
+  ok(`[${T}] 神煞查法恢復預設`, (await txt("#sha-state")) === "目前全用預設");
+  await page.check('input[data-dyn="dy"]');
+  await page.click('.nav-item[data-page="pro"]');
+  const headDy = await page.$$eval("#page-pro .pro-left table.pan tr.r-head td", tds => tds.map(t => t.innerText.trim()));
+  ok(`[${T}] 細盤表可只留流年與大運（小運）`, headDy.join(",") === "流年,小運,年柱,月柱,日柱,時柱", headDy.join(","));
+  ok(`[${T}] 表下說明其餘看干支條`, (await txt("#page-pro .dyn-note")).includes("其餘 3 欄"));
+  ok(`[${T}] 關係清單仍算全部層級`, (await page.$eval("#rb-pro", e => e.textContent)).includes("流時"));
+  await page.click('.nav-item[data-page="theme"]');
+  await page.check('input[data-dyn="all"]');
+  await page.click('.nav-item[data-page="cases"]');
+  ok(`[${T}] 案例頁寫明存放位置`, (await txt("#cases-sync")).includes("案例存在這個瀏覽器"));
+  ok(`[${T}] 節氣算過存進瀏覽器`, await page.evaluate(() => { window.dispatchEvent(new Event("pagehide")); const v = JSON.parse(localStorage.getItem("bazi.terms.v1") || "null"); return !!(v && v.y && Object.keys(v.y).length > 3); }));
   ok(`[${T}] 不載入任何網路資源`, ext.length === 0, ext.slice(0, 3).join(" "));
   // 11 真的刪除一筆（頁內確認）
   await page.click('.nav-item[data-page="cases"]');
@@ -326,9 +358,130 @@ async function run(vp) {
   await browser.close();
 }
 
+/* 瀏覽器寫入 localStorage 是非同步送出的，寫完馬上重新整理偶爾會遺失；等一下再重整，並確認資料還在 */
+async function settleReload(page, seed, arg, check) {
+  for (let i = 0; i < 4; i++) {
+    await page.evaluate(seed, arg);
+    await page.waitForTimeout(250);
+    await page.reload();
+    if (await page.evaluate(check)) return;
+  }
+  throw new Error("測試資料沒有寫進 localStorage");
+}
+/* 合盤：干支條對照對方原局，同年出生的兩人在 2043 癸亥同時天剋地沖 */
+const mkCase = (id, name, y, m, d, hh) => ({ id, name, sex: "m", mode: "solar", solar: { y, m, d, hh, mi: 0 }, place: { name: "未知地（北京時間）", lon: 120, lat: 39, tz: 8 }, dst: false, trueSolar: false, zishi: "day23", createdAt: 1, updatedAt: 1 });
+async function crossRun(vp) {
+  const browser = await chromium.launch();
+  const ctx = await browser.newContext({ viewport: { width: vp.w, height: vp.h }, timezoneId: "Asia/Shanghai", isMobile: !!vp.mobile, hasTouch: !!vp.mobile });
+  const page = await ctx.newPage(); const errors = [];
+  page.on("pageerror", e => errors.push(e.message));
+  await page.clock.install({ time: new Date("2026-10-18T17:01:30+08:00") });
+  await page.goto(FILE);
+  await settleReload(page, cs => { localStorage.clear(); localStorage.setItem("bazi.cases.v1", JSON.stringify(cs)); localStorage.setItem("bazi.hepan.v1", JSON.stringify({ a: "ca", b: "cb", started: true })); localStorage.setItem("bazi.page", JSON.stringify("hepan")); history.replaceState(null, "", "#hepan"); },
+    [mkCase("ca", "甲方", 1990, 1, 1, 0), mkCase("cb", "乙方", 1989, 6, 15, 12)], () => !!localStorage.getItem("bazi.hepan.v1"));
+  await page.waitForSelector(".hp-panels .pro[data-pid='B'] .strip.s-hour");
+  const T = "cross-" + vp.name;
+  ok(`[${T}] 預設不對照對方`, (await page.locator(".mk-x").count()) === 0 && (await page.locator(".hp-both").count()) === 0);
+  await page.click(".hp-tools .switch");
+  await page.waitForSelector(".hp-both");
+  ok(`[${T}] 打開後出現對方原局的空心標記`, (await page.locator('.pro[data-pid="A"] .mk-x').count()) > 0);
+  const chips = await page.$$eval(".yr-chip.yr-tkdc", cs => cs.map(c => c.dataset.y));
+  ok(`[${T}] 列出 2043 年同時沖到兩人`, chips.includes("2043"), chips.join(","));
+  await page.click('.yr-chip.yr-tkdc[data-y="2043"]');
+  const selY = await page.$$eval('.strip.s-year .cell[aria-pressed="true"]', cs => cs.map(c => c.dataset.v));
+  ok(`[${T}] 點年份後兩邊都選中 2043`, selY.length === 2 && selY.every(v => v === "2043"), selY.join(","));
+  ok(`[${T}] 2043 格子有同沖折角`, (await page.locator('.pro[data-pid="A"] .strip.s-year .cell.hit2-tkdc[data-v="2043"]').count()) === 1);
+  await page.reload();
+  await page.waitForSelector(".hp-both");
+  ok(`[${T}] 重新整理後開關保留`, await page.isChecked('[data-act="hp-cross"]'));
+  const r = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
+  ok(`[${T}] 無橫向溢出`, r.sw <= r.cw + 1, `${r.sw}/${r.cw}`);
+  ok(`[${T}] 沒有錯誤`, errors.length === 0, errors.join(" | "));
+  await browser.close();
+}
+
+/* 帳戶同步：用假的 window.claude 模擬帳戶資料庫，檢查合併、墓碑與狀態顯示 */
+async function cloudRun() {
+  const browser = await chromium.launch();
+  const ctx = await browser.newContext({ viewport: { width: 1366, height: 900 }, timezoneId: "Asia/Shanghai" });
+  await ctx.addInitScript(() => {
+    if (location.protocol !== "file:") return;
+    const st = { cases: new Map(), deleted: new Map(), log: [] };
+    const seed = JSON.parse(localStorage.getItem("fake.remote") || "null");
+    if (!seed) return;                       // 還沒放好測試資料的那一次先不模擬帳戶，免得非同步存檔蓋掉測試資料
+    seed.cases.forEach(c => st.cases.set(c.id, c));
+    seed.deleted.forEach(x => { const o = typeof x === "string" ? { id: x, at: 1 } : x; st.deleted.set(o.id, o); });
+    const subs = new Set();
+    const snap = () => ({ metadata: { fromCache: false, hasPendingWrites: false }, docs: [...st.cases.values()].map(d => ({ id: d.id, exists: true, data: () => JSON.parse(JSON.stringify(d)) })) });
+    const ping = () => setTimeout(() => subs.forEach(f => f(snap())), 10);
+    const coll = name => ({
+      doc: id => ({
+        set: async d => { st[name].set(id, JSON.parse(JSON.stringify(d))); st.log.push(`set ${name} ${id}`); if (name === "cases") ping(); },
+        delete: async () => { st[name].delete(id); st.log.push(`delete ${name} ${id}`); if (name === "cases") ping(); }
+      }),
+      get: async () => ({ docs: [...st[name].values()].map(d => ({ id: d.id, exists: true, data: () => d })) }),
+      onSnapshot: cb => { subs.add(cb); setTimeout(() => cb({ metadata: { fromCache: true }, docs: [] }), 5); setTimeout(() => cb(snap()), 60); return () => subs.delete(cb); }
+    });
+    const db = { doc: () => ({ collection: n => coll(n) }) };
+    window.__fake = st;
+    window.claude = { use: async n => n === "db" ? db : n === "user" ? { id: async () => "u_test" } : null };
+  });
+  const page = await ctx.newPage(); const errors = [];
+  const txt = sel => txtOf(page, sel);
+  page.on("pageerror", e => errors.push(e.message));
+  await page.goto(FILE);
+  /* gone：本機舊快取，帳戶已刪；zombie：舊版頁面又傳回帳戶（修改時間早於刪除）；reborn：刪除後重新存檔（較晚）；
+     edited：帳戶是被傳回的舊版，本機那份在刪除後改過，應保留並補存 */
+  const at = (c, t) => Object.assign(c, { updatedAt: t });
+  const NAME_ID = { 雲端也有: "keep", 只在本機: "newone", 刪後重存: "reborn", 刪後又改: "edited" };
+  await settleReload(page, cs => {
+    localStorage.clear();
+    localStorage.setItem("bazi.cases.v1", JSON.stringify(cs.local));
+    localStorage.setItem("fake.remote", JSON.stringify({ cases: cs.remote, deleted: ["gone", { id: "zombie", at: 5 }, { id: "reborn", at: 5 }, { id: "edited", at: 5 }] }));
+    localStorage.setItem("bazi.page", JSON.stringify("cases"));
+    history.replaceState(null, "", "#cases");
+  }, {
+    local: [mkCase("keep", "雲端也有", 1990, 1, 1, 0), mkCase("gone", "別處已刪", 1991, 2, 2, 2), mkCase("newone", "只在本機", 1992, 3, 3, 3), mkCase("zombie", "舊版傳回", 1993, 4, 4, 4), at(mkCase("edited", "刪後又改", 1995, 6, 6, 6), 20)],
+    remote: [mkCase("keep", "雲端也有", 1990, 1, 1, 0), mkCase("zombie", "舊版傳回", 1993, 4, 4, 4), at(mkCase("reborn", "刪後重存", 1994, 5, 5, 5), 10), mkCase("edited", "刪後又改", 1995, 6, 6, 6)]
+  }, () => !!window.__fake);
+  const T = "cloud";
+  try { await page.waitForFunction(() => (document.querySelector("#cases-sync") || {}).textContent && document.querySelector("#cases-sync").textContent.includes("已同步"), null, { timeout: 15000 }); }
+  catch (e) {
+    const d = await page.evaluate(() => ({ sync: (document.querySelector("#cases-sync") || {}).textContent, nav: (document.querySelector("#nav-sync") || {}).textContent, card: document.querySelector("#cases-card").textContent.slice(0, 80), hash: location.hash, fake: !!window.__fake, log: window.__fake && window.__fake.log }));
+    ok(`[${T}] 等到已同步`, false, JSON.stringify(d) + " | " + errors.join(" | "));
+    await browser.close(); return;
+  }
+  await page.waitForFunction(() => window.__fake.log.includes("delete cases zombie"), null, { timeout: 5000 }).catch(() => {});
+  await page.waitForTimeout(150);
+  const names = await page.$$eval(".case .case-name", ns => ns.map(n => n.textContent.trim().split(" ")[0]));
+  ok(`[${T}] 在別處刪掉的案例不會被傳回`, !names.includes("別處已刪") && names.includes("只在本機") && names.includes("雲端也有"), names.join("、"));
+  ok(`[${T}] 舊版頁面傳回帳戶的已刪案例不顯示`, !names.includes("舊版傳回"), names.join("、"));
+  ok(`[${T}] 刪除後重新存檔、刪除後又改過的都保留`, names.includes("刪後重存") && names.includes("刪後又改"), names.join("、"));
+  const log1 = await page.evaluate(() => window.__fake.log.slice());
+  ok(`[${T}] 只在本機的案例補存進帳戶`, log1.includes("set cases newone") && !log1.some(x => x.includes("gone")), log1.join("；"));
+  ok(`[${T}] 帳戶裡被傳回的已刪案例會清掉`, log1.includes("delete cases zombie") && !log1.includes("set cases zombie"), log1.join("；"));
+  ok(`[${T}] 刪除後又改過的那份補存、不被清掉`, log1.includes("set cases edited") && !log1.includes("delete cases edited"), log1.join("；"));
+  const remoteIds = await page.evaluate(() => [...window.__fake.cases.keys()].sort().join(","));
+  ok(`[${T}] 帳戶最後只剩該留的案例`, remoteIds === "edited,keep,newone,reborn", remoteIds);
+  ok(`[${T}] 導覽列顯示已同步`, (await txt("#nav-sync")).includes("已同步"));
+  await page.locator('.case [data-act="case-del"]').first().click();
+  const delName = (await txt(".case-confirm")).match(/「(.+)」/)[1];
+  await page.click('[data-act="case-del-yes"]');
+  await page.waitForFunction(() => window.__fake.log.some(x => x.startsWith("set deleted")));
+  const log2 = await page.evaluate(() => window.__fake.log.slice());
+  const id = NAME_ID[delName];
+  ok(`[${T}] 刪除時一併寫入已刪除紀錄`, !!id && log2.includes(`delete cases ${id}`) && log2.includes(`set deleted ${id}`), delName + "：" + log2.slice(-2).join("；"));
+  ok(`[${T}] 沒有錯誤`, errors.length === 0, errors.join(" | "));
+  await browser.close();
+}
+const txtOf = async (page, sel) => (await page.locator(sel).first().innerText()).replace(/\s+/g, " ").trim();
+
 (async () => {
   await run({ name: "desktop", w: 1366, h: 900 });
   await run({ name: "mobile", w: 390, h: 844, mobile: true });
+  await crossRun({ name: "desktop", w: 1366, h: 900 });
+  await crossRun({ name: "mobile", w: 390, h: 844, mobile: true });
+  await cloudRun();
   const f = results.filter(r => !r.pass);
   console.log(`\n通過 ${results.length - f.length}，失敗 ${f.length}`);
   process.exit(f.length ? 1 : 0);

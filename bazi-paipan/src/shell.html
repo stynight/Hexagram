@@ -19,9 +19,10 @@ try { var tv = JSON.parse(localStorage.getItem("bazi.theme.vars") || "null"); if
     <button type="button" class="nav-item" data-act="go" data-page="pro" aria-current="false">專業細盤</button>
     <button type="button" class="nav-item" data-act="go" data-page="hepan" aria-current="false">合盤</button>
     <button type="button" class="nav-item" data-act="go" data-page="theme" aria-current="false">設定</button>
+    <div class="nav-sync" id="nav-sync" aria-live="polite"></div>
   </nav>
   <main class="main">
-    <section class="page" id="page-input" aria-label="排盤輸入">
+    <section class="page" id="page-input" aria-label="排盤輸入" hidden>
       <div class="banner" id="f-banner" hidden></div>
       <form class="card card-pad form" id="f-form" novalidate>
         <div class="frow"><label for="f-name">命主姓名</label><input class="field" id="f-name" placeholder="請輸入姓名（可留空）" maxlength="30" autocomplete="off"></div>
