@@ -268,6 +268,14 @@ async function run(vp) {
   await shot("15-theme-moye");
   await page.locator("#cp-accent").evaluate(el => { el.value = "#cc3366"; el.dispatchEvent(new Event("input", { bubbles: true })); });
   ok(`[${T}] 自訂主色立即套用`, (await cssVar("--accent")) === "#CC3366" && (await page.getAttribute('.theme-card[data-id="custom"]', "aria-pressed")) === "true", await cssVar("--accent"));
+  await page.locator("#cp-accent").evaluate(el => { el.value = "#ffffff"; el.dispatchEvent(new Event("input", { bubbles: true })); });
+  const pale = await page.evaluate(() => {
+    const st = getComputedStyle(document.documentElement), a = st.getPropertyValue("--accent").trim(), c = st.getPropertyValue("--card").trim();
+    const lum = h => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0); };
+    const x = lum(a), y = lum(c);
+    return { a, c, ratio: (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05), code: document.getElementById("cpv-accent").textContent };
+  });
+  ok(`[${T}] 主色設成與卡片同為白色時，畫面自動加深到看得見，色盤仍記白色`, pale.a.toUpperCase() !== "#FFFFFF" && pale.ratio >= 3 && pale.code === "#FFFFFF", JSON.stringify(pale));
   await page.click('[data-act="cp-copy"]');
   ok(`[${T}] 複製目前主題到自訂`, (await page.inputValue("#cp-bg")).toUpperCase() === "#F3F4F6", await page.inputValue("#cp-bg"));
   await page.click('.theme-card[data-id="auto"]');
@@ -385,12 +393,26 @@ async function crossRun(vp) {
   await page.click(".hp-tools .switch");
   await page.waitForSelector(".hp-both");
   ok(`[${T}] 打開後出現對方原局的空心標記`, (await page.locator('.pro[data-pid="A"] .mk-x').count()) > 0);
+  const over = await page.$$eval("table.pan tr.r-mk td .mk", ms => ms.filter(m => { const a = m.getBoundingClientRect(), b = m.closest("td").getBoundingClientRect(); return a.left < b.left - 1 || a.right > b.right + 1; }).map(m => m.textContent));
+  ok(`[${T}] 沖合列的標記不超出自己的格子`, over.length === 0, over.join("、"));
+  const nyGap = await page.$$eval('.pro[data-pid="A"] table.pan tr[data-row="ny"] td', tds => Math.min(...tds.filter(td => td.textContent.trim()).map(td => {
+    const rg = document.createRange(); rg.selectNodeContents(td); const a = rg.getBoundingClientRect(), b = td.getBoundingClientRect();
+    return Math.min(a.left - b.left, b.right - a.right);
+  })));
+  ok(`[${T}] 納音字與格子左右至少留 1px，不連成一串`, nyGap >= 1, nyGap.toFixed(1) + "px");
+  const mini = await page.$eval(".hp-mini", el => {
+    const r = s => el.querySelector(s).getBoundingClientRect(), ring = r(".sx-ring"), txt = el.querySelector(":scope > div").getBoundingClientRect(), tag = r(".side-tag");
+    return { row: ring.right <= txt.left && txt.right <= tag.left && tag.top < ring.bottom && ring.top < tag.bottom, h: Math.round(el.getBoundingClientRect().height) };
+  });
+  ok(`[${T}] 合盤抬頭（生肖、姓名、A）排在同一列`, mini.row, mini.h + "px");
   const chips = await page.$$eval(".yr-chip.yr-tkdc", cs => cs.map(c => c.dataset.y));
   ok(`[${T}] 列出 2043 年同時沖到兩人`, chips.includes("2043"), chips.join(","));
   await page.click('.yr-chip.yr-tkdc[data-y="2043"]');
   const selY = await page.$$eval('.strip.s-year .cell[aria-pressed="true"]', cs => cs.map(c => c.dataset.v));
   ok(`[${T}] 點年份後兩邊都選中 2043`, selY.length === 2 && selY.every(v => v === "2043"), selY.join(","));
   ok(`[${T}] 2043 格子有同沖折角`, (await page.locator('.pro[data-pid="A"] .strip.s-year .cell.hit2-tkdc[data-v="2043"]').count()) === 1);
+  const ph = await page.$eval('.pro[data-pid="A"] table.pan td.ph .phhint', el => ({ t: el.innerText.trim(), h: Math.round(el.getBoundingClientRect().height) }));
+  ok(`[${T}] 未選欄位的提示只占一行（窄表格改用三個字）`, ph.h < 20 && (vp.mobile ? ph.t === "先選日" : ["先選流日", "先選日"].includes(ph.t)), `${ph.t} ${ph.h}px`);
   await page.reload();
   await page.waitForSelector(".hp-both");
   ok(`[${T}] 重新整理後開關保留`, await page.isChecked('[data-act="hp-cross"]'));
@@ -438,6 +460,7 @@ async function cloudRun() {
     localStorage.clear();
     localStorage.setItem("bazi.cases.v1", JSON.stringify(cs.local));
     localStorage.setItem("fake.remote", JSON.stringify({ cases: cs.remote, deleted: ["gone", { id: "zombie", at: 5 }, { id: "reborn", at: 5 }, { id: "edited", at: 5 }] }));
+    localStorage.setItem("bazi.cur.v1", JSON.stringify({ c: cs.local[3], saved: true }));
     localStorage.setItem("bazi.page", JSON.stringify("cases"));
     history.replaceState(null, "", "#cases");
   }, {
@@ -471,6 +494,16 @@ async function cloudRun() {
   const log2 = await page.evaluate(() => window.__fake.log.slice());
   const id = NAME_ID[delName];
   ok(`[${T}] 刪除時一併寫入已刪除紀錄`, !!id && log2.includes(`delete cases ${id}`) && log2.includes(`set deleted ${id}`), delName + "：" + log2.slice(-2).join("；"));
+  await page.click('.nav-item[data-page="basic"]');
+  await page.waitForSelector("#page-basic .hbar");
+  ok(`[${T}] 目前的盤在帳戶已刪除時，抬頭改回「存檔」`, (await page.locator('#page-basic .hbar [data-act="save-cur"]').count()) === 1 && (await page.locator("#page-basic .hbar .hdone").count()) === 0, await txt("#page-basic .hbar-acts"));
+  await page.click('#page-basic .hbar [data-act="save-cur"]');
+  await page.waitForFunction(() => window.__fake.log.includes("delete deleted zombie"), null, { timeout: 5000 }).catch(() => {});
+  const log3 = await page.evaluate(() => window.__fake.log.slice());
+  ok(`[${T}] 重新存檔會存回帳戶並撤掉已刪除紀錄`, log3.includes("set cases zombie") && log3.includes("delete deleted zombie"), log3.slice(-3).join("；"));
+  await page.click('.nav-item[data-page="cases"]');
+  const names2 = await page.$$eval(".case .case-name", ns => ns.map(n => n.textContent.trim().split(" ")[0]));
+  ok(`[${T}] 重新存檔後回到案例列表`, names2.includes("舊版傳回"), names2.join("、"));
   ok(`[${T}] 沒有錯誤`, errors.length === 0, errors.join(" | "));
   await browser.close();
 }
