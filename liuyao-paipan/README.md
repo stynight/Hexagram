@@ -76,3 +76,9 @@
 - `node tests/calendar-check.js [起年] [迄年]`：曆算互核，需要先 `npm install`（devDependencies 有 lunar-javascript）。
 - `node tests/ui.js [截圖資料夾]`：用 Playwright 在桌面 1366 與手機 390 寬度走一遍所有控制項，檢查橫向溢出、元素超框與主控台錯誤。
 - `data/build_text.py`：從 `data/sources/` 重新組出 `data/zhouyi.json` 與校勘清單。
+
+## 待辦（之後再改）
+
+- 「複製文字盤」在 Artifact 裡的提示：已加三段備援，還沒在 Chrome 實機確認。
+- Chrome 實機還沒走完的：手機寬度、在 Artifact 裡存卦例後關掉再打開。
+- 使用中發現的其他問題記在這裡。
