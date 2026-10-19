@@ -1,0 +1,2086 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}body{margin:0}img{max-width:100%}</style>
+<title>六爻納甲排盤</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="六爻納甲排盤：數字、手動六爻、時間起卦；本卦變卦、世應、六親、六神、伏神、旬空，月建日辰生剋沖合與依力量排序的關係清單，附《周易》原文。">
+<style>
+/* 版面：桌面左側導覽＋右側內容；手機頂部分頁。與同倉庫八字排盤共用一套色票與元件樣式。
+   配色只給底色、卡片、文字、主色、抬頭帶幾個基礎色，其餘由 color-mix 混出。 */
+:root {
+  --bg: #F3F4F6;
+  --card: #FFFFFF;
+  --ink: #1F2328;
+  --accent: #4A5B8C;
+  --on-accent: #FFFFFF;
+  --bar: #1F2430;
+  --bar-ink: #E6EAF2;
+  --mu: #1A973D; --huo: #D2261E; --tu: #8A681B; --jin: #D5820A; --shui: #2B62D5;
+  --danger: #B42318;
+  --good: #1F7A45;
+  --warn: #A45D00;
+  --shadow: 0 1px 2px rgba(20, 24, 32, .05), 0 6px 18px rgba(20, 24, 32, .05);
+  --card-2: color-mix(in srgb, var(--ink) 4%, var(--card));
+  --ink-2: color-mix(in srgb, var(--ink) 74%, var(--card));
+  --dim: color-mix(in srgb, var(--ink) 54%, var(--card));
+  --line: color-mix(in srgb, var(--ink) 12%, var(--card));
+  --line-2: color-mix(in srgb, var(--ink) 6%, var(--card));
+  --gold: var(--accent);
+  --gold-ink: color-mix(in srgb, var(--accent) 80%, var(--ink));
+  --gold-soft: color-mix(in srgb, var(--accent) 15%, var(--card));
+  --gold-softer: color-mix(in srgb, var(--accent) 6%, var(--card));
+  --chip: color-mix(in srgb, var(--ink) 6%, var(--card));
+  --scroll: color-mix(in srgb, var(--ink) 26%, var(--card));
+  --bar-2: color-mix(in srgb, var(--bar-ink) 9%, var(--bar));
+  --bar-dim: color-mix(in srgb, var(--bar-ink) 62%, var(--bar));
+  --bar-accent: color-mix(in srgb, var(--accent) 50%, var(--bar-ink));
+  --btn: var(--bar);
+  --btn-ink: var(--bar-accent);
+  --bad-bg: color-mix(in srgb, var(--danger) 11%, var(--card));
+  --good-bg: color-mix(in srgb, var(--good) 12%, var(--card));
+  --warn-bg: color-mix(in srgb, var(--warn) 13%, var(--card));
+  --r: 14px;
+  --f-serif: "Songti TC", "STSong", "Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "PMingLiU", "SimSun", serif;
+  --f-sans: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Hiragino Sans", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111214; --card: #1A1C20; --ink: #E8EAED; --accent: #8AB4F8; --on-accent: #10131A;
+    --bar: #0B0C0E; --bar-ink: #DDE3EC;
+    --mu: #58CF78; --huo: #FF6B5E; --tu: #D4AA5E; --jin: #F2AA3A; --shui: #73A2FF;
+    --danger: #FF7B6E; --good: #5BC98A; --warn: #F0B45A;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111214; --card: #1A1C20; --ink: #E8EAED; --accent: #8AB4F8; --on-accent: #10131A;
+  --bar: #0B0C0E; --bar-ink: #DDE3EC;
+  --mu: #58CF78; --huo: #FF6B5E; --tu: #D4AA5E; --jin: #F2AA3A; --shui: #73A2FF;
+  --danger: #FF7B6E; --good: #5BC98A; --warn: #F0B45A;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); }
+body { font-family: var(--f-sans); font-size: 14px; line-height: 1.5; -webkit-text-size-adjust: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
+.serif { font-family: var(--f-serif); }
+.num { font-variant-numeric: tabular-nums; }
+.w0 { color: var(--mu); } .w1 { color: var(--huo); } .w2 { color: var(--tu); } .w3 { color: var(--jin); } .w4 { color: var(--shui); }
+.dim { color: var(--dim); }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+
+/* ---------- 外框 ---------- */
+.app {
+  display: grid; grid-template-columns: 172px minmax(0, 1fr); gap: 20px;
+  max-width: 1500px; margin: 0 auto;
+  padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.nav { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; display: flex; flex-direction: column; gap: 6px; }
+.nav-brand { font-family: var(--f-serif); font-weight: 700; font-size: 18px; letter-spacing: .08em; color: var(--ink); padding: 6px 14px 12px; }
+.nav-brand small { display: block; font-family: var(--f-sans); font-weight: 400; font-size: 12px; letter-spacing: 0; color: var(--dim); }
+.nav-item { text-align: left; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); font-size: 15px; position: relative; }
+.nav-item:hover { border-color: var(--gold); color: var(--ink); }
+.nav-item[aria-current="page"] { background: var(--gold-soft); border-color: var(--gold); color: var(--gold-ink); font-weight: 700; }
+.nav-item[aria-current="page"]::before { content: ""; position: absolute; left: 6px; top: 12px; bottom: 12px; width: 3px; border-radius: 3px; background: var(--gold); }
+.nav-item .dot { position: absolute; right: 12px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--gold); }
+.main { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.page { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+@media (max-width: 899px) {
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bar); }
+  .app { display: block; padding: 0 0 40px; }
+  .nav {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 25; flex-direction: row; gap: 0; background: var(--bar);
+    padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); margin-bottom: 14px;
+  }
+  .nav-brand { display: none; }
+  .nav-item { flex: 1 1 0; min-width: 0; text-align: center; border: 0; border-radius: 0; background: transparent; color: var(--bar-dim); padding: 13px 2px 11px; font-size: 14px; white-space: nowrap; }
+  .nav-item:hover { color: var(--bar-ink); border-color: transparent; }
+  .nav-item[aria-current="page"] { background: transparent; color: var(--bar-accent); font-weight: 700; }
+  .nav-item[aria-current="page"]::before { left: 24%; right: 24%; top: auto; bottom: 0; width: auto; height: 3px; border-radius: 3px 3px 0 0; background: var(--bar-accent); }
+  .nav-item .dot { right: 50%; top: 7px; margin: 0 -14px 0 0; width: 6px; height: 6px; background: var(--bar-accent); }
+  .main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}
+
+/* ---------- 通用 ---------- */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); min-width: 0; }
+.card-pad { padding: 18px 20px; }
+.card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 14px; flex-wrap: wrap; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+.card-title { font-family: var(--f-serif); font-size: 17px; font-weight: 700; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.card-title small { font-family: var(--f-sans); font-size: 12px; font-weight: 400; color: var(--dim); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 14px; white-space: nowrap; }
+.btn:hover { border-color: var(--gold); }
+.btn-gold { background: var(--gold); border-color: var(--gold); color: var(--on-accent); }
+.btn-gold:hover { filter: brightness(1.06); }
+.btn-dark { background: var(--btn); border-color: var(--btn); color: var(--btn-ink); font-weight: 700; letter-spacing: .12em; }
+.btn-danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, var(--line)); }
+.btn-danger.solid { background: var(--danger); color: var(--card); border-color: var(--danger); }
+.btn-sm { min-height: 32px; padding: 0 12px; font-size: 13px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+.hint { font-size: 12.5px; color: var(--dim); }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: 4px; background: var(--chip); color: var(--ink-2); font-size: 12px; line-height: 1.6; white-space: nowrap; border: 1px solid transparent; }
+.chip.good { background: var(--good-bg); color: var(--good); }
+.chip.bad { background: var(--bad-bg); color: var(--danger); }
+.chip.warn { background: var(--warn-bg); color: var(--warn); }
+.chip.kong { background: transparent; border: 1px dashed var(--dim); color: var(--ink-2); }
+.chip.chong { background: transparent; border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); color: var(--danger); }
+.chip.gold { background: var(--gold-soft); color: var(--gold-ink); }
+.field { width: 100%; min-height: 42px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.field:hover { border-color: color-mix(in srgb, var(--gold) 60%, var(--line)); }
+.field[aria-invalid="true"] { border-color: var(--danger); }
+select.field { padding-right: 28px; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--card-2); border: 1px solid var(--line); max-width: 100%; }
+.seg button { border: 0; background: transparent; padding: 7px 20px; border-radius: 999px; color: var(--ink-2); font-size: 15px; white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--gold); color: var(--on-accent); font-weight: 700; }
+.seg button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+.check { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 14.5px; }
+.check input { appearance: none; width: 19px; height: 19px; border-radius: 4px; border: 1.5px solid var(--dim); margin: 0; display: grid; place-items: center; cursor: pointer; background: var(--card); flex: none; }
+.check input:checked { background: var(--gold); border-color: var(--gold); }
+.check input:checked::after { content: ""; width: 9px; height: 5px; border: 2px solid var(--on-accent); border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); }
+.switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; }
+.switch input { appearance: none; width: 44px; height: 24px; border-radius: 999px; background: var(--scroll); position: relative; margin: 0; cursor: pointer; transition: background .15s; flex: none; }
+.switch input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #FFF; box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform .15s; }
+.switch input:checked { background: var(--gold); }
+.switch input:checked::after { transform: translateX(20px); }
+.empty { padding: 36px 22px; text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.empty p { color: var(--ink-2); max-width: 36em; }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; background: var(--bar); color: var(--bar-ink); padding: 10px 18px; border-radius: 999px; font-size: 14px; box-shadow: var(--shadow); max-width: calc(100vw - 32px); text-align: center; }
+.modal { position: fixed; inset: 0; z-index: 70; background: color-mix(in srgb, #000 45%, transparent); display: grid; place-items: center; padding: 16px; }
+.modal-card { width: min(640px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--card); border-radius: var(--r); border: 1px solid var(--line); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+.modal-card textarea { width: 100%; min-height: 260px; border: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 12px 16px; background: var(--card-2); font-family: var(--f-sans); font-size: 13px; resize: vertical; }
+.modal-acts { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; padding: 12px 16px; }
+
+/* ---------- 起卦頁 ---------- */
+.form { display: flex; flex-direction: column; gap: 18px; }
+.form-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 16px; align-items: start; }
+@media (max-width: 1099px) { .form-wrap { grid-template-columns: minmax(0, 1fr); } }
+.method-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.frow { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; align-items: center; }
+.frow > label, .frow > .flabel { color: var(--ink-2); font-size: 14.5px; }
+.fgroup { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; min-width: 0; }
+.fgroup select.field { width: auto; min-width: 0; flex: 1 1 74px; }
+.nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.nums label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--dim); min-width: 0; }
+.nums input { text-align: center; font-size: 18px; font-variant-numeric: tabular-nums; }
+.steps { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 10px 12px; border-radius: 10px; background: var(--card-2); border: 1px solid var(--line-2); font-size: 13.5px; color: var(--ink-2); min-height: 88px; }
+.steps .st { display: grid; grid-template-columns: 3.2em minmax(0, 1fr) auto; gap: 8px; align-items: baseline; }
+.steps .st b { color: var(--ink); font-weight: 600; }
+.steps .st .res { font-family: var(--f-serif); font-weight: 700; color: var(--gold-ink); white-space: nowrap; }
+.steps .err { color: var(--danger); }
+.picker { display: flex; flex-direction: column; gap: 6px; }
+.pick-row { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) 52px; gap: 10px; align-items: center; }
+.pick-row .pl { color: var(--dim); font-size: 13px; }
+.pick-btns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.pick-btns button { min-height: 40px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); font-size: 13px; padding: 2px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; color: var(--ink-2); }
+.pick-btns button .sym { font-size: 15px; color: var(--ink); letter-spacing: 0; }
+.pick-btns button:hover { border-color: var(--gold); }
+.pick-btns button[aria-pressed="true"] { background: var(--gold-soft); border-color: var(--gold); color: var(--gold-ink); font-weight: 700; }
+.pick-btns button[aria-pressed="true"] .sym { color: var(--gold-ink); }
+.pick-row .mini { justify-self: end; }
+.picker-foot { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+.checks { display: flex; gap: 10px 22px; flex-wrap: wrap; align-items: center; }
+.datebox { display: flex; flex-direction: column; gap: 12px; }
+.drow { display: flex; flex-direction: column; gap: 6px; }
+.drow .flabel { font-size: 13px; color: var(--dim); }
+.dsel select.field { flex: 1 1 82px; min-width: 82px; padding: 8px 24px 8px 10px; }
+.dsel #f-y { flex: 1.25 1 104px; min-width: 104px; }
+.dsel .btn { flex: none; min-height: 42px; }
+.gobar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 320px); gap: 14px 18px; align-items: center; padding: 14px 16px; }
+@media (max-width: 760px) { .gobar { grid-template-columns: minmax(0, 1fr); } }
+.preview { padding: 14px 16px; border-radius: 12px; background: var(--card-2); border: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; color: var(--ink-2); }
+.pv-gz { font-family: var(--f-serif); font-size: 22px; font-weight: 700; letter-spacing: .1em; color: var(--ink); }
+.pv-kv { display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 2px 10px; }
+.pv-kv .k { color: var(--dim); }
+.pv-gua { display: flex; align-items: center; gap: 10px 16px; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--gold); background: var(--gold-softer); min-height: 64px; }
+.pv-one { display: inline-flex; align-items: center; gap: 10px; }
+.pv-gua .nm { font-family: var(--f-serif); font-size: 20px; font-weight: 700; color: var(--gold-ink); }
+.pv-gua .arrow { color: var(--dim); }
+.gobtn { width: 100%; min-height: 54px; font-size: 18px; border-radius: 999px; }
+.gobtn:not(:disabled) { color: var(--bar-ink); }
+
+/* ---------- 爻畫 ---------- */
+.yao { display: inline-flex; gap: 7px; width: 48px; height: 9px; vertical-align: middle; flex: none; }
+.yao i { flex: 1 1 0; border-radius: 2px; background: var(--ink); }
+.yao.mv i { background: var(--gold); }
+.yao.sm { width: 30px; height: 6px; gap: 5px; }
+.gua-mini { display: inline-flex; flex-direction: column-reverse; gap: 4px; vertical-align: middle; }
+.gua-mini .yao { width: 34px; height: 6px; gap: 5px; }
+
+/* ---------- 抬頭帶 ---------- */
+.hbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 18px; align-items: center; padding: 16px 20px; border-radius: var(--r); color: var(--bar-ink); background: radial-gradient(120% 140% at 0% 0%, var(--bar-2) 0%, var(--bar) 60%); border: 1px solid color-mix(in srgb, var(--bar-ink) 12%, var(--bar)); box-shadow: var(--shadow); }
+.hbar-gua { display: flex; align-items: center; gap: 10px 16px; flex-wrap: wrap; min-width: 0; }
+.hg { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.hg .gua-mini .yao i { background: var(--bar-ink); }
+.hg .gua-mini .yao.mv i { background: var(--bar-accent); }
+.hg-name { font-family: var(--f-serif); font-size: 24px; font-weight: 700; color: var(--bar-accent); letter-spacing: .04em; line-height: 1.2; }
+.hg-sub { font-size: 12.5px; color: var(--bar-dim); }
+.hg-arrow { color: var(--bar-dim); font-size: 20px; }
+.hbar-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--bar-ink); }
+.hbar-meta .k { color: var(--bar-dim); margin-right: 4px; }
+.hbar-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.hbtn { min-height: 34px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--bar-accent); background: transparent; color: var(--bar-accent); font-size: 14px; white-space: nowrap; }
+.hbtn:hover { background: color-mix(in srgb, var(--bar-accent) 16%, transparent); }
+.hbar .q { grid-column: 1 / -1; font-size: 14px; color: var(--bar-ink); }
+.hbar .q .k { color: var(--bar-dim); margin-right: 8px; }
+@media (max-width: 899px) {
+  .hbar { grid-template-columns: minmax(0, 1fr); padding: 14px 16px; }
+  .hbar-acts { justify-content: flex-start; }
+  .hg-name { font-size: 20px; }
+}
+
+/* ---------- 排盤表 ---------- */
+.chart-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (min-width: 1320px) { .chart-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); } .chart-grid .pan-card { position: sticky; top: 20px; } }
+.pan { display: flex; flex-direction: column; }
+.pan-head, .pan-row { display: grid; grid-template-columns: 2.6em 6.6em minmax(7.6em, 1fr) 76px minmax(7.6em, 1fr); grid-template-areas: "shen fu ben yao bian" "tags tags tags tags tags"; column-gap: 10px; align-items: center; }
+.pan-head { padding: 10px 16px; font-size: 12px; color: var(--dim); border-bottom: 1px solid var(--line); }
+.pan-head .h-bian, .pan-head .h-ben { font-family: var(--f-serif); font-size: 14px; color: var(--ink-2); font-weight: 700; }
+.pan-row { padding: 10px 16px; border-bottom: 1px solid var(--line-2); cursor: pointer; row-gap: 6px; position: relative; }
+.pan-row:last-child { border-bottom: 0; }
+.pan-row:hover { background: var(--gold-softer); }
+.pan-row.is-focus { background: var(--gold-soft); }
+.pan-row.is-mark { box-shadow: inset 3px 0 0 var(--gold); }
+.c-shen { grid-area: shen; font-size: 13px; color: var(--ink-2); }
+.c-fu { grid-area: fu; font-size: 12.5px; color: var(--dim); line-height: 1.35; }
+.c-fu b { font-weight: 600; color: var(--ink-2); }
+.c-ben { grid-area: ben; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.c-yao { grid-area: yao; display: flex; align-items: center; gap: 6px; }
+.c-bian { grid-area: bian; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; color: var(--ink-2); }
+.c-tags { grid-area: tags; display: flex; flex-wrap: wrap; gap: 4px 5px; min-width: 0; }
+.c-tags:empty { display: none; }
+.qin { font-size: 14px; color: var(--ink-2); }
+.gz { font-family: var(--f-serif); font-size: 17px; font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+.sy { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; font-weight: 700; flex: none; }
+.sy.shi { background: var(--gold); color: var(--on-accent); }
+.sy.ying { border: 1.5px solid var(--gold); color: var(--gold-ink); }
+.sy.none { visibility: hidden; }
+.mvk { font-size: 13px; font-weight: 700; color: var(--gold-ink); width: 1em; text-align: center; flex: none; }
+.tagsep { width: 1px; align-self: stretch; background: var(--line); margin: 0 2px; }
+.pan-foot { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 10px 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); }
+@media (max-width: 640px) {
+  .pan-head, .pan-row { grid-template-columns: 2.3em minmax(0, 1fr) 58px minmax(0, 1fr); grid-template-areas: "shen ben yao bian" "fu fu fu fu" "tags tags tags tags"; column-gap: 8px; }
+  .pan-head { padding: 8px 12px; }
+  .pan-head .h-fu { display: none; }
+  .pan-row { padding: 9px 12px; row-gap: 4px; }
+  .c-fu:empty { display: none; }
+  .c-fu { padding-left: calc(2.3em + 8px); }
+  .gz { font-size: 15.5px; }
+  .qin { font-size: 13px; }
+  .yao { width: 34px; gap: 5px; height: 8px; }
+  .c-bian .yao { display: none; }
+  .c-yao { gap: 4px; }
+  .sy { width: 19px; height: 19px; font-size: 11px; }
+}
+
+/* ---------- 關係清單 ---------- */
+.rel-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.rel-sec { padding: 6px 0 10px; border-top: 1px solid var(--line); }
+.rel-sec:first-of-type { border-top: 0; }
+.rel-sec { scroll-margin-top: 64px; }
+.rel-jump { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 20px; border-bottom: 1px solid var(--line); }
+.rel-jump button { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 3px 12px; font-size: 13px; color: var(--ink-2); }
+.rel-jump button:hover { border-color: var(--gold); color: var(--ink); }
+.rel-jump button b { font-weight: 600; color: var(--gold-ink); margin-left: 4px; font-variant-numeric: tabular-nums; }
+.rel-sec > h3 { font-family: var(--f-serif); font-size: 15px; padding: 10px 20px 6px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.rel-sec > h3 small { font-family: var(--f-sans); font-size: 12px; font-weight: 400; color: var(--dim); }
+.rel { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 2px 12px; padding: 8px 20px; border-left: 3px solid transparent; cursor: pointer; }
+.rel:hover { background: var(--gold-softer); }
+.rel.is-top { border-left-color: var(--gold); }
+.rel.is-dim { opacity: .38; }
+.rel.is-sel { background: var(--gold-soft); }
+.rel-power { grid-row: span 2; display: flex; flex-direction: column; gap: 4px; padding-top: 5px; }
+.rel-bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.rel-bar i { display: block; height: 100%; background: var(--gold); border-radius: 3px; }
+.rel-score { font-size: 11.5px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.rel-title { font-size: 14px; color: var(--ink); display: flex; gap: 6px 8px; flex-wrap: wrap; align-items: baseline; min-width: 0; overflow-wrap: anywhere; }
+.rel-note { font-size: 12.5px; color: var(--dim); overflow-wrap: anywhere; }
+.verdict { display: inline-flex; padding: 0 7px; border-radius: 4px; font-size: 12.5px; background: var(--chip); color: var(--ink); white-space: nowrap; }
+.verdict.hc { background: var(--bad-bg); color: var(--danger); }
+.verdict.sk { background: var(--gold-soft); color: var(--gold-ink); }
+.verdict.kong { background: transparent; border: 1px dashed var(--dim); }
+.focusbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 8px 20px; background: var(--gold-softer); border-bottom: 1px solid var(--line); font-size: 13px; }
+.rule-note { padding: 12px 20px 16px; font-size: 12.5px; color: var(--dim); border-top: 1px solid var(--line); }
+.rule-note summary { cursor: pointer; color: var(--ink-2); }
+.rule-note ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 3px; }
+
+/* ---------- 原文 ---------- */
+.texts { display: flex; flex-direction: column; gap: 16px; max-width: 860px; }
+.tx-sec { padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+.tx-sec h2 { font-family: var(--f-serif); font-size: 18px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.tx-sec h2 small { font-family: var(--f-sans); font-size: 12.5px; font-weight: 400; color: var(--dim); }
+.tx { font-family: var(--f-serif); font-size: 17px; line-height: 1.85; letter-spacing: .02em; }
+.tx .lab { color: var(--gold-ink); font-weight: 700; }
+.tx-xiang { font-family: var(--f-serif); font-size: 15.5px; line-height: 1.8; color: var(--ink-2); padding-left: 1em; border-left: 2px solid var(--line); }
+.tx-xiang .lab { color: var(--dim); }
+.tx-yao { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-top: 1px dashed var(--line); }
+.tx-yao:first-of-type { border-top: 0; padding-top: 0; }
+.avoid { display: inline-block; min-width: 1em; text-align: center; border-bottom: 1px dotted var(--dim); color: var(--dim); cursor: help; }
+.tx-note { font-size: 12.5px; color: var(--dim); }
+
+/* ---------- 卦例 ---------- */
+.caselist { display: flex; flex-direction: column; }
+.case { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 16px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--line-2); }
+.case:first-child { border-top: 0; }
+.case.is-cur { background: var(--gold-softer); }
+.case-name { font-family: var(--f-serif); font-weight: 700; font-size: 16px; overflow-wrap: anywhere; }
+.case-gua { font-family: var(--f-serif); font-size: 15px; color: var(--gold-ink); }
+.case-meta { font-size: 12.5px; color: var(--dim); }
+.case-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.case-edit, .case-confirm { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.case-edit .field { max-width: 320px; min-height: 36px; }
+.case-confirm { padding: 10px 12px; border-radius: 10px; background: var(--bad-bg); color: var(--danger); }
+.listhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+.listhead .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 640px) { .case { grid-template-columns: minmax(0, 1fr); } .case-acts { justify-content: flex-start; } }
+
+/* ---------- 設定 ---------- */
+.set-sec { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; border-top: 1px solid var(--line); }
+.set-sec:first-child { border-top: 0; }
+.set-sec h3 { font-family: var(--f-serif); font-size: 15.5px; }
+.themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.tc { border: 1px solid var(--line); border-radius: 12px; padding: 6px; background: var(--card); display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--ink-2); text-align: left; }
+.tc[aria-pressed="true"] { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold-soft); color: var(--gold-ink); font-weight: 700; }
+.tc-prev { display: flex; flex-direction: column; height: 54px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line-2); }
+.tc-prev .b { height: 16px; }
+.tc-prev .c { flex: 1; display: flex; align-items: center; justify-content: center; gap: 3px; font-family: var(--f-serif); font-weight: 700; font-size: 13px; }
+.tc-prev .c i { width: 22px; height: 6px; border-radius: 2px; }
+.range { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.range input[type="range"] { width: min(260px, 100%); accent-color: var(--gold); }
+.range output { font-variant-numeric: tabular-nums; min-width: 2.5em; font-weight: 700; color: var(--gold-ink); }
+
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+<script>
+/* 先套用上次選的主題，避免畫面閃一下預設色 */
+try { var tv = JSON.parse(localStorage.getItem("liuyao.theme.vars") || "null"); if (tv) for (var tk in tv) document.documentElement.style.setProperty(tk, tv[tk]); } catch (e) { /* 無痕或封鎖 */ }
+</script>
+</head>
+<body>
+<div class="app">
+  <nav class="nav" aria-label="頁面">
+    <div class="nav-brand">六爻排盤<small>納甲・世應・伏神</small></div>
+    <button type="button" class="nav-item" data-act="go" data-page="input" aria-current="page">起卦</button>
+    <button type="button" class="nav-item" data-act="go" data-page="chart" aria-current="false">排盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="text" aria-current="false">原文</button>
+    <button type="button" class="nav-item" data-act="go" data-page="cases" aria-current="false">卦例</button>
+    <button type="button" class="nav-item" data-act="go" data-page="settings" aria-current="false">設定</button>
+  </nav>
+  <main class="main">
+    <section class="page" id="page-input" aria-label="起卦">
+      <div class="form-wrap">
+        <form class="card card-pad form" id="f-form" novalidate>
+          <div class="method-row">
+            <h1 class="card-title">起卦</h1>
+            <div class="seg" role="group" aria-label="起卦方式">
+              <button type="button" id="m-btn-number" data-act="method" data-method="number" aria-pressed="true">數字</button>
+              <button type="button" id="m-btn-manual" data-act="method" data-method="manual" aria-pressed="false">六爻</button>
+              <button type="button" id="m-btn-time" data-act="method" data-method="time" aria-pressed="false">時間</button>
+            </div>
+          </div>
+          <div id="m-number">
+            <div class="nums">
+              <label for="f-n1">第一數（上卦）<input class="field" id="f-n1" inputmode="numeric" autocomplete="off" maxlength="40" placeholder="例 4"></label>
+              <label for="f-n2">第二數（下卦）<input class="field" id="f-n2" inputmode="numeric" autocomplete="off" maxlength="40" placeholder="例 6"></label>
+              <label for="f-n3">第三數<input class="field" id="f-n3" inputmode="numeric" autocomplete="off" maxlength="40" placeholder="例 2"></label>
+            </div>
+            <p class="hint" style="margin-top:8px">第一數、第二數各除以 8 取上卦、下卦（餘 0 取坤），三數之和除以 6 取動爻（餘 0 取上爻）。先天數：乾1 兌2 離3 震4 巽5 坎6 艮7 坤8。</p>
+          </div>
+          <div id="m-manual" hidden>
+            <div class="picker" id="f-picker" role="group" aria-label="六爻"></div>
+            <div class="picker-foot" style="margin-top:8px">
+              <span class="hint">由上往下是上爻到初爻。三枚錢：一背少陽、二背少陰、三背老陽、無背老陰。</span>
+              <button type="button" class="btn btn-sm" id="f-clear" data-act="clear-lines">全部清除</button>
+            </div>
+          </div>
+          <div id="m-time" hidden>
+            <p class="hint">梅花易數年月日時起卦：年取農曆年地支數（子1 … 亥12），月、日用農曆（閏月按本月數），時取時支數。用右邊（手機在下方）的日期時間計算。</p>
+          </div>
+          <div class="steps" id="f-steps" aria-live="polite"></div>
+          <div class="frow"><label for="f-q">占事</label><input class="field" id="f-q" placeholder="想問的事（可留空，存卦例時當標題）" maxlength="80" autocomplete="off"></div>
+        </form>
+        <div class="card card-pad datebox" id="f-datebox">
+          <h2 class="card-title">日期時間 <small>預設現在，可改</small></h2>
+          <div class="drow"><span class="flabel">日期</span>
+            <div class="fgroup dsel"><select class="field" id="f-y" aria-label="年"></select><select class="field" id="f-m" aria-label="月"></select><select class="field" id="f-d" aria-label="日"></select></div>
+          </div>
+          <div class="drow"><span class="flabel">時間</span>
+            <div class="fgroup dsel"><select class="field" id="f-hh" aria-label="時"></select><select class="field" id="f-mi" aria-label="分"></select><button type="button" class="btn btn-sm" id="f-now" data-act="now">現在</button></div>
+          </div>
+          <div class="drow"><label class="flabel" for="f-tz">時區</label><select class="field" id="f-tz"></select></div>
+          <label class="check"><input type="checkbox" id="f-zs" checked> 子時換日（23:00 起算次日）</label>
+          <p class="hint" style="margin-top:-6px">不勾時，23:00–24:00 為夜子時：日柱用當天，時干用次日。</p>
+          <div class="preview" id="f-preview" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="card gobar">
+        <div class="pv-gua" id="f-gua" aria-live="polite"></div>
+        <button class="btn btn-dark gobtn" id="f-go" type="submit" form="f-form">開始排盤</button>
+      </div>
+    </section>
+    <section class="page" id="page-chart" aria-label="排盤" hidden></section>
+    <section class="page" id="page-text" aria-label="原文" hidden></section>
+    <section class="page" id="page-cases" aria-label="卦例" hidden></section>
+    <section class="page" id="page-settings" aria-label="設定" hidden></section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="modal" id="modal" hidden></div>
+<input type="file" id="f-import" accept="application/json,.json" class="sr-only" tabindex="-1" aria-hidden="true">
+<script>
+/* ===== ENGINE BEGIN ===== */
+/* ==========================================================
+   曆算模組：節氣、農曆、四柱干支
+   本檔第 2–5 節逐字沿用同倉庫 bazi-paipan/src/engine.js 的曆算部分
+   （VSOP87 截斷級數求太陽視黃經、Espenak–Meeus ΔT、Meeus 真朔、中氣置閏），
+   方便兩個工具的節氣與日柱完全一致。驗證見 tests/calendar-check.js。
+   ========================================================== */
+const Cal = (() => {
+"use strict";
+const mod = (a, n) => ((a % n) + n) % n;
+const gzIndex = (g, b) => ((g & 1) === (b & 1)) ? mod(6 * g - 5 * b, 60) : -1;
+
+/* ---------------- 2. 曆算（沿用舊版） ---------------- */
+const RAD = Math.PI / 180;
+const mod360 = x => ((x % 360) + 360) % 360;
+const sind = d => Math.sin(d * RAD);
+
+function toJD(y, m, d, frac) {
+  frac = frac || 0;
+  if (m <= 2) { y -= 1; m += 12; }
+  const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5 + frac;
+}
+function fromJD(jd) {
+  const z = Math.floor(jd + 0.5), f = jd + 0.5 - z;
+  let a = z;
+  if (z >= 2299161) { const al = Math.floor((z - 1867216.25) / 36524.25); a = z + 1 + al - Math.floor(al / 4); }
+  const b = a + 1524, c = Math.floor((b - 122.1) / 365.25), dd = Math.floor(365.25 * c),
+    e = Math.floor((b - dd) / 30.6001);
+  const day = b - dd - Math.floor(30.6001 * e) + f;
+  const mo = e < 14 ? e - 1 : e - 13;
+  const yr = mo > 2 ? c - 4716 : c - 4715;
+  return { y: yr, m: mo, d: Math.floor(day), frac: day - Math.floor(day) };
+}
+const ymdToDayNum = (y, m, d) => Math.round(toJD(y, m, d, 0) + 0.5);
+function dayNumToYMD(n) { const o = fromJD(n); return { y: o.y, m: o.m, d: o.d }; }
+const dayGZ = dn => mod(dn + 49, 60);            // 1949-10-01（JDN 2433191）為甲子
+const monthLen = (y, m) => ymdToDayNum(m === 12 ? y + 1 : y, m === 12 ? 1 : m + 1, 1) - ymdToDayNum(y, m, 1);
+
+/* ΔT（Espenak & Meeus） */
+function deltaT(y) {
+  let u, t;
+  if (y < 1600) { u = (y - 1000) / 100; return 1574.2 - 556.01 * u + 71.23472 * u * u + 0.319781 * u ** 3 - 0.8503463 * u ** 4 - 0.005050998 * u ** 5 + 0.0083572073 * u ** 6; }
+  if (y < 1700) { t = y - 1600; return 120 - 0.9808 * t - 0.01532 * t * t + t ** 3 / 7129; }
+  if (y < 1800) { t = y - 1700; return 8.83 + 0.1603 * t - 0.0059285 * t * t + 0.00013336 * t ** 3 - t ** 4 / 1174000; }
+  if (y < 1860) { t = y - 1800; return 13.72 - 0.332447 * t + 0.0068612 * t * t + 0.0041116 * t ** 3 - 0.00037436 * t ** 4 + 0.0000121272 * t ** 5 - 0.0000001699 * t ** 6 + 0.000000000875 * t ** 7; }
+  if (y < 1900) { t = y - 1860; return 7.62 + 0.5737 * t - 0.251754 * t * t + 0.01680668 * t ** 3 - 0.0004473624 * t ** 4 + t ** 5 / 233174; }
+  if (y < 1920) { t = y - 1900; return -2.79 + 1.494119 * t - 0.0598939 * t * t + 0.0061966 * t ** 3 - 0.000197 * t ** 4; }
+  if (y < 1941) { t = y - 1920; return 21.20 + 0.84493 * t - 0.076100 * t * t + 0.0020936 * t ** 3; }
+  if (y < 1961) { t = y - 1950; return 29.07 + 0.407 * t - t * t / 233 + t ** 3 / 2547; }
+  if (y < 1986) { t = y - 1975; return 45.45 + 1.067 * t - t * t / 260 - t ** 3 / 718; }
+  if (y < 2005) { t = y - 2000; return 63.86 + 0.3345 * t - 0.060374 * t * t + 0.0017275 * t ** 3 + 0.000651814 * t ** 4 + 0.00002373599 * t ** 5; }
+  if (y < 2050) { t = y - 2000; return 62.92 + 0.32217 * t + 0.005589 * t * t; }
+  if (y < 2150) { u = (y - 1820) / 100; return -20 + 32 * u * u - 0.5628 * (2150 - y); }
+  u = (y - 1820) / 100; return -20 + 32 * u * u;
+}
+
+/* 太陽視黃經（VSOP87 截斷） */
+const L0 = [[175347046,0,0],[3341656,4.6692568,6283.07585],[34894,4.6261,12566.1517],[3497,2.7441,5753.3849],[3418,2.8289,3.5231],[3136,3.6277,77713.7715],[2676,4.4181,7860.4194],[2343,6.1352,3930.2097],[1324,0.7425,11506.7698],[1273,2.0371,529.691],[1199,1.1096,1577.3435],[990,5.233,5884.927],[902,2.045,26.298],[857,3.508,398.149],[780,1.179,5223.694],[753,2.533,5507.553],[505,4.583,18849.228],[492,4.205,775.523],[357,2.92,0.067],[317,5.849,11790.629],[284,1.899,796.298],[271,0.315,10977.079],[243,0.345,5486.778],[206,4.806,2544.314],[205,1.869,5573.143],[202,2.458,6069.777],[156,0.833,213.299],[132,3.411,2942.463],[126,1.083,20.775],[115,0.645,0.98],[103,0.636,4694.003],[102,0.976,15720.839],[102,4.267,7.114],[99,6.21,2146.17],[98,0.68,155.42],[86,5.98,161000.69],[85,1.3,6275.96],[85,3.67,71430.7],[80,1.81,17260.15],[79,3.04,12036.46],[75,1.76,5088.63],[74,3.5,3154.69],[74,4.68,801.82],[70,0.83,9437.76],[62,3.98,8827.39],[61,1.82,7084.9],[57,2.78,6286.6],[56,4.39,14143.5],[56,3.47,6279.55],[52,0.19,12139.55],[52,1.33,1748.02],[51,0.28,5856.48],[49,0.49,1194.45],[41,5.37,8429.24],[41,2.4,19651.05],[39,6.17,10447.39],[37,6.04,10213.29],[37,2.57,1059.38],[36,1.71,2352.87],[36,1.78,6812.77],[33,0.59,17789.85],[30,0.44,83996.85],[30,2.74,1349.87],[25,3.16,4690.48]];
+const L1 = [[628331966747,0,0],[206059,2.678235,6283.07585],[4303,2.6351,12566.1517],[425,1.59,3.523],[119,5.796,26.298],[109,2.966,1577.344],[93,2.59,18849.23],[72,1.14,529.69],[68,1.87,398.15],[67,4.41,5507.55],[59,2.89,5223.69],[56,2.17,155.42],[45,0.4,796.3],[36,0.47,775.52],[29,2.65,7.11],[21,5.34,0.98],[19,1.85,5486.78],[19,4.97,213.3],[17,2.99,6275.96],[16,0.03,2544.31],[16,1.43,2146.17],[15,1.21,10977.08],[12,2.83,1748.02],[12,3.26,5088.63],[12,5.27,1194.45],[12,2.08,4694],[11,0.77,553.57],[10,1.3,6286.6],[10,4.24,1349.87],[9,2.7,242.73],[9,5.64,951.72],[8,5.3,2352.87],[6,2.65,9437.76],[6,4.67,4690.48]];
+const L2 = [[52919,0,0],[8720,1.0721,6283.0758],[309,0.867,12566.152],[27,0.05,3.52],[16,5.19,26.3],[16,3.68,155.42],[10,0.76,18849.23],[9,2.06,77713.77],[7,0.83,775.52],[5,4.66,1577.34],[4,1.03,7.11],[4,3.44,5573.14],[3,5.14,796.3],[3,6.05,5507.55],[3,1.19,242.73],[3,6.12,529.69],[3,0.31,398.15],[3,2.28,553.57],[2,4.38,5223.69],[2,3.75,0.98]];
+const L3 = [[289,5.844,6283.076],[35,0,0],[17,5.49,12566.15],[3,5.2,155.42],[1,4.72,3.52],[1,5.3,18849.23],[1,5.97,242.73]];
+const L4 = [[114,3.142,0],[8,4.13,6283.08],[1,3.84,12566.15]];
+const L5 = [[1,3.14,0]];
+const R0 = [[100013989,0,0],[1670700,3.0984635,6283.07585],[13956,3.05525,12566.1517],[3084,5.1985,77713.7715],[1628,1.1739,5753.3849],[1576,2.8469,7860.4194],[925,5.453,11506.77],[542,4.564,3930.21],[472,3.661,5884.927],[346,0.964,5507.553],[329,5.9,5223.694],[307,0.299,5573.143],[243,4.273,11790.629],[212,5.847,1577.344],[186,5.022,10977.079],[175,3.012,18849.228],[110,5.055,5486.778],[98,0.89,6069.78],[86,5.69,15720.84],[86,1.27,161000.69],[65,0.27,17260.15],[63,0.92,529.69],[57,2.01,83996.85],[56,5.24,71430.7],[49,3.25,2544.31],[47,2.58,775.52],[45,5.54,9437.76],[43,6.01,6275.96],[39,5.36,4694],[38,2.39,8827.39],[37,0.83,19651.05],[37,4.9,12139.55],[36,1.67,12036.46],[35,1.84,2942.46],[33,0.24,7084.9],[32,0.18,5088.63],[32,1.78,398.15],[28,1.21,6286.6],[28,1.9,6279.55],[26,4.59,10447.39]];
+function sumSer(ser, t) { let s = 0; for (const [a, b, c] of ser) s += a * Math.cos(b + c * t); return s; }
+
+function apparentSunLon(jde) {
+  const t = (jde - 2451545) / 365250;
+  const L = (sumSer(L0, t) + sumSer(L1, t) * t + sumSer(L2, t) * t * t + sumSer(L3, t) * t ** 3 + sumSer(L4, t) * t ** 4 + sumSer(L5, t) * t ** 5) / 1e8;
+  const R = sumSer(R0, t) / 1e8;
+  let lon = mod360(L / RAD + 180);
+  const T = t * 10;
+  lon += -0.09033 / 3600;                                     // FK5
+  const Om = 125.04452 - 1934.136261 * T;
+  const Ls = 280.4665 + 36000.7698 * T;
+  const Lm = 218.3165 + 481267.8813 * T;
+  const dpsi = (-17.20 * sind(Om) - 1.32 * sind(2 * Ls) - 0.23 * sind(2 * Lm) + 0.21 * sind(2 * Om)) / 3600; // 章動
+  const ab = -20.4898 / 3600 / R;                             // 光行差
+  return mod360(lon + dpsi + ab);
+}
+/* 某公曆年中太陽視黃經達 lon 的時刻（世界時 JD） */
+function solarTermJD(year, lon) {
+  let jd = toJD(year, 1, 1, 0) + mod360(lon - 280) / 360 * 365.2422;
+  for (let i = 0; i < 14; i++) {
+    const jde = jd + deltaT(year) / 86400;
+    const diff = mod360(lon - apparentSunLon(jde) + 180) - 180;
+    jd += diff * 365.2422 / 360;
+    if (Math.abs(diff) < 1e-7) break;
+  }
+  return jd;
+}
+/* 真朔（Meeus 第 49 章） */
+function newMoonJD(k) {
+  const T = k / 1236.85, T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+  let jde = 2451550.09766 + 29.530588861 * k + 0.00015437 * T2 - 0.000000150 * T3 + 0.00000000073 * T4;
+  const E = 1 - 0.002516 * T - 0.0000074 * T2;
+  const M = 2.5534 + 29.10535670 * k - 0.0000014 * T2 - 0.00000011 * T3;
+  const Mp = 201.5643 + 385.81693528 * k + 0.0107582 * T2 + 0.00001238 * T3 - 0.000000058 * T4;
+  const F = 160.7108 + 390.67050284 * k - 0.0016118 * T2 - 0.00000227 * T3 + 0.000000011 * T4;
+  const Om = 124.7746 - 1.56375588 * k + 0.0020672 * T2 + 0.00000215 * T3;
+  let c = 0;
+  c += -0.40720 * sind(Mp); c += 0.17241 * E * sind(M); c += 0.01608 * sind(2 * Mp); c += 0.01039 * sind(2 * F);
+  c += 0.00739 * E * sind(Mp - M); c += -0.00514 * E * sind(Mp + M); c += 0.00208 * E * E * sind(2 * M);
+  c += -0.00111 * sind(Mp - 2 * F); c += -0.00057 * sind(Mp + 2 * F); c += 0.00056 * E * sind(2 * Mp + M);
+  c += -0.00042 * sind(3 * Mp); c += 0.00042 * E * sind(M + 2 * F); c += 0.00038 * E * sind(M - 2 * F);
+  c += -0.00024 * E * sind(2 * Mp - M); c += -0.00017 * sind(Om); c += -0.00007 * sind(Mp + 2 * M);
+  c += 0.00004 * sind(2 * Mp - 2 * F); c += 0.00004 * sind(3 * M); c += 0.00003 * sind(Mp + M - 2 * F);
+  c += 0.00003 * sind(2 * Mp + 2 * F); c += -0.00003 * sind(Mp + M + 2 * F); c += 0.00003 * sind(Mp - M + 2 * F);
+  c += -0.00002 * sind(Mp - M - 2 * F); c += -0.00002 * sind(3 * Mp + M); c += 0.00002 * sind(4 * Mp);
+  const A = [299.77 + 0.107408 * k - 0.009173 * T2, 251.88 + 0.016321 * k, 251.83 + 26.651886 * k,
+    349.42 + 36.412478 * k, 84.66 + 18.206239 * k, 141.74 + 53.303771 * k, 207.14 + 2.453732 * k,
+    154.84 + 7.306860 * k, 34.52 + 27.261239 * k, 207.19 + 0.121824 * k, 291.34 + 1.844379 * k,
+    161.72 + 24.198154 * k, 239.56 + 25.513099 * k, 331.55 + 3.592518 * k];
+  const W = [0.000325, 0.000165, 0.000164, 0.000126, 0.000110, 0.000062, 0.000060, 0.000056,
+    0.000047, 0.000042, 0.000040, 0.000037, 0.000035, 0.000023];
+  for (let i = 0; i < 14; i++) c += W[i] * sind(A[i]);
+  jde += c;
+  return jde - deltaT(fromJD(jde).y) / 86400;   // → 世界時
+}
+/* 均時差（分鐘） */
+function equationOfTime(jdUT) {
+  const jde = jdUT + deltaT(fromJD(jdUT).y) / 86400;
+  const T = (jde - 2451545) / 36525;
+  const Lm = mod360(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
+  const lam = apparentSunLon(jde);
+  const eps = 23.439291111 - 0.013004167 * T - 1.6389e-7 * T * T + 5.036e-7 * T ** 3;
+  const a = mod360(Math.atan2(Math.cos(eps * RAD) * Math.sin(lam * RAD), Math.cos(lam * RAD)) / RAD);
+  let E = Lm - 0.0057183 - a;
+  E = ((E + 180) % 360 + 360) % 360 - 180;
+  return E * 4;
+}
+
+/* ---------------- 3. 節氣 ---------------- */
+const TERM_NAMES = ["小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至",
+  "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"];
+const termCache = new Map();
+function termsOfYear(Y) {                       // 該公曆年的 24 節氣（小寒…冬至）
+  if (termCache.has(Y)) return termCache.get(Y);
+  const arr = TERM_NAMES.map((name, k) => {
+    const lon = mod360(285 + 15 * k);
+    const jd = solarTermJD(Y, lon);
+    const isJie = k % 2 === 0;
+    return { k, name, lon, jd, isJie, branch: isJie ? mod(1 + k / 2, 12) : null, year: Y };
+  });
+  termCache.set(Y, arr);
+  return arr;
+}
+function jieAround(jdUT) {                      // 前一個節、後一個節
+  const Y = fromJD(jdUT).y;
+  const list = [];
+  for (const yy of [Y - 1, Y, Y + 1]) for (const t of termsOfYear(yy)) if (t.isJie) list.push(t);
+  list.sort((a, b) => a.jd - b.jd);
+  let prev = null, next = null;
+  for (const t of list) { if (t.jd <= jdUT) prev = t; else { next = t; break; } }
+  return { prev, next };
+}
+function termAround(jdUT) {                     // 前後最近的節氣（含中氣）
+  const Y = fromJD(jdUT).y;
+  const list = [];
+  for (const yy of [Y - 1, Y, Y + 1]) for (const t of termsOfYear(yy)) list.push(t);
+  list.sort((a, b) => a.jd - b.jd);
+  let prev = null, next = null;
+  for (const t of list) { if (t.jd <= jdUT) prev = t; else { next = t; break; } }
+  return { prev, next };
+}
+function solarYearOf(jdUT) {
+  const Y = fromJD(jdUT).y;
+  return jdUT >= termsOfYear(Y)[2].jd ? Y : Y - 1;
+}
+const yearGZ = Y => mod(Y - 1984, 60);
+function monthGZ(yearIdx, mb) {                 // 五虎遁
+  const yinStem = mod((yearIdx % 10 % 5) * 2 + 2, 10);
+  return gzIndex(mod(yinStem + mod(mb - 2, 12), 10), mb);
+}
+function hourGZ(dayIdx, hb) {                   // 五鼠遁
+  return gzIndex(mod((dayIdx % 10 % 5) * 2 + hb, 10), hb);
+}
+
+/* ---------------- 4. 農曆 ---------------- */
+/* 民國元年至十七年（1912–1928）的曆書以北京地方平時（東經 116.4°，約 UTC+7:45:36）定朔，其餘年份用東經 120° 標準時。
+   這是六爻工具相對八字引擎唯一的改動：1914、1916、1920 年三個朔日落在午夜前後十四分鐘內的月份，因此與官方曆書一致。 */
+const JD_1912 = toJD(1912, 1, 1, 0), JD_1929 = toJD(1929, 1, 1, 0);
+const jdToCnDay = jd => Math.floor(jd + 0.5 + (jd >= JD_1912 && jd < JD_1929 ? 116.4 / 360 : 8 / 24));
+const suiCache = new Map();
+function suiMonths(Y) {                         // 冬至(Y-1) 所在月 起，到冬至(Y) 所在月之前
+  if (suiCache.has(Y)) return suiCache.get(Y);
+  const w1 = solarTermJD(Y - 1, 270), w2 = solarTermJD(Y, 270);
+  const ws1 = jdToCnDay(w1), ws2 = jdToCnDay(w2);
+  const k0 = Math.floor((w1 - 2451550.09766) / 29.530588861) - 1;
+  const nms = [];
+  for (let i = 0; i < 17; i++) nms.push(jdToCnDay(newMoonJD(k0 + i)));
+  let s = -1, e = -1;
+  for (let i = 0; i < nms.length - 1; i++) {
+    if (s < 0 && nms[i] <= ws1 && ws1 < nms[i + 1]) s = i;
+    if (e < 0 && nms[i] <= ws2 && ws2 < nms[i + 1]) e = i;
+  }
+  const count = e - s;
+  const zq = [];
+  for (const yy of [Y - 1, Y]) for (const t of termsOfYear(yy)) if (!t.isJie) zq.push(jdToCnDay(t.jd));
+  const months = [];
+  let num = 11, leapDone = false, ly = Y - 1;
+  for (let i = s; i < e; i++) {
+    const a = nms[i], b = nms[i + 1];
+    let leap = false;
+    if (i > s) {
+      if (count === 13 && !leapDone && !zq.some(d => d >= a && d < b)) { leap = true; leapDone = true; }
+      if (!leap) { num = num === 12 ? 1 : num + 1; if (num === 1) ly = Y; }
+    }
+    months.push({ start: a, end: b, num, leap, ly });
+  }
+  suiCache.set(Y, months);
+  return months;
+}
+function lunarOfDay(dn) {
+  const { y } = dayNumToYMD(dn);
+  for (const Y of [y, y + 1]) {
+    for (const m of suiMonths(Y)) if (dn >= m.start && dn < m.end)
+      return { year: m.ly, month: m.num, leap: m.leap, day: dn - m.start + 1, size: m.end - m.start };
+  }
+  return null;
+}
+function lunarMonthsOfYear(ly) {                // 某農曆年的所有月份（含閏月）
+  const out = [];
+  for (const Y of [ly, ly + 1]) for (const m of suiMonths(Y)) if (m.ly === ly) out.push(m);
+  out.sort((a, b) => a.start - b.start);
+  const seen = new Set();
+  return out.filter(m => { const k = m.start; if (seen.has(k)) return false; seen.add(k); return true; });
+}
+function lunarToDayNum(ly, lm, leap, ld) {
+  const m = lunarMonthsOfYear(ly).find(x => x.num === lm && !!x.leap === !!leap);
+  if (!m) return null;
+  return m.start + Math.min(ld, m.end - m.start) - 1;
+}
+const LUNAR_MONTH = ["", "正月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "冬月", "臘月"];
+const LUNAR_DAY = ["", "初一", "初二", "初三", "初四", "初五", "初六", "初七", "初八", "初九", "初十",
+  "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十",
+  "廿一", "廿二", "廿三", "廿四", "廿五", "廿六", "廿七", "廿八", "廿九", "三十"];
+const lunarText = l => l ? `${l.year}年${l.leap ? "閏" : ""}${LUNAR_MONTH[l.month]}${LUNAR_DAY[l.day]}` : "";
+
+/* ---------------- 5. 時間換算 ---------------- */
+const pad2 = n => String(n).padStart(2, "0");
+function jdToClock(jd) {                        // 「本地 JD」→ 年月日時分秒
+  const t = Math.round((jd + 0.5) * 86400);
+  const dayNum = Math.floor(t / 86400);
+  const sec = t - dayNum * 86400;
+  const { y, m, d } = dayNumToYMD(dayNum);
+  return { y, m, d, hh: Math.floor(sec / 3600), mi: Math.floor((sec % 3600) / 60), ss: sec % 60, dayNum };
+}
+const clockToJD = c => toJD(c.y, c.m, c.d, ((c.hh || 0) + (c.mi || 0) / 60 + (c.ss || 0) / 3600) / 24);
+const jdNow = () => 2440587.5 + Date.now() / 86400000;
+function addCalendar(c, Y, M, D, H, Mi) {      // 按年、月、日、時順加
+  let y = c.y + (Y || 0), m = c.m + (M || 0);
+  while (m > 12) { m -= 12; y += 1; }
+  const base = toJD(y, m, 1, 0) + (c.d - 1) + ((c.hh || 0) + (c.mi || 0) / 60 + (c.ss || 0) / 3600) / 24;
+  return jdToClock(base + (D || 0) + ((H || 0) + (Mi || 0) / 60) / 24);
+}
+const hourBranchOf = hh => Math.floor((hh + 1) / 2) % 12;
+const SHICHEN_RANGE = b => b === 0 ? "23–01" : `${pad2(2 * b - 1)}–${pad2(2 * b + 1)}`;
+
+
+/* ---------------- 6. 旬空 ---------------- */
+function xunKong(i) { const head = i - mod(i, 10); return [mod(head + 10, 12), mod(head + 11, 12)]; }
+
+return {
+  mod, gzIndex, toJD, fromJD, ymdToDayNum, dayNumToYMD, dayGZ, monthLen, deltaT, apparentSunLon, solarTermJD, newMoonJD,
+  TERM_NAMES, termsOfYear, jieAround, termAround, solarYearOf, yearGZ, monthGZ, hourGZ,
+  suiMonths, lunarOfDay, lunarMonthsOfYear, lunarToDayNum, LUNAR_MONTH, LUNAR_DAY, lunarText,
+  pad2, jdToClock, clockToJD, jdNow, addCalendar, hourBranchOf, SHICHEN_RANGE, xunKong
+};
+})();
+
+/* ==========================================================
+   六爻納甲排盤計算引擎
+   起卦（數字、手動六爻、時間）→ 本卦變卦、八宮世應、納甲、六親、六神、伏神、旬空
+   → 月建日辰對各爻、動變、飛伏、三合、卦級沖合反伏 → 依力量排序的關係清單
+   規則依據以《增刪卜易》為主（各章名寫在註解裡），進退神、飛伏生剋歌、卦反吟伏吟依《卜筮正宗》。
+   ========================================================== */
+const Liuyao = (() => {
+"use strict";
+const C = (typeof Cal !== "undefined") ? Cal : require("./calendar.js");
+const { mod } = C;
+
+/* ---------------- 1. 干支與五行 ---------------- */
+const GAN = "甲乙丙丁戊己庚辛壬癸".split("");
+const ZHI = "子丑寅卯辰巳午未申酉戌亥".split("");
+const WX = "木火土金水".split("");                    // 木0 火1 土2 金3 水4；生：+1，剋：+2
+const ZHI_WX = [4, 2, 0, 0, 2, 1, 1, 2, 3, 3, 2, 4];
+const zhiWx = b => ZHI_WX[b];
+const ganWx = g => g >> 1;
+const gzName = i => GAN[mod(i, 10)] + ZHI[mod(i, 12)];
+const gzOf = (g, b) => C.gzIndex(g, b);
+/* a 對 b：same 比和、sheng a生b、ke a剋b、beike b剋a、besheng b生a */
+function wxRel(a, b) { return ["same", "sheng", "ke", "beike", "besheng"][mod(b - a, 5)]; }
+const isChong = (a, b) => mod(a - b, 12) === 6;
+const isHe = (a, b) => a !== b && mod(a + b, 12) === 1;
+/* 生旺墓絕（《增刪卜易·生旺墓絕章》：只驗生旺墓絕；土隨水，長生申、旺子、墓辰、絕巳） */
+const CS_START = [11, 2, 8, 5, 8];                   // 木亥 火寅 土申 金巳 水申
+function csStage(wx, b) {
+  const s = mod(b - CS_START[wx], 12);
+  return s === 0 ? "長生" : s === 4 ? "帝旺" : s === 8 ? "墓" : s === 9 ? "絕" : null;
+}
+/* 三合局：申子辰水、亥卯未木、寅午戌火、巳酉丑金 */
+const SANHE = [{ m: [8, 0, 4], wx: 4 }, { m: [11, 3, 7], wx: 0 }, { m: [2, 6, 10], wx: 1 }, { m: [5, 9, 1], wx: 3 }];
+/* 進神退神（《增刪卜易·進神退神章》） */
+const JIN = { 11: 0, 2: 3, 5: 6, 8: 9, 1: 4, 4: 7, 7: 10, 10: 1 };
+const TUI = { 0: 11, 3: 2, 6: 5, 9: 8, 4: 1, 7: 4, 10: 7, 1: 10 };
+
+/* ---------------- 2. 八卦與六十四卦 ---------------- */
+/* 三爻卦編碼：初爻＝1、二爻＝2、三爻＝4，陽爻為 1 */
+const TRI_NAME = ["坤", "震", "坎", "兌", "艮", "離", "巽", "乾"];
+const TRI_XIANG = ["地", "雷", "水", "澤", "山", "火", "風", "天"];
+const TRI_WX = [2, 0, 4, 3, 2, 1, 0, 3];
+const TRI_XT = [8, 4, 6, 2, 7, 3, 5, 1];               // 先天數
+const XT_TRI = [null, 7, 3, 5, 1, 6, 2, 4, 0];
+const TRI_BY_NAME = Object.fromEntries(TRI_NAME.map((n, i) => [n, i]));
+/* 納甲（《增刪卜易·渾天甲子章》）：[內卦天干, 內卦三支, 外卦天干, 外卦三支] */
+const NAJIA = [
+  [1, [7, 5, 3], 9, [1, 11, 9]],    // 坤 乙未 乙巳 乙卯／癸丑 癸亥 癸酉
+  [6, [0, 2, 4], 6, [6, 8, 10]],    // 震 庚子 庚寅 庚辰／庚午 庚申 庚戌
+  [4, [2, 4, 6], 4, [8, 10, 0]],    // 坎 戊寅 戊辰 戊午／戊申 戊戌 戊子
+  [3, [5, 3, 1], 3, [11, 9, 7]],    // 兌 丁巳 丁卯 丁丑／丁亥 丁酉 丁未
+  [2, [4, 6, 8], 2, [10, 0, 2]],    // 艮 丙辰 丙午 丙申／丙戌 丙子 丙寅
+  [5, [3, 1, 11], 5, [9, 7, 5]],    // 離 己卯 己丑 己亥／己酉 己未 己巳
+  [7, [1, 11, 9], 7, [7, 5, 3]],    // 巽 辛丑 辛亥 辛酉／辛未 辛巳 辛卯
+  [0, [0, 2, 4], 8, [6, 8, 10]]     // 乾 甲子 甲寅 甲辰／壬午 壬申 壬戌
+];
+/* 文王卦序：上卦、下卦 */
+const KW_PAIRS = "乾乾 坤坤 坎震 艮坎 坎乾 乾坎 坤坎 坎坤 巽乾 乾兌 坤乾 乾坤 乾離 離乾 坤艮 震坤 兌震 艮巽 坤兌 巽坤 離震 艮離 艮坤 坤震 乾震 艮乾 艮震 兌巽 坎坎 離離 兌艮 震巽 乾艮 震乾 離坤 坤離 巽離 離兌 坎艮 震坎 艮兌 巽震 兌乾 乾巽 兌坤 坤巽 兌坎 坎巽 兌離 離巽 震震 艮艮 巽艮 震兌 震離 離艮 巽巽 兌兌 巽坎 坎兌 巽兌 震艮 坎離 離坎".split(" ");
+const KW_NAMES = "乾 坤 屯 蒙 需 訟 師 比 小畜 履 泰 否 同人 大有 謙 豫 隨 蠱 臨 觀 噬嗑 賁 剝 復 无妄 大畜 頤 大過 坎 離 咸 恆 遯 大壯 晉 明夷 家人 睽 蹇 解 損 益 夬 姤 萃 升 困 井 革 鼎 震 艮 漸 歸妹 豐 旅 巽 兌 渙 節 中孚 小過 既濟 未濟".split(" ");
+const KW_OF_BITS = new Array(64);
+const BITS_OF_KW = new Array(65);
+KW_PAIRS.forEach((p, i) => {
+  const up = TRI_BY_NAME[p[0]], lo = TRI_BY_NAME[p[1]];
+  const bits = lo | (up << 3);
+  KW_OF_BITS[bits] = i + 1; BITS_OF_KW[i + 1] = bits;
+});
+const lowerOf = bits => bits & 7, upperOf = bits => bits >> 3;
+function fullName(bits) {
+  const up = upperOf(bits), lo = lowerOf(bits), n = KW_NAMES[KW_OF_BITS[bits] - 1];
+  if (up === lo) return `${TRI_NAME[up]}為${TRI_XIANG[up]}`;
+  return TRI_XIANG[up] + TRI_XIANG[lo] + n;
+}
+/* 八宮（京房）：乾 坎 艮 震 巽 離 坤 兌；本宮→一世…五世→遊魂→歸魂 */
+const PALACE_ORDER = [7, 2, 4, 1, 6, 5, 0, 3];
+const GEN_NAMES = ["八純", "一世", "二世", "三世", "四世", "五世", "遊魂", "歸魂"];
+const GEN_SHI = [6, 1, 2, 3, 4, 5, 4, 3];
+const PALACE_OF = new Array(64);
+for (const t of PALACE_ORDER) {
+  const seq = [];
+  let h = t | (t << 3); seq.push(h);
+  h ^= 1; seq.push(h); h ^= 2; seq.push(h); h ^= 4; seq.push(h); h ^= 8; seq.push(h); h ^= 16; seq.push(h);
+  h ^= 8; seq.push(h);
+  seq.push((h & 56) | t);
+  seq.forEach((b, gen) => { PALACE_OF[b] = { palace: t, gen, shi: GEN_SHI[gen], ying: mod(GEN_SHI[gen] + 2, 6) + 1 }; });
+}
+/* 一卦六爻的納甲 */
+function najiaOf(bits) {
+  const lo = NAJIA[lowerOf(bits)], up = NAJIA[upperOf(bits)];
+  const out = [];
+  for (let k = 0; k < 3; k++) out.push({ g: lo[0], b: lo[1][k] });
+  for (let k = 0; k < 3; k++) out.push({ g: up[2], b: up[3][k] });
+  return out;
+}
+const LIUQIN = ["兄弟", "子孫", "妻財", "官鬼", "父母"];       // (爻五行 − 我) mod 5
+const liuqinOf = (meWx, wx) => LIUQIN[mod(wx - meWx, 5)];
+const LIUSHEN = ["青龍", "朱雀", "勾陳", "螣蛇", "白虎", "玄武"];
+const LIUSHEN_START = [0, 0, 1, 1, 2, 3, 4, 4, 5, 5];        // 甲乙青龍、丙丁朱雀、戊勾陳、己螣蛇、庚辛白虎、壬癸玄武
+/* 六沖卦、六合卦：初四、二五、三上三對地支皆沖（合） */
+function pairKind(bits) {
+  const L = najiaOf(bits);
+  if ([0, 1, 2].every(k => isChong(L[k].b, L[k + 3].b))) return "六沖";
+  if ([0, 1, 2].every(k => isHe(L[k].b, L[k + 3].b))) return "六合";
+  return null;
+}
+function hexInfo(bits) {
+  const kw = KW_OF_BITS[bits], pal = PALACE_OF[bits];
+  return {
+    bits, kw, name: KW_NAMES[kw - 1], full: fullName(bits), upper: upperOf(bits), lower: lowerOf(bits),
+    palace: pal.palace, palaceName: TRI_NAME[pal.palace], palaceWx: TRI_WX[pal.palace], gen: pal.gen, genName: GEN_NAMES[pal.gen],
+    shi: pal.shi, ying: pal.ying, pair: pairKind(bits), najia: najiaOf(bits)
+  };
+}
+/* 爻名：初九、六二…上六 */
+const POS_NAME = ["初", "二", "三", "四", "五", "上"];
+function yaoName(pos, yang) { const n = yang ? "九" : "六"; return pos === 0 ? "初" + n : pos === 5 ? "上" + n : n + POS_NAME[pos]; }
+const POS_SHORT = ["初爻", "二爻", "三爻", "四爻", "五爻", "上爻"];
+
+/* ---------------- 3. 起卦 ---------------- */
+/* 爻值：6 老陰（動）、7 少陽、8 少陰、9 老陽（動） */
+const isYang = v => v === 7 || v === 9;
+const isMoving = v => v === 6 || v === 9;
+const YAO_LABEL = { 6: "老陰", 7: "少陽", 8: "少陰", 9: "老陽" };
+function bigMod(str, n) {                         // 大整數取餘，餘 0 取 n
+  const v = BigInt(str) % BigInt(n);
+  return v === 0n ? n : Number(v);
+}
+function validNum(s) { return typeof s === "string" ? /^\d{1,60}$/.test(s.trim()) && BigInt(s.trim()) > 0n : Number.isInteger(s) && s > 0; }
+/* 數字起卦：第一數上卦、第二數下卦，三數之和除 6 取動爻（餘 0 取上爻） */
+function castNumbers(a, b, c) {
+  const s = [a, b, c].map(x => String(x).trim());
+  if (!s.every(validNum)) return { error: "請填三個正整數" };
+  const up = bigMod(s[0], 8), lo = bigMod(s[1], 8);
+  const sum = (BigInt(s[0]) + BigInt(s[1]) + BigInt(s[2])).toString();
+  const mv = bigMod(sum, 6);
+  return linesFrom(XT_TRI[up], XT_TRI[lo], [mv], {
+    method: "number", nums: s, steps: [
+      { label: "上卦", expr: `${s[0]} ÷ 8`, rem: up % 8, use: up, tri: XT_TRI[up] },
+      { label: "下卦", expr: `${s[1]} ÷ 8`, rem: lo % 8, use: lo, tri: XT_TRI[lo] },
+      { label: "動爻", expr: `(${s[0]} + ${s[1]} + ${s[2]}) = ${sum} ÷ 6`, rem: mv % 6, use: mv }
+    ]
+  });
+}
+function linesFrom(upTri, loTri, movingPositions, detail) {
+  const bits = loTri | (upTri << 3);
+  const lines = [];
+  for (let k = 0; k < 6; k++) {
+    const yang = (bits >> k) & 1, mv = movingPositions.includes(k + 1);
+    lines.push(yang ? (mv ? 9 : 7) : (mv ? 6 : 8));
+  }
+  return { lines, detail };
+}
+/* 時間起卦（梅花易數）：(年支數＋農曆月＋農曆日)÷8 上卦；再加時支數 ÷8 下卦；總數 ÷6 動爻。
+   年取農曆年地支；閏月以本月數計；時支數子=1…亥=12。 */
+function castTime(mom) {
+  const L = mom.lunar;
+  if (!L) return { error: "這一天查不到農曆" };
+  const yb = mod(L.year - 4, 12);                       // 農曆年地支（1984 甲子）
+  const Y = yb + 1, M = L.month, D = L.day, H = mom.hourBranch + 1;
+  const s1 = Y + M + D, s2 = s1 + H;
+  const up = mod(s1 - 1, 8) + 1, lo = mod(s2 - 1, 8) + 1, mv = mod(s2 - 1, 6) + 1;
+  return linesFrom(XT_TRI[up], XT_TRI[lo], [mv], {
+    method: "time", Y, M, D, H, yb, leap: L.leap, steps: [
+      { label: "上卦", expr: `年${ZHI[yb]}${Y} + ${L.leap ? "閏" : ""}${M}月 + ${D}日 = ${s1} ÷ 8`, rem: s1 % 8, use: up, tri: XT_TRI[up] },
+      { label: "下卦", expr: `${s1} + ${ZHI[mom.hourBranch]}時${H} = ${s2} ÷ 8`, rem: s2 % 8, use: lo, tri: XT_TRI[lo] },
+      { label: "動爻", expr: `${s2} ÷ 6`, rem: s2 % 6, use: mv }
+    ]
+  });
+}
+function castManual(values) {
+  if (!Array.isArray(values) || values.length !== 6 || !values.every(v => [6, 7, 8, 9].includes(v))) return { error: "六個爻都要選" };
+  return { lines: values.slice(), detail: { method: "manual" } };
+}
+
+/* ---------------- 4. 時間 ---------------- */
+/* inp = { y, m, d, hh, mi, tz（小時）, zishi: 'day23'（23 點換日）| 'split'（夜子時不換日） } */
+function moment(inp) {
+  const tz = +inp.tz;
+  const civil = { y: inp.y, m: inp.m, d: inp.d, hh: inp.hh || 0, mi: inp.mi || 0, ss: 0 };
+  const jdLocal = C.clockToJD(civil);
+  const jdUT = jdLocal - tz / 24;
+  const clock = C.jdToClock(jdLocal);
+  const solarYear = C.solarYearOf(jdUT);
+  const yi = C.yearGZ(solarYear);
+  const { prev: prevJie, next: nextJie } = C.jieAround(jdUT);
+  const mb = prevJie.branch;
+  const mi = C.monthGZ(yi, mb);
+  const hb = C.hourBranchOf(clock.hh);
+  let dayNum = clock.dayNum, hourDay = clock.dayNum;
+  const zishi = inp.zishi === "split" ? "split" : "day23";
+  if (clock.hh >= 23) { if (zishi === "day23") { dayNum += 1; hourDay = dayNum; } else hourDay = dayNum + 1; }
+  const di = C.dayGZ(dayNum), hi = C.hourGZ(C.dayGZ(hourDay), hb);
+  const lunar = C.lunarOfDay(dayNum);
+  const term = C.termAround(jdUT);
+  return {
+    input: Object.assign({}, inp), tz, zishi, jdUT, clock, dayNum, solarYear,
+    pillars: [yi, mi, di, hi], yearIdx: yi, monthIdx: mi, dayIdx: di, hourIdx: hi,
+    monthBranch: mb, dayBranch: di % 12, dayStem: di % 10, hourBranch: hb,
+    xunkong: C.xunKong(di), lunar, prevJie, nextJie, prevTerm: term.prev, nextTerm: term.next,
+    lateZi: clock.hh >= 23
+  };
+}
+
+/* ---------------- 5. 旺衰 ---------------- */
+/* 月令（《增刪卜易·四時旺相章》《月將章》）：臨月建、同類為旺，月生為相；月沖為月破、月合為月合 */
+function monthState(mb, b) {
+  const mw = zhiWx(mb), w = zhiWx(b);
+  if (b === mb) return { key: "lin", text: "臨月建", wang: true };
+  if (isChong(mb, b)) return { key: "po", text: "月破", wang: false };
+  if (isHe(mb, b)) return { key: "he", text: "月合", wang: true };
+  const r = wxRel(mw, w);
+  if (r === "same") return { key: "fu", text: "旺", wang: true };
+  if (r === "sheng") return { key: "xiang", text: "相", wang: true };
+  if (r === "besheng") return { key: "xiu", text: "休", wang: false, yuqi: (mb === 7 && w === 1) || (mb === 1 && w === 4) };
+  if (r === "beike") return { key: "qiu", text: "囚", wang: false };
+  return { key: "si", text: "死", wang: false };            // 月剋爻
+}
+const MONTH_F = { lin: 1.0, fu: 0.95, xiang: 0.85, he: 0.85, xiu: 0.6, qiu: 0.55, si: 0.5, po: 0.4 };
+function dayRel(db, b) {
+  const dw = zhiWx(db), w = zhiWx(b);
+  if (b === db) return "lin";
+  if (isChong(db, b)) return "chong";
+  if (isHe(db, b)) return "he";
+  const r = wxRel(dw, w);
+  return { same: "fu", sheng: "sheng", ke: "ke", beike: "hao", besheng: "xie" }[r];
+}
+
+/* ---------------- 6. 排盤 ---------------- */
+function build(cast, mom) {
+  const vals = cast.lines;
+  let bits = 0, cbits = 0;
+  const moving = [];
+  vals.forEach((v, k) => {
+    if (isYang(v)) bits |= 1 << k;
+    if (isMoving(v)) moving.push(k);
+  });
+  cbits = bits; for (const k of moving) cbits ^= 1 << k;
+  const ben = hexInfo(bits), bian = moving.length ? hexInfo(cbits) : null;
+  const meWx = ben.palaceWx;
+  const mb = mom.monthBranch, db = mom.dayBranch, kong = mom.xunkong;
+  const shenStart = LIUSHEN_START[mom.dayStem];
+  const lines = ben.najia.map((nj, k) => {
+    const yang = isYang(vals[k]), mv = isMoving(vals[k]);
+    const wx = zhiWx(nj.b);
+    const L = {
+      pos: k, posName: POS_SHORT[k], yaoName: yaoName(k, yang), value: vals[k], yang, moving: mv,
+      g: nj.g, b: nj.b, wx, qin: liuqinOf(meWx, wx), shen: LIUSHEN[(shenStart + k) % 6],
+      shi: ben.shi === k + 1, ying: ben.ying === k + 1,
+      kong: kong.includes(nj.b), month: monthState(mb, nj.b), day: dayRel(db, nj.b),
+      dayStage: csStage(wx, db)
+    };
+    if (mv) {
+      const cn = bian.najia[k];
+      const cwx = zhiWx(cn.b);
+      L.change = {
+        pos: k, g: cn.g, b: cn.b, wx: cwx, qin: liuqinOf(meWx, cwx), yang: !yang,
+        kong: kong.includes(cn.b), month: monthState(mb, cn.b), day: dayRel(db, cn.b), dayStage: csStage(cwx, db)
+      };
+    }
+    return L;
+  });
+  /* 伏神：本卦缺的六親，取本宮首卦同一六親所在之爻，伏於本卦同位之下（《火珠林》：本宮之六親在飛象之下為伏神） */
+  const present = new Set(lines.map(l => l.qin));
+  const shou = hexInfo(ben.palace | (ben.palace << 3));
+  const fu = [];
+  shou.najia.forEach((nj, k) => {
+    const wx = zhiWx(nj.b), q = liuqinOf(meWx, wx);
+    if (!present.has(q)) {
+      const F = { pos: k, g: nj.g, b: nj.b, wx, qin: q, kong: kong.includes(nj.b), month: monthState(mb, nj.b), day: dayRel(db, nj.b), dayStage: csStage(wx, db) };
+      F.fei = lines[k];
+      lines[k].fu = F;
+      fu.push(F);
+    }
+  });
+  /* 爻的動態（《增刪卜易·暗動章》《動散章》《六合章》）：
+     靜爻旺相逢日沖為暗動、休囚為日破；旬空逢日沖為沖空則實（旺相者兼作暗動）；
+     動爻逢日沖，旺相不散、休囚恐散；靜而逢日合為合起，動而逢日合為合絆 */
+  for (const L of lines) {
+    L.wang = L.month.wang;                                         // 旺相休囚以月令定
+    if (L.day === "chong") {
+      if (L.moving) L.dayChong = L.wang ? "notsan" : "san";
+      else if (L.kong) { L.dayChong = "kongshi"; L.andong = L.wang; }
+      else if (L.wang) { L.dayChong = "andong"; L.andong = true; }
+      else { L.dayChong = "ripo"; L.ripo = true; }
+    }
+    if (L.day === "he") L.dayHe = L.moving ? "ban" : "qi";
+  }
+  /* 動變 */
+  for (const L of lines) if (L.moving) L.hua = huaOf(L, mom);
+  const out = { cast, mom, ben, bian, shou, lines, fu, moving, meWx };
+  out.lineForce = lines.map(L => lineForce(L));
+  out.relations = relations(out);
+  out.summary = summarize(out);
+  return out;
+}
+
+/* 動爻化出的關係：回頭生剋沖合、進退、生旺墓絕、化空、化破、伏吟 */
+function huaOf(L, mom) {
+  const c = L.change, res = [];
+  const r = wxRel(c.wx, L.wx);                       // 變爻對動爻
+  if (c.b === L.b) res.push({ key: "fuyin", text: "化伏吟", note: "變爻與動爻同支" });
+  if (isChong(c.b, L.b)) res.push({ key: "chong", text: "回頭沖", note: "變爻沖本位，爻之反吟" });
+  if (isHe(c.b, L.b)) res.push({ key: "he", text: "回頭合", note: "爻動化出之爻回頭相合，謂之化扶" });
+  if (JIN[L.b] === c.b) res.push({ key: "jin", text: "化進神" });
+  if (TUI[L.b] === c.b) res.push({ key: "tui", text: "化退神" });
+  if (r === "sheng") res.push({ key: "sheng", text: "回頭生" });
+  if (r === "ke") res.push({ key: "ke", text: "回頭剋" });
+  if (r === "besheng") res.push({ key: "xie", text: "化洩", note: "動爻生變爻" });
+  if (r === "beike") res.push({ key: "hao", text: "化耗", note: "動爻剋變爻" });
+  if (r === "same" && c.b !== L.b && JIN[L.b] !== c.b && TUI[L.b] !== c.b) res.push({ key: "bihe", text: "化比和" });
+  const st = csStage(L.wx, c.b);
+  if (st === "長生") res.push({ key: "zhangsheng", text: "化長生" });
+  if (st === "帝旺") res.push({ key: "diwang", text: "化帝旺" });
+  if (st === "墓") res.push({ key: "mu", text: "化墓" });
+  if (st === "絕") res.push({ key: "jue", text: "化絕" });
+  if (c.kong) res.push({ key: "kong", text: "化空" });
+  if (isChong(mom.monthBranch, c.b)) res.push({ key: "po", text: "化破" });
+  return res;
+}
+const hasHua = (L, k) => L.hua && L.hua.some(h => h.key === k);
+
+/* 動爻或暗動爻作為施力者的力量係數（0.2–1.2） */
+function lineForce(L) {
+  let f = MONTH_F[L.month.key];
+  if (L.day === "lin") f += 0.15; else if (L.day === "sheng") f += 0.1; else if (L.day === "fu") f += 0.05; else if (L.day === "ke") f -= 0.15;
+  if (L.moving) {
+    if (L.dayHe === "ban") f *= 0.6;
+    if (L.dayChong === "san") f *= 0.7;
+    if (hasHua(L, "ke")) f *= 0.6;
+    if (hasHua(L, "chong")) f *= 0.75;
+    if (hasHua(L, "tui")) f *= 0.8;
+    if (hasHua(L, "po")) f *= 0.7;
+    if (hasHua(L, "kong")) f *= 0.8;
+    if (hasHua(L, "jue") || hasHua(L, "mu")) f *= 0.8;
+    if (hasHua(L, "sheng") || hasHua(L, "jin")) f *= 1.1;
+  }
+  return Math.max(0.2, Math.min(1.2, f));
+}
+
+/* ---------------- 7. 關係清單 ---------------- */
+/* group: 'hc' 合沖、'sk' 生剋、'kong' 旬空。score 0–100 為力量，排序用。 */
+const wxN = w => WX[w];
+const bName = b => ZHI[b] + WX[zhiWx(b)];
+function who(L) {
+  const t = [];
+  if (L.shi) t.push("世"); if (L.ying) t.push("應");
+  return `${L.posName}${GAN[L.g]}${bName(L.b)}${L.qin}${t.length ? "（" + t.join("、") + "）" : ""}`;
+}
+function whoChange(L) { const c = L.change; return `${L.posName}變爻${GAN[c.g]}${bName(c.b)}${c.qin}`; }
+function whoFu(F) { return `伏神${GAN[F.g]}${bName(F.b)}${F.qin}（伏${POS_SHORT[F.pos]}下）`; }
+function relations(ch) {
+  const R = [];
+  const { lines, mom, ben, bian } = ch;
+  const mb = mom.monthBranch, db = mom.dayBranch;
+  const M = `月建${ZHI[mb]}${WX[zhiWx(mb)]}`, D = `日辰${gzName(mom.dayIdx)}`;
+  const add = (o) => { o.score = Math.round(Math.max(1, Math.min(100, o.score))); R.push(o); };
+  /* 7.1 月建 → 各爻、變爻、伏神 */
+  const monthItems = (target, label, kind, base) => {
+    const st = target.month;
+    const sub = { line: "爻", change: "變爻", fu: "伏神" }[kind];
+    if (st.key === "po") {
+      const extra = kind === "change" ? "，化破" : "";
+      add({ group: "hc", type: "月破", actor: "M", target: label, kind, pos: target.pos, score: base * 1.0,
+        title: `${M}沖${label}`, verdict: kind === "change" ? "化破" : "月破",
+        note: `月建沖爻即為月破，${sub}目下無力${target.day === "lin" ? "；但臨日辰，逢破不破" : ""}${extra}` });
+    } else if (st.key === "he") {
+      add({ group: "hc", type: "月合", actor: "M", target: label, kind, pos: target.pos, score: base * 0.82,
+        title: `${M}合${label}`, verdict: "月合", note: "月建合爻為月合，有用之爻" });
+    } else {
+      const map = {
+        lin: ["臨月建", 0.9, "爻值月建，旺"], fu: ["月扶", 0.66, "與月建同五行，旺（次於臨月）"],
+        xiang: ["月生", 0.78, "月建生之，相"], si: ["月剋", 0.84, "月建剋之，受制"],
+        xiu: ["生月（休）", 0.3, st.yuqi ? "爻生月建，休；《增刪卜易》謂此月尚有餘氣" : "爻生月建，休"],
+        qiu: ["剋月（囚）", 0.26, "爻剋月建，囚"]
+      }[st.key];
+      add({ group: "sk", type: map[0], actor: "M", target: label, kind, pos: target.pos, score: base * map[1],
+        title: `${M}與${label}`, verdict: map[0], note: map[2] });
+    }
+  };
+  /* 7.2 日辰 → 各爻、變爻、伏神 */
+  const dayItems = (target, label, kind, base) => {
+    const rel = target.day;
+    if (rel === "chong") {
+      let verdict, note, s = base;
+      if (kind === "line" && !target.moving) {
+        if (target.kong) { verdict = target.wang ? "沖空則實（暗動）" : "沖空則實"; note = "爻遇旬空，日辰沖起而有用，謂之沖空則實"; s *= 0.92; }
+        else if (target.wang) { verdict = "暗動"; note = "靜爻旺相，日辰沖之為暗動"; s *= 0.95; }
+        else { verdict = "日破"; note = "靜爻休囚，日辰沖之為日破，愈加無用"; s *= 0.95; }
+      } else if (kind === "line") {
+        if (target.dayChong === "san") { verdict = "沖散之虞"; note = "動爻休囚逢日沖，間有沖散（《增刪卜易·動散章》）"; s *= 0.86; }
+        else { verdict = "沖而不散"; note = "動爻旺相，日沖不散，愈彊"; s *= 0.7; }
+      } else if (kind === "change") { verdict = "日沖變爻"; note = "日辰能沖變爻，變爻之力受制"; s *= 0.8; }
+      else { verdict = "日沖伏神"; note = "日辰沖伏神"; s *= 0.7; }
+      add({ group: "hc", type: "日沖", actor: "D", target: label, kind, pos: target.pos, score: s, title: `${D}沖${label}`, verdict, note });
+    } else if (rel === "he") {
+      let verdict, note, s = base * 0.84;
+      if (kind === "line" && target.moving) { verdict = "合絆"; note = "動而逢合謂之合絆，暫不能動，待沖開"; }
+      else if (kind === "line") { verdict = "合起"; note = target.wang ? "靜而逢合謂之合起" : "靜而逢合謂之合起，休囚亦有旺相之意"; }
+      else if (kind === "change") { verdict = "日合變爻"; note = "日辰合變爻"; s *= 0.85; }
+      else { verdict = "日合伏神"; note = "日辰合伏神，伏神得合而起"; s *= 0.85; }
+      add({ group: "hc", type: "日合", actor: "D", target: label, kind, pos: target.pos, score: s, title: `${D}合${label}`, verdict, note });
+    } else {
+      const map = {
+        lin: ["臨日", 0.9, "爻臨日辰，旺；逢月破而不破"], fu: ["日扶", 0.66, "與日辰同五行，得扶"],
+        sheng: ["日生", 0.8, "日辰生之，有力"], ke: ["日剋", 0.86, "日辰剋之，受傷"],
+        xie: ["生日（洩）", 0.3, "爻生日辰，洩氣"], hao: ["剋日（耗）", 0.26, "爻剋日辰，耗力；爻傷日辰，徒受其名"]
+      }[rel];
+      add({ group: "sk", type: map[0], actor: "D", target: label, kind, pos: target.pos, score: base * map[1], title: `${D}與${label}`, verdict: map[0], note: map[2] });
+    }
+    const st = target.b === db ? null : target.dayStage;          // 臨日已含旺意，不再重列生旺墓絕
+    if (st) {
+      const m = { 長生: ["長生於日", 0.66, "爻長生於日辰"], 帝旺: ["帝旺於日", 0.7, "爻帝旺於日辰"], 墓: ["入日墓", 0.76, "爻墓於日辰，墓中人不沖不發"], 絕: ["絕於日", 0.72, "爻絕於日辰；旺相或得生扶者逢絕不絕"] }[st];
+      add({ group: "sk", type: m[0], actor: "D", target: label, kind, pos: target.pos, score: base * m[1], title: `${D}與${label}`, verdict: m[0], note: m[2] });
+    }
+  };
+  for (const L of lines) {
+    monthItems(L, who(L), "line", 100);
+    dayItems(L, who(L), "line", 100);
+    if (L.moving) { monthItems(L.change, whoChange(L), "change", 92); dayItems(L.change, whoChange(L), "change", 92); }
+    if (L.fu) { monthItems(L.fu, whoFu(L.fu), "fu", 80); dayItems(L.fu, whoFu(L.fu), "fu", 80); }
+  }
+  /* 7.3 變爻 → 本位動爻（《增刪卜易·動變生克沖合章》：變爻只生剋沖合本位之動爻） */
+  const HUA = {
+    ke: ["hc", 0], chong: ["hc", 0.95, "變爻沖本位，回頭沖，爻之反吟"], he: ["hc", 0.82, "回頭合，謂之化扶"],
+    po: ["hc", 0.9, "變爻逢月建沖，化破"],
+    sheng: ["sk", 0.86, "變爻生本位動爻，回頭生"], kesk: ["sk", 0.95, "變爻剋本位動爻，回頭剋"],
+    jin: ["sk", 0.8, "化進神，愈進愈旺"], tui: ["sk", 0.84, "化退神，漸退無力"], bihe: ["sk", 0.55, "化出同五行之爻"],
+    xie: ["sk", 0.42, "動爻生變爻，化洩"], hao: ["sk", 0.38, "動爻剋變爻，化耗"],
+    zhangsheng: ["sk", 0.7, "動爻化出長生之地"], diwang: ["sk", 0.72, "動爻化出帝旺之地"], mu: ["sk", 0.8, "動爻化入墓"], jue: ["sk", 0.8, "動爻化絕"],
+    fuyin: ["sk", 0.78, "變爻與動爻同支，伏吟"], kong: ["kong", 0.84, "變爻旬空，化空"]
+  };
+  for (const L of lines) if (L.moving) {
+    for (const h of L.hua) {
+      const k = h.key === "ke" ? "kesk" : h.key;
+      if (k === "po") continue;                                  // 化破已在月建項下列出
+      const [g, w, note] = HUA[k];
+      let n = note;
+      if (k === "jue" && hasHua(L, "sheng") && L.wx === 2) n += (L.wang ? "；土爻旺相，化巳反能生土，論生不論絕（《增刪卜易·生旺墓絕章》）" : "；土爻休囚，化巳論絕");
+      add({ group: g, type: h.text, actor: "C", target: who(L), kind: "line", pos: L.pos, score: 90 * w,
+        title: `${who(L)}化${GAN[L.change.g]}${bName(L.change.b)}`, verdict: h.text, note: n });
+    }
+  }
+  /* 7.4 動爻（明動、暗動）→ 他爻、伏神；靜爻旺相 → 靜爻休囚（《增刪卜易·動靜生克章》） */
+  const actors = lines.filter(L => L.moving || L.andong);
+  const actorF = ch.lineForce;
+  const pairSeen = new Set();
+  for (const A of actors) {
+    const aw = A.moving ? 0.75 : 0.6;
+    const aname = `${A.moving ? "動爻" : "暗動"}${who(A)}`;
+    for (const T of lines) {
+      if (T === A) continue;
+      const base = 100 * aw * actorF[A.pos];
+      linePair(A, T, aname, who(T), base, A.moving ? "動" : "暗動", "line");
+    }
+    for (const F of ch.fu) {
+      const base = 80 * aw * actorF[A.pos];
+      linePair(A, F, aname, whoFu(F), base, A.moving ? "動" : "暗動", "fu");
+    }
+  }
+  function linePair(A, T, aname, tname, base, how, kind) {
+    const key = [A.pos, kind, T.pos].join("-");
+    if (pairSeen.has(key)) return; pairSeen.add(key);
+    const mutual = kind === "line" && (T.moving || T.andong);       // 兩爻都在動：沖合只列一次
+    if (mutual && T.pos < A.pos && (isChong(A.b, T.b) || isHe(A.b, T.b))) { /* 已在另一方列過 */ }
+    else if (isChong(A.b, T.b)) {
+      const both = mutual;
+      add({ group: "hc", type: "爻沖", actor: "L", target: tname, kind, pos: T.pos, apos: A.pos, score: base * 0.9,
+        title: `${aname}沖${tname}`, verdict: both ? "相沖" : "沖之", note: kind === "fu" ? "動爻沖伏神" : (T.moving ? "動爻相沖，謂之相殺" : "動爻沖靜爻，靜者被沖而動或散，視旺衰而定") });
+    } else if (isHe(A.b, T.b)) {
+      const both = mutual;
+      add({ group: "hc", type: "爻合", actor: "L", target: tname, kind, pos: T.pos, apos: A.pos, score: base * 0.8,
+        title: `${aname}合${tname}`, verdict: both ? "合好" : "合之", note: both ? "爻動與動爻相合，乃得他來合我，相助之意" : (kind === "fu" ? "動爻合伏神" : "動爻合靜爻，靜者得合而起") });
+    }
+    if (A.b === T.b) {
+      add({ group: "sk", type: "爻比", actor: "L", target: tname, kind, pos: T.pos, apos: A.pos, score: base * 0.5,
+        title: `${aname}與${tname}`, verdict: "同支相扶", note: "同支比和" });
+      return;
+    }
+    const r = wxRel(A.wx, T.wx);
+    const m = { sheng: ["生之", 0.82], ke: ["剋之", 0.88], same: ["扶之", 0.5] }[r];
+    if (m) add({ group: "sk", type: "爻" + m[0].slice(0, 1), actor: "L", target: tname, kind, pos: T.pos, apos: A.pos, score: base * m[1],
+      title: `${aname}${m[0].slice(0, 1)}${tname}`, verdict: m[0], note: { sheng: "動爻生他爻", ke: "動爻剋他爻", same: "同五行相扶" }[r] });
+  }
+  /* 靜爻旺相 → 靜爻休囚 */
+  for (const A of lines) {
+    if (A.moving || A.andong || !A.wang) continue;
+    for (const T of lines) {
+      if (T === A || T.moving || T.andong || T.wang) continue;
+      const r = wxRel(A.wx, T.wx);
+      if (r !== "sheng" && r !== "ke") continue;
+      add({ group: "sk", type: r === "sheng" ? "靜生" : "靜剋", actor: "L", target: who(T), kind: "line", pos: T.pos, apos: A.pos,
+        score: 30 * actorF[A.pos] * (r === "ke" ? 1 : 0.92), title: `靜爻${who(A)}${r === "sheng" ? "生" : "剋"}${who(T)}`,
+        verdict: r === "sheng" ? "旺生衰" : "旺剋衰", note: "六爻安靜旺相之爻，可以生剋休囚之爻（《增刪卜易·動靜生克章》）" });
+    }
+  }
+  /* 靜爻之間的沖合（兩爻皆靜，只是位置上的沖合，力量最弱） */
+  for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
+    const A = lines[i], B = lines[j];
+    if (A.moving || B.moving || A.andong || B.andong) continue;
+    if (isChong(A.b, B.b)) add({ group: "hc", type: "靜沖", actor: "L", target: who(B), kind: "line", pos: B.pos, apos: A.pos, score: 12,
+      title: `${who(A)}與${who(B)}`, verdict: "靜爻相沖", note: "兩爻皆靜，相沖不發" });
+    else if (isHe(A.b, B.b)) add({ group: "hc", type: "靜合", actor: "L", target: who(B), kind: "line", pos: B.pos, apos: A.pos, score: 10,
+      title: `${who(A)}與${who(B)}`, verdict: "靜爻相合", note: "兩爻皆靜，相合不發" });
+  }
+  /* 7.5 飛伏（《卜筮正宗》飛伏生剋吉凶歌） */
+  for (const F of ch.fu) {
+    const fei = F.fei;
+    const r = wxRel(fei.wx, F.wx);
+    const m = {
+      sheng: ["飛來生伏", "飛來生伏得長生", 0.66], ke: ["飛來剋伏", "飛來剋伏反傷身", 0.8],
+      besheng: ["伏去生飛", "伏去生飛名洩氣", 0.5], beike: ["伏剋飛神", "伏剋飛神為出暴", 0.6], same: ["飛伏比和", "飛伏比和為有助", 0.46]
+    }[r];
+    add({ group: "sk", type: m[0], actor: "F", target: whoFu(F), kind: "fu", pos: F.pos, score: 80 * m[2],
+      title: `飛神${who(fei)}／${whoFu(F)}`, verdict: m[0], note: m[1] });
+    if (isChong(fei.b, F.b)) add({ group: "hc", type: "飛伏沖", actor: "F", target: whoFu(F), kind: "fu", pos: F.pos, score: 40, title: `飛神${who(fei)}／${whoFu(F)}`, verdict: "飛伏相沖", note: "飛伏地支相沖" });
+    if (isHe(fei.b, F.b)) add({ group: "hc", type: "飛伏合", actor: "F", target: whoFu(F), kind: "fu", pos: F.pos, score: 36, title: `飛神${who(fei)}／${whoFu(F)}`, verdict: "飛伏相合", note: "飛伏地支相合" });
+    /* 提拔、推開（《黃金策》：伏無提拔終徒爾，飛不推開亦枉然；空下伏神易於引拔） */
+    const lift = [];
+    if (["lin", "fu", "xiang", "he"].includes(F.month.key)) lift.push("月建" + F.month.text);
+    if (["lin", "fu", "sheng", "he"].includes(F.day)) lift.push({ lin: "臨日", fu: "日扶", sheng: "日生", he: "日合" }[F.day]);
+    for (const A of lines) if (A.moving || A.andong) { const r2 = wxRel(A.wx, F.wx); if (r2 === "sheng" || A.b === F.b) lift.push(`${A.posName}${A.moving ? "動" : "暗動"}生扶`); }
+    const push = [];
+    if (fei.kong) push.push("飛神旬空");
+    if (fei.month.key === "po") push.push("飛神月破");
+    if (fei.day === "chong" && !fei.moving) push.push(fei.wang ? "日沖飛神（暗動）" : "日沖飛神（日破）");
+    if (fei.month.key === "si") push.push("月剋飛神");
+    if (fei.day === "ke") push.push("日剋飛神");
+    add({ group: "sk", type: "伏神出伏", actor: "F", target: whoFu(F), kind: "fu", pos: F.pos, score: 30 + 8 * lift.length + 8 * push.length,
+      title: `${whoFu(F)}能否出伏`, verdict: lift.length && push.length ? "有提拔、有推開" : lift.length ? "有提拔" : push.length ? "飛神被推開" : "無提拔、無推開",
+      note: `提拔：${lift.length ? lift.join("、") : "無"}；推開：${push.length ? push.join("、") : "無"}。伏無提拔終徒爾，飛不推開亦枉然` });
+  }
+  /* 7.6 世應 */
+  const S = lines[ben.shi - 1], Y = lines[ben.ying - 1];
+  {
+    const r = wxRel(Y.wx, S.wx);
+    const t = isChong(S.b, Y.b) ? ["hc", "世應相沖", 46] : isHe(S.b, Y.b) ? ["hc", "世應相合", 44] :
+      r === "sheng" ? ["sk", "應生世", 40] : r === "ke" ? ["sk", "應剋世", 42] : r === "besheng" ? ["sk", "世生應", 34] : r === "beike" ? ["sk", "世剋應", 36] : ["sk", "世應比和", 30];
+    add({ group: t[0], type: t[1], actor: "L", target: who(S), kind: "line", pos: S.pos, apos: Y.pos, score: t[2], title: `世${who(S)}／應${who(Y)}`, verdict: t[1], note: "世為我、應為彼" });
+  }
+  /* 7.7 卦級：六沖六合、反吟伏吟 */
+  if (ben.pair || (bian && bian.pair)) {
+    const a = ben.pair, b = bian ? bian.pair : null;
+    let v, note, s;
+    if (a && b) { v = `${a}化${b}`; s = 82; note = { "六沖化六合": "散而復聚，先離後合", "六合化六沖": "先合後離，有始無終", "六沖化六沖": "沖而又沖，事多散", "六合化六合": "始終作合" }[v]; }
+    else if (a && bian) { v = `${a}卦`; s = 72; note = a === "六沖" ? "卦逢六沖，主散" : "卦逢六合，主聚"; }
+    else if (a) { v = `${a}卦`; s = 72; note = a === "六沖" ? "卦逢六沖，主散（靜卦）" : "卦逢六合，主聚（靜卦）"; }
+    else { v = `變卦為${b}`; s = 66; note = b === "六沖" ? "化出六沖" : "化出六合"; }
+    add({ group: "hc", type: v, actor: "G", target: "全卦", kind: "gua", score: s, title: `${ben.full}${bian ? "之" + bian.full : ""}`, verdict: v, note });
+  }
+  if (bian) {
+    const OPP = { 7: 6, 6: 7, 2: 5, 5: 2, 4: 0, 0: 4, 1: 3, 3: 1 };     // 乾巽、坎離、艮坤、震兌（後天方位相對）
+    for (const [part, f] of [["內卦", lowerOf], ["外卦", upperOf]]) {
+      const a = f(ben.bits), b = f(bian.bits);
+      if (a === b) continue;
+      if (OPP[a] === b) add({ group: "hc", type: "卦反吟", actor: "G", target: part, kind: "gua", score: 80, title: `${part}${TRI_NAME[a]}化${TRI_NAME[b]}`, verdict: `${part}反吟`, note: "乾巽、坎離、艮坤、震兌互變為卦之反吟，主反覆" });
+      const idx = part === "內卦" ? [0, 1, 2] : [3, 4, 5];
+      const mv = idx.filter(k => lines[k].moving);
+      if (mv.length === 3 && mv.every(k => isChong(lines[k].b, lines[k].change.b)))
+        add({ group: "hc", type: "爻反吟", actor: "G", target: part, kind: "gua", score: 78, title: `${part}${TRI_NAME[a]}化${TRI_NAME[b]}`, verdict: `${part}三爻回頭沖`, note: "內外爻動而反伏，三爻皆回頭沖（《增刪卜易·反伏章》）" });
+      if (mv.length && mv.every(k => lines[k].change.b === lines[k].b) && ((a === 7 && b === 1) || (a === 1 && b === 7)))
+        add({ group: "sk", type: "伏吟", actor: "G", target: part, kind: "gua", score: 74, title: `${part}${TRI_NAME[a]}化${TRI_NAME[b]}`, verdict: `${part}伏吟`, note: "乾震互變，地支不變，主憂鬱呻吟" });
+    }
+  }
+  /* 7.8 三合局（《增刪卜易·六合章》：三爻動；兩動一靜；內卦初三動或外卦四六動、變出之爻成局。暗動作動論。） */
+  for (const g of SANHE) {
+    const slots = g.m.map(b => ({
+      b,
+      mv: lines.filter(L => (L.moving || L.andong) && L.b === b),
+      st: lines.filter(L => !L.moving && !L.andong && L.b === b),
+      ch: lines.filter(L => L.moving && L.change.b === b)
+    }));
+    const movingCount = slots.filter(s => s.mv.length).length;
+    const present = slots.filter(s => s.mv.length || s.st.length).length;
+    let status = null, how = "";
+    if (movingCount === 3) { status = "成局"; how = "三爻皆動"; }
+    else if (movingCount === 2 && present === 3) { status = "成局"; how = "兩爻動、一爻靜"; }
+    else if (movingCount === 2) {
+      const missing = slots.find(s => !s.mv.length && !s.st.length);
+      const byChange = missing && missing.ch.some(L => {
+        const tri = L.pos < 3 ? [0, 2] : [3, 5];
+        return tri.includes(L.pos) && slots.every(s => s === missing || s.mv.some(x => x.moving && tri.includes(x.pos)));
+      });
+      if (byChange) { status = "成局"; how = "同一卦內兩爻動，變出之爻補足"; }
+      else { status = "待用"; how = "兩爻動，缺一待補（虛一待用）"; }
+    } else if (movingCount >= 1 && present === 3) { status = "未成"; how = "三支俱在而只一爻動"; }
+    if (!status) continue;
+    const members = slots.map(s => {
+      const L = s.mv[0] || s.st[0] || s.ch[0];
+      if (!L) return `${ZHI[s.b]}（缺）`;
+      const src = s.mv[0] ? (s.mv[0].moving ? "動" : "暗動") : s.st[0] ? "靜" : "變";
+      return `${ZHI[s.b]}（${L.posName}${src}）`;
+    }).join("、");
+    const flaw = status !== "未成" && slots.some(s => [...s.mv, ...s.st].some(L => L.kong || L.month.key === "po")) ? "；局中有爻空破，待填實之日成之" : "";
+    add({ group: "hc", type: "三合", actor: "G", target: `${g.m.map(b => ZHI[b]).join("")}${WX[g.wx]}局`, kind: "gua",
+      score: status === "成局" ? 84 : status === "待用" ? 46 : 20,
+      title: `${g.m.map(b => ZHI[b]).join("")}合${WX[g.wx]}局`, verdict: status, note: `${how}：${members}${flaw}` });
+  }
+  /* 7.9 旬空（《增刪卜易·旬空章》：旺不為空、動不為空、有日建動爻生扶不為空；月破亦空；春土夏金秋木冬火為真空） */
+  const ZHENKONG = { 2: 2, 5: 2, 1: 3, 4: 3, 7: 0, 10: 0 };   // 寅卯月土、巳午月金…（以月令剋爻判「死」）
+  const kongItem = (T, label, kind, moving, base) => {
+    if (!T.kong) return;
+    let verdict, s;
+    const help = T.day === "sheng" || T.day === "fu" || lines.some(A => (A.moving || A.andong) && A !== T && (wxRel(A.wx, T.wx) === "sheng" || A.b === T.b));
+    if (moving) { verdict = "動不為空"; s = 40; }
+    else if (T.day === "chong") { verdict = "沖空則實"; s = 52; }
+    else if (T.month.key === "po") { verdict = "空又逢破"; s = 86; }
+    else if (T.month.key === "si") { verdict = "真空"; s = 84; }
+    else if (T.month.wang) { verdict = "旺而逢空，出旬可用"; s = 56; }
+    else if (help) { verdict = "有生扶，不為真空"; s = 60; }
+    else { verdict = "旬空"; s = 72; }
+    add({ group: "kong", type: "旬空", actor: "K", target: label, kind, pos: T.pos, score: base * s / 100, title: `${label}落旬空（${mom.xunkong.map(b => ZHI[b]).join("")}）`, verdict, note: "旬內為空，出旬或逢沖、逢值則實" });
+  };
+  for (const L of lines) {
+    kongItem(L, who(L), "line", L.moving, 100);
+    if (L.fu) kongItem(L.fu, whoFu(L.fu), "fu", false, 80);
+  }
+  /* 排序：同分時合沖先於生剋 */
+  const GO = { hc: 0, sk: 1, kong: 2 };
+  R.sort((a, b) => b.score - a.score || GO[a.group] - GO[b.group]);
+  R.forEach((r, i) => { r.id = i; });
+  return R;
+}
+
+/* ---------------- 8. 摘要（給表格標籤用） ---------------- */
+function summarize(ch) {
+  return ch.lines.map(L => {
+    const tags = [];
+    if (L.month.key === "lin") tags.push({ t: "臨月建", k: "good" });
+    if (L.month.key === "po") tags.push({ t: L.day === "lin" ? "月破（臨日不破）" : "月破", k: "bad" });
+    if (L.month.key === "he") tags.push({ t: "月合", k: "good" });
+    if (L.day === "lin") tags.push({ t: "臨日", k: "good" });
+    if (L.day === "chong") {
+      if (!L.moving) tags.push(L.kong ? { t: "沖空則實", k: "note" } : L.wang ? { t: "暗動", k: "warn" } : { t: "日破", k: "bad" });
+      else tags.push(L.dayChong === "san" ? { t: "日沖（恐散）", k: "bad" } : { t: "日沖（不散）", k: "note" });
+      tags.push({ t: "日沖", k: "chong" });
+    }
+    if (L.day === "he") tags.push(L.moving ? { t: "合絆", k: "warn" } : { t: "合起", k: "good" });
+    if (L.kong) tags.push({ t: L.moving ? "旬空（動不為空）" : "旬空", k: "kong" });
+    if (L.dayStage) tags.push({ t: { 長生: "長生於日", 帝旺: "帝旺於日", 墓: "入日墓", 絕: "絕於日" }[L.dayStage], k: "note" });
+    const hua = (L.hua || []).map(h => ({ t: h.text, k: ["ke", "chong", "tui", "kong", "po", "jue", "mu"].includes(h.key) ? "bad" : ["sheng", "jin", "he", "zhangsheng", "diwang"].includes(h.key) ? "good" : "note" }));
+    return { tags, hua };
+  });
+}
+
+/* ---------------- 匯出 ---------------- */
+return {
+  GAN, ZHI, WX, ZHI_WX, TRI_NAME, TRI_XIANG, TRI_WX, TRI_XT, XT_TRI, NAJIA, KW_NAMES, KW_PAIRS, KW_OF_BITS, BITS_OF_KW, PALACE_OF,
+  LIUQIN, LIUSHEN, POS_SHORT, YAO_LABEL, SANHE, JIN, TUI,
+  mod, zhiWx, ganWx, gzName, gzOf, wxRel, isChong, isHe, csStage, hexInfo, najiaOf, liuqinOf, yaoName, fullName,
+  isYang, isMoving, castNumbers, castTime, castManual, linesFrom, moment, monthState, dayRel, build, Cal: C
+};
+})();
+
+/* ===== ENGINE END ===== */
+const ZHOUYI = [{"n":"乾","g":"元亨，利貞。","lab":["初九","九二","九三","九四","九五","上九"],"y":["潛龍，勿用。","見龍在田，利見大人。","君子終日乾乾，夕惕若，厲，无咎。","或躍在淵，无咎。","飛龍在天，利見大人。","亢龍有悔。"],"d":"天行健，君子以自強不息。","x":["潛龍勿用，陽在下也。","見龍在田，德施普也。","終日乾乾，反復道也。","或躍在淵，進无咎也。","飛龍在天，大人造也。","亢龍有悔，盈不可久也。"],"yy":"見群龍无首，吉。","yx":"用九，天德不可為首也。"},{"n":"坤","g":"元亨，利牝馬之貞。君子有攸往，先迷後得主，利西南得朋，東北喪朋。安貞，吉。","lab":["初六","六二","六三","六四","六五","上六"],"y":["履霜，堅冰至。","直，方，大，不習无不利。","含章可貞。或從王事，无成有終。","括囊；无咎，无譽。","黃裳，元吉。","龍戰于野，其血玄黃。"],"d":"地勢坤，君子以厚德載物。","x":["履霜堅冰，陰始凝也。馴致其道，至堅冰也。","六二之動，直以方也。不習无不利，地道光也。","含章可貞，以時發也。或從王事，知光大也。","括囊无咎，慎不害也。","黃裳元吉，文在中也。","龍戰于野，其道窮也。"],"yy":"利永貞。","yx":"用六永貞，以大終也。"},{"n":"屯","g":"元亨，利貞，勿用有攸往，利建侯。","lab":["初九","六二","六三","六四","九五","上六"],"y":["磐桓；利居貞，利建侯。","屯如邅如，乘馬班如。匪寇婚媾，女子貞不字，十年乃字。","即鹿无虞，惟入于林中，君子幾不如舍，往吝。","乘馬班如，求婚媾，往吉，无不利。","屯其膏，小貞吉，大貞凶。","乘馬班如，泣血漣如。"],"d":"雲，雷，屯；君子以經綸。","x":["雖磐桓，志行正也。以貴下賤，大得民也。","六二之難，乘剛也。十年乃字，反常也。","即鹿无虞，以從禽也。君子舍之，往吝窮也。","求而往，明也。","屯其膏，施未光也。","泣血漣如，何可長也。"]},{"n":"蒙","g":"亨。匪我求童蒙，童蒙求我。初筮告，再三瀆，瀆則不告。利貞。","lab":["初六","九二","六三","六四","六五","上九"],"y":["發蒙，利用刑人，用說桎梏，以往吝。","包蒙吉；納婦吉；子克家。","勿用取女；見金夫，不有躬，无攸利。","困蒙，吝。","童蒙，吉。","擊蒙；不利為寇，利禦寇。"],"d":"山下出泉，蒙；君子以果行育德。","x":["利用刑人，以正法也。","子克家，剛柔〓也。","勿用取女，行不順也。","困蒙之吝，獨遠實也。","童蒙之吉，順以巽也。","利用禦寇，上下順也。"]},{"n":"需","g":"有孚，光亨，貞吉。利涉大川。","lab":["初九","九二","九三","六四","九五","上六"],"y":["需于郊。利用恆，无咎。","需于沙。小有言，終吉。","需于泥，致寇至。","需于血，出自穴。","需于酒食，貞吉。","入于穴，有不速之客三人來，敬之終吉。"],"d":"雲上於天，需；君子以飲食宴樂。","x":["需于郊，不犯難行也。利用恆，无咎，未失常也。","需于沙，衍在中也。雖小有言，以吉終也。","需于泥，災在外也。自我致寇，敬慎不敗也。","需于血，順以聽也。","酒食，貞吉，以中正也。","不速之客來，敬之終吉。雖不當位，未大失也。"]},{"n":"訟","g":"有孚，窒。惕中吉。終凶。利見大人，不利涉大川。","lab":["初六","九二","六三","九四","九五","上九"],"y":["不永所事，小有言，終吉。","不克訟，歸而逋，其邑人三百戶，无眚。","食舊德，貞厲，終吉，或從王事，无成。","不克訟，復即命渝，安貞吉。","訟元吉。","或錫之鞶帶，終朝三褫之。"],"d":"天與水違行，訟；君子以作事謀始。","x":["不永所事，訟不可長也。雖小有言，其辯明也。","不克訟，歸逋竄也。自下訟上，患至掇也。","食舊德，從上吉也。","復即命渝，安貞，不失也。","訟，元吉，以中正也。","以訟受服，亦不足敬也。"]},{"n":"師","g":"貞，丈人，吉无咎。","lab":["初六","九二","六三","六四","六五","上六"],"y":["師出以律，否臧凶。","在師中吉，无咎，王三錫命。","師或輿尸，凶。","師左次，无咎。","田有禽，利執言，无咎。長子帥師，弟子輿尸，貞凶。","大君有命，開國承家，小人勿用。"],"d":"地中有水，師；君子以容民畜眾。","x":["師出以律；失律，凶也。","在師中吉，承天寵也。王三錫命，懷萬邦也。","師或輿尸，大无功也。","左次无咎，未失常也。","長子帥師，以中行也。弟子輿尸，使不當也。","大君有命，以正功也。小人勿用，必亂邦也。"]},{"n":"比","g":"吉。原筮元永貞，无咎。不寧方來，後夫凶。","lab":["初六","六二","六三","六四","九五","上六"],"y":["有孚，比之，无咎。有孚盈缶，終來有它吉。","比之自內，貞吉。","比之匪人。","外比之，貞吉。","顯比，王用三驅，失前禽。邑人不誡，吉。","比之无首，凶。"],"d":"地上有水，比；先王以建萬國，親諸侯。","x":["比之初六，有它吉也。","比之自內，不自失也。","比之匪人，不亦傷乎！","外比於賢，以從上也。","顯比之吉，位正中也。舍逆取順，失前禽也。邑人不誡，上使中也。","比之无首，无所終也。"]},{"n":"小畜","g":"亨。密雲不雨，自我西郊。","lab":["初九","九二","九三","六四","九五","上九"],"y":["復自道，何其咎，吉。","牽復，吉。","輿說輻，夫妻反目。","有孚，血去惕出，无咎。","有孚攣如，富以其鄰。","既雨既處，尚德載，婦貞厲。月幾望，君子征凶。"],"d":"風行天上，小畜；君子以懿文德。","x":["復自道，其義吉也。","牽復在中，亦不自失也。","夫妻反目，不能正室也。","有孚。惕出。上合志也。","有孚攣如，不獨富也。","既雨既處，德積載也。君子征凶，有所疑也。"]},{"n":"履","g":"履虎尾，不咥人，亨。","lab":["初九","九二","六三","九四","九五","上九"],"y":["素履，往无咎。","履道坦坦，幽人貞吉。","眇能視，跛能履，履虎尾，咥人，凶。武人為于大君。","履虎尾，愬愬，終吉。","夬履，貞厲。","視履考祥，其旋元吉。"],"d":"上天下澤，履；君子以辯上下，定民志。","x":["素履之往，獨行願也。","幽人貞吉，中不自亂也。","眇能視，不足以有明也。跛能履，不足以與行也。咥人之凶，位不當也。武人為于大君，志剛也。","愬愬終吉，志行也。","夬履貞厲，位正當也。","元吉在上，大有慶也。"]},{"n":"泰","g":"小往大來，吉亨。","lab":["初九","九二","九三","六四","六五","上六"],"y":["拔茅茹，以其彙，征吉。","包荒，用馮河，不遐遺，朋亡，得尚于中行。","无平不陂，无往不復，艱貞无咎。勿恤其孚，于食有福。","翩翩，不富，以其鄰，不戒以孚。","帝乙歸妹，以祉元吉。","城復于隍，勿用師。自邑告命，貞吝。"],"d":"天地交泰，后以財成天地之道，輔相天地之宜，以左右民。","x":["拔茅征吉，志在外也。","包荒，得尚于中行，以光大也。","无往不復，天地際也。","翩翩不富，皆失實也。不戒以孚，中心願也。","以祉，元吉。中以行願也。","城復于隍，其命亂也。"]},{"n":"否","g":"否之匪人，不利君子貞，大往小來。","lab":["初六","六二","六三","九四","九五","上九"],"y":["拔茅茹，以其彙，貞吉亨。","包承。小人吉，大人否，亨。","包羞。","有命，无咎，疇離祉。","休否，大人吉。其亡其亡，繫于苞桑。","傾否，先否後喜。"],"d":"天地不交，否；君子以儉德辟難，不可榮以祿。","x":["拔茅貞吉，志在君也。","大人否，亨。不亂群也。","包羞，位不當也。","有命无咎，志行也。","大人之吉，位正當也。","否終則傾，何可長也。"]},{"n":"同人","g":"同人于野，亨。利涉大川，利君子貞。","lab":["初九","六二","九三","九四","九五","上九"],"y":["同人于門，无咎。","同人于宗，吝。","伏戎于莽，升其高陵，三歲不興。","乘其墉，弗克攻，吉。","同人，先號咷而後笑。大師克相遇。","同人于郊，无悔。"],"d":"天與火，同人；君子以類族辨物。","x":["出門同人，又誰咎也。","同人于宗，吝道也。","伏戎于莽，敵剛也。三歲不興，安行也。","乘其墉，義弗克也，其吉，則困而反則也。","同人之先，以中直也。大師相遇，言相克也。","同人于郊，志未得也。"]},{"n":"大有","g":"元亨。","lab":["初九","九二","九三","九四","六五","上九"],"y":["无交害，匪咎，艱則无咎。","大車以載，有攸往，无咎。","公用亨于天子，小人弗克。","匪其彭，无咎。","厥孚交如，威如；吉。","自天祐之，吉无不利。"],"d":"火在天上，大有；君子以遏惡揚善，順天休命。","x":["大有初九，无交害也。","大車以載，積中不敗也。","公用亨于天子，小人害也。","匪其彭，无咎；明辨晳也。","厥孚交如，信以發志也。威如之吉，易而无備也。","大有上吉，自天祐也。"]},{"n":"謙","g":"亨，君子有終。","lab":["初六","六二","九三","六四","六五","上六"],"y":["謙謙君子，用涉大川，吉。","鳴謙，貞吉。","勞謙，君子有終，吉。","无不利，撝謙。","不富，以其鄰，利用侵伐，无不利。","鳴謙，利用行師，征邑國。"],"d":"地中有山，謙；君子以裒多益寡，稱物平施。","x":["謙謙君子，卑以自牧也。","鳴謙貞吉，中心得也。","勞謙君子，萬民服也。","无不利撝謙；不違則也。","利用侵伐，征不服也。","鳴謙，志未得也。可用行師，征邑國也。"]},{"n":"豫","g":"利建侯，行師。","lab":["初六","六二","六三","九四","六五","上六"],"y":["鳴豫，凶。","介于石，不終日，貞吉。","盱豫，悔。遲有悔。","由豫，大有得。勿疑。朋盍簪。","貞疾，恆不死。","冥豫，成有渝，无咎。"],"d":"雷出地奮，豫。先王以作樂崇德，殷薦之上帝，以配祖考。","x":["初六鳴豫，志窮凶也。","不終日，貞吉；以中正也。","盱豫有悔，位不當也。","由豫，大有得；志大行也。","六五貞疾，乘剛也。恆不死，中未亡也。","冥豫在上，何可長也。"]},{"n":"隨","g":"元亨利貞，无咎。","lab":["初九","六二","六三","九四","九五","上六"],"y":["官有渝，貞吉。出門交有功。","係小子，失丈夫。","係丈夫，失小子。隨有求得，利居貞。","隨有獲，貞凶。有孚在道，以明，何咎。","孚于嘉，吉。","拘係之，乃從維之。王用亨于西山。"],"d":"澤中有雷，隨；君子以嚮晦入宴息。","x":["官有渝，從正吉也。出門交有功，不失也。","係小子，弗兼與也。","係丈夫，志舍下也。","隨有獲，其義凶也。有孚在道，明功也。","孚于嘉，吉；位正中也。","拘係之，上窮也。"]},{"n":"蠱","g":"元亨，利涉大川。先甲三日，後甲三日。","lab":["初六","九二","九三","六四","六五","上九"],"y":["幹父之蠱，有子，考无咎，厲終吉。","幹母之蠱，不可貞。","幹父之蠱，小有悔，无大咎。","裕父之蠱，往見吝。","幹父之蠱，用譽。","不事王侯，高尚其事。"],"d":"山下有風，蠱；君子以振民育德。","x":["幹父之蠱，意承考也。","幹母之蠱，得中道也。","幹父之蠱，終无咎也。","裕父之蠱，往未得也。","幹父用譽，承以德也。","不事王侯，志可則也。"]},{"n":"臨","g":"元，亨，利，貞。至于八月有凶。","lab":["初九","九二","六三","六四","六五","上六"],"y":["咸臨，貞吉。","咸臨，吉无不利。","甘臨，无攸利。既憂之，无咎。","至臨，无咎。","知臨，大君之宜，吉。","敦臨，吉无咎。"],"d":"澤上有地，臨；君子以教思无窮，容保民无疆。","x":["咸臨貞吉，志行正也。","咸臨，吉无不利；未順命也。","甘臨，位不當也。既憂之，咎不長也。","至臨无咎，位當也。","大君之宜，行中之謂也。","敦臨之吉，志在內也。"]},{"n":"觀","g":"盥而不薦，有孚顒若。","lab":["初六","六二","六三","六四","九五","上九"],"y":["童觀，小人无咎，君子吝。","闚觀，利女貞。","觀我生，進退。","觀國之光，利用賓于王。","觀我生，君子无咎。","觀其生，君子无咎。"],"d":"風行地上，觀；先王以省方，觀民設教。","x":["初六童觀，小人道也。","闚觀女貞，亦可醜也。","觀我生，進退；未失道也。","觀國之光，尚賓也。","觀我生，觀民也。","觀其生，志未平也。"]},{"n":"噬嗑","g":"亨。利用獄。","lab":["初九","六二","六三","九四","六五","上九"],"y":["屨校滅趾，无咎。","噬膚滅鼻，无咎。","噬腊肉，遇毒；小吝，无咎。","噬乾胏，得金矢，利艱貞，吉。","噬乾肉，得黃金，貞厲，无咎。","何校滅耳，凶。"],"d":"雷電噬嗑；先王以明罰敕法。","x":["屨校滅趾，不行也。","噬膚滅鼻，乘剛也。","遇毒，位不當也。","利艱貞吉，未光也。","貞厲无咎，得當也。","何校滅耳，聰不明也。"]},{"n":"賁","g":"亨。小利有攸往。","lab":["初九","六二","九三","六四","六五","上九"],"y":["賁其趾，舍車而徒。","賁其須。","賁如濡如，永貞吉。","賁如皤如，白馬翰如，匪寇婚媾。","賁于丘園，束帛戔戔，吝，終吉。","白賁，无咎。"],"d":"山下有火，賁；君子以明庶政，无敢折獄。","x":["舍車而徒，義弗乘也。","賁其須，與上興也。","永貞之吉，終莫之陵也。","六四，當位疑也。匪寇婚媾，終无尤也。","六五之吉，有喜也。","白賁无咎，上得志也。"]},{"n":"剝","g":"不利有攸往。","lab":["初六","六二","六三","六四","六五","上九"],"y":["剝牀以足，蔑貞凶。","剝牀以辨，蔑貞凶。","剝之，无咎。","剝牀以膚，凶。","貫魚，以宮人寵，无不利。","碩果不食，君子得輿，小人剝廬。"],"d":"山附於地，剝；上以厚下，安宅。","x":["剝牀以足，以滅下也。","剝牀以辨，未有與也。","剝之无咎，失上下也。","剝牀以膚，切近災也。","以宮人寵，終无尤也。","君子得輿，民所載也。小人剝廬，終不可用也。"]},{"n":"復","g":"亨。出入无疾，朋來无咎。反復其道，七日來復，利有攸往。","lab":["初九","六二","六三","六四","六五","上六"],"y":["不遠復，无祗悔，元吉。","休復，吉。","頻復，厲无咎。","中行獨復。","敦復，无悔。","迷復，凶，有災眚。用行師，終有大敗，以其國君，凶；至于十年，不克征。"],"d":"雷在地中，復；先王以至日閉關，商旅不行，后不省方。","x":["不遠之復，以脩身也。","休復之吉，以下仁也。","頻復之厲，義无咎也。","中行獨復，以從道也。","敦復无悔，中以自考也。","迷復之凶，反君道也。"]},{"n":"无妄","g":"元亨，利貞。其匪正有眚，不利有攸往。","lab":["初九","六二","六三","九四","九五","上九"],"y":["无妄，往吉。","不耕穫，不菑畬，則利有攸往。","无妄之災，或繫之牛，行人之得，邑人之災。","可貞，无咎。","无妄之疾，勿藥有喜。","无妄，行有眚，无攸利。"],"d":"天下雷行，物與无妄；先王以茂對時，育萬物。","x":["无妄之往，得志也。","不耕穫，未富也。","行人得牛，邑人災也。","可貞无咎，固有之也。","无妄之藥，不可試也。","无妄之行，窮之災也。"]},{"n":"大畜","g":"利貞，不家食吉，利涉大川。","lab":["初九","九二","九三","六四","六五","上九"],"y":["有厲利已。","輿說輹。","良馬逐，利艱貞。曰閑輿衛，利有攸往。","童牛之牿，元吉。","豶豕之牙，吉。","何天之衢，亨。"],"d":"天在山中，大畜；君子以多識前言往行，以畜其德。","x":["有厲利已，不犯災也。","輿說輹，中无尤也。","利有攸往，上合志也。","六四元吉，有喜也。","六五之吉，有慶也。","何天之衢，道大行也。"]},{"n":"頤","g":"貞吉。觀頤，自求口實。","lab":["初九","六二","六三","六四","六五","上九"],"y":["舍爾靈龜，觀我朵頤，凶。","顛頤，拂經，于丘頤，征凶。","拂頤，貞凶，十年勿用，无攸利。","顛頤，吉，虎視眈眈，其欲逐逐，无咎。","拂經，居貞吉，不可涉大川。","由頤，厲吉，利涉大川。"],"d":"山下有雷，頤；君子以慎言語，節飲食。","x":["觀我朵頤，亦不足貴也。","六二征凶，行失類也。","十年勿用，道大悖也。","顛頤之吉，上施光也。","居貞之吉，順以從上也。","由頤厲吉，大有慶也。"]},{"n":"大過","g":"棟橈，利有攸往，亨。","lab":["初六","九二","九三","九四","九五","上六"],"y":["藉用白茅，无咎。","枯楊生稊，老夫得其女妻，无不利。","棟橈，凶。","棟隆，吉；有它吝。","枯楊生華，老婦得其士夫，无咎无譽。","過涉滅頂，凶，无咎。"],"d":"澤滅木，大過；君子以獨立不懼，遯世无悶。","x":["藉用白茅，柔在下也。","老夫女妻，過以相與也。","棟橈之凶，不可以有輔也。","棟隆之吉，不橈乎下也。","枯楊生華，何可久也。老婦士夫，亦可醜也。","過涉之凶，不可咎也。"]},{"n":"坎","g":"習坎，有孚，維心亨，行有尚。","lab":["初六","九二","六三","六四","九五","上六"],"y":["習坎，入于坎窞，凶。","坎有險，求小得。","來之坎坎，險且枕，入于坎窞，勿用。","樽酒簋貳，用缶，納約自牖，終无咎。","坎不盈，祗既平，无咎。","係用徽纆，寘于叢棘，三歲不得，凶。"],"d":"水洊至，習坎；君子以常德行，習教事。","x":["習坎入坎，失道凶也。","求小得，未出中也。","來之坎坎，終无功也。","樽酒簋貳，剛柔際也。","坎不盈，中未大也。","上六失道，凶三歲也。"]},{"n":"離","g":"利貞，亨。畜牝牛，吉。","lab":["初九","六二","九三","九四","六五","上九"],"y":["履錯然，敬之无咎。","黃離，元吉。","日昃之離，不鼓缶而歌，則大耋之嗟，凶。","突如其來如，焚如，死如，棄如。","出涕沱若，戚嗟若，吉。","王用出征，有嘉折首，獲匪其醜，无咎。"],"d":"明兩作離，大人以繼明照于四方。","x":["履錯之敬，以辟咎也。","黃離元吉，得中道也。","日昃之離，何可久也。","突如其來如，无所容也。","六五之吉，離王公也。","王用出征，以正邦也。"]},{"n":"咸","g":"咸，亨，利貞，取女吉。","lab":["初六","六二","九三","九四","九五","上六"],"y":["咸其拇。","咸其腓，凶，居吉。","咸其股，執其隨，往吝。","貞吉，悔亡，憧憧往來，朋從爾思。","咸其脢，无悔。","咸其輔頰舌。"],"d":"山上有澤，咸，君子以虛受人。","x":["咸其拇，志在外也。","雖凶，居吉，順不害也。","咸其股，亦不處也。志在隨人，所執下也。","貞吉悔亡，未感害也。憧憧往來，未光大也。","咸其脢，志末也。","咸其輔，頰，舌，滕口說也。"]},{"n":"恆","g":"亨，无咎，利貞，利有攸往。","lab":["初六","九二","九三","九四","六五","上六"],"y":["浚恆，貞凶，无攸利。","悔亡。","不恆其德，或承之羞，貞吝。","田无禽。","恆其德，貞，婦人吉，夫子凶。","振恆，凶。"],"d":"雷風，恆；君子以立不易方。","x":["浚恆之凶，始求深也。","九二悔亡，能久中也。","不恆其德，无所容也。","久非其位，安得禽也。","婦人貞吉，從一而終也。夫子制義，從婦凶也。","振恆在上，大无功也。"]},{"n":"遯","g":"亨，小利貞。","lab":["初六","六二","九三","九四","九五","上九"],"y":["遯尾，厲，勿用有攸往。","執之用黃牛之革，莫之勝說。","係遯，有疾厲，畜臣妾吉。","好遯，君子吉，小人否。","嘉遯，貞吉。","肥遯，无不利。"],"d":"天下有山，遯；君子以遠小人，不惡而嚴。","x":["遯尾之厲，不往何災也。","執用黃牛，固志也。","係遯之厲，有疾憊也。畜臣妾吉，不可大事也。","君子好遯，小人否也。","嘉遯貞吉，以正志也。","肥遯，无不利；无所疑也。"]},{"n":"大壯","g":"利貞。","lab":["初九","九二","九三","九四","六五","上六"],"y":["壯于趾，征凶，有孚。","貞吉。","小人用壯，君子用罔，貞厲。羝羊觸藩，羸其角。","貞吉悔亡，藩決不羸，壯于大輿之輹。","喪羊于易，无悔。","羝羊觸藩，不能退，不能遂，无攸利，艱則吉。"],"d":"雷在天上，大壯；君子以非禮弗履。","x":["壯于趾，其孚窮也。","九二貞吉，以中也。","小人用壯，君子罔也。","藩決不羸，尚往也。","喪羊于易，位不當也。","不能退，不能遂，不詳也。艱則吉，咎不長也。"]},{"n":"晉","g":"康侯用錫馬蕃庶，晝日三〓。","lab":["初六","六二","六三","九四","六五","上九"],"y":["晉如，摧如，貞吉。罔孚，裕无咎。","晉如，愁如，貞吉。受茲介福，于其王母。","眾允，悔亡。","晉如鼫鼠，貞厲。","悔亡，失得勿恤，往吉，无不利。","晉其角，維用伐邑，厲吉无咎，貞吝。"],"d":"明出地上，晉；君子以自昭明德。","x":["晉如，摧如；獨行正也。裕无咎；未受命也。","受茲介福，以中正也。","眾允之志，上行也。","鼫鼠貞厲，位不當也。","失得勿恤，往有慶也。","維用伐邑，道未光也。"]},{"n":"明夷","g":"利艱貞。","lab":["初九","六二","九三","六四","六五","上六"],"y":["明夷于飛，垂其翼。君子于行，三日不食，有攸往，主人有言。","明夷，夷于左股，用拯馬壯，吉。","明夷于南狩，得其大首，不可疾貞。","入于左腹，獲明夷之心，于出門庭。","箕子之明夷，利貞。","不明晦，初登于天，後入于地。"],"d":"明入地中，明夷；君子以蒞眾，用晦而明。","x":["君子于行，義不食也。","六二之吉，順以則也。","南狩之志，乃大得也。","入于左腹，獲心意也。","箕子之貞，明不可息也。","初登于天，照四國也。後入于地，失則也。"]},{"n":"家人","g":"利女貞。","lab":["初九","六二","九三","六四","九五","上九"],"y":["閑有家，悔亡。","无攸遂，在中饋，貞吉。","家人嗃嗃，悔厲吉；婦子嘻嘻，終吝。","富家，大吉。","王假有家，勿恤，吉。","有孚威如，終吉。"],"d":"風自火出，家人；君子以言有物，而行有恆。","x":["閑有家，志未變也。","六二之吉，順以巽也。","家人嗃嗃，未失也；婦子嘻嘻，失家節也。","富家大吉，順在位也。","王假有家，交相愛也。","威如之吉，反身之謂也。"]},{"n":"睽","g":"小事吉。","lab":["初九","九二","六三","九四","六五","上九"],"y":["悔亡，喪馬勿逐，自復；見惡人无咎。","遇主于巷，无咎。","見輿曳，其牛掣，其人天且劓，无初有終。","睽孤，遇元夫，交孚，厲无咎。","悔亡，厥宗噬膚，往何咎。","睽孤，見豕負塗，載鬼一車，先張之弧，後說之弧，匪寇婚媾，往遇雨則吉。"],"d":"上火下澤，睽；君子以同而異。","x":["見惡人，以辟咎也。","遇主于巷，未失道也。","見輿曳，位不當也。无初有終，遇剛也。","交孚无咎，志行也。","厥宗噬膚，往有慶也。","遇雨之吉，群疑亡也。"]},{"n":"蹇","g":"利西南，不利東北；利見大人，貞吉。","lab":["初六","六二","九三","六四","九五","上六"],"y":["往蹇，來譽。","王臣蹇蹇，匪躬之故。","往蹇來反。","往蹇來連。","大蹇朋來。","往蹇來碩，吉；利見大人。"],"d":"山上有水，蹇；君子以反身修德。","x":["往蹇來譽，宜待也。","王臣蹇蹇，終无尤也。","往蹇來反，內喜之也。","往蹇來連，當位實也。","大蹇朋來，以中節也。","往蹇來碩，志在內也。利見大人，以從貴也。"]},{"n":"解","g":"利西南，无所往，其來復吉。有攸往，夙吉。","lab":["初六","九二","六三","九四","六五","上六"],"y":["无咎。","田獲三狐，得黃矢，貞吉。","負且乘，致寇至，貞吝。","解而拇，朋至斯孚。","君子維有解，吉；有孚于小人。","公用射隼于高墉之上，獲之，无不利。"],"d":"雷雨作，解；君子以赦過宥罪。","x":["剛柔之際，義无咎也。","九二貞吉，得中道也。","負且乘，亦可醜也。自我致戎，又誰咎也？","解而拇，未當位也。","君子有解，小人退也。","公用射隼，以解悖也。"]},{"n":"損","g":"有孚，元吉，无咎，可貞，利有攸往。曷之用，二簋可用享。","lab":["初九","九二","六三","六四","六五","上九"],"y":["已事遄往，无咎，酌損之。","利貞，征凶，弗損，益之。","三人行，則損一人；一人行，則得其友。","損其疾，使遄有喜，无咎。","或益之，十朋之龜弗克違，元吉。","弗損益之，无咎，貞吉，利有攸往，得臣无家。"],"d":"山下有澤，損；君子以懲忿窒欲。","x":["已事遄往，尚合志也。","九二利貞，中以為志也。","一人行，三則疑也。","損其疾，亦可喜也。","六五元吉，自上祐也。","弗損益之，大得志也。"]},{"n":"益","g":"利有攸往，利涉大川。","lab":["初九","六二","六三","六四","九五","上九"],"y":["利用為大作，元吉，无咎。","或益之，十朋之龜弗克違，永貞吉。王用享于帝，吉。","益之用凶事，无咎。有孚中行，告公用圭。","中行，告公從。利用為依遷國。","有孚惠心，勿問元吉。有孚惠我德。","莫益之，或擊之，立心勿恆，凶。"],"d":"風雷，益；君子以見善則遷，有過則改。","x":["元吉无咎，下不厚事也。","或益之，自外來也。","益用凶事，固有之也。","告公從，以益志也。","有孚惠心，勿問之矣。惠我德，大得志也。","莫益之，偏辭也。或擊之，自外來也。"]},{"n":"夬","g":"揚于王庭，孚號，有厲，告自邑，不利即戎，利有攸往。","lab":["初九","九二","九三","九四","九五","上六"],"y":["壯于前趾，往不勝為咎。","惕號，莫夜有戎，勿恤。","壯于頄，有凶。君子夬夬，獨行，遇雨，若濡，有慍，无咎。","臀无膚，其行次且。牽羊悔亡，聞言不信。","莧陸夬夬，中行无咎。","无號，終有凶。"],"d":"澤上於天，夬；君子以施祿及下，居德則忌。","x":["不勝而往，咎也。","有戎勿恤，得中道也。","君子夬夬，終无咎也。","其行次且，位不當也。聞言不信，聰不明也。","中行无咎，中未光也。","无號之凶，終不可長也。"]},{"n":"姤","g":"女壯，勿用取女。","lab":["初六","九二","九三","九四","九五","上九"],"y":["繫于金柅，貞吉，有攸往，見凶，羸豕孚蹢躅。","包有魚，无咎，不利賓。","臀无膚，其行次且，厲，无大咎。","包无魚，起凶。","以杞包瓜，含章，有隕自天。","姤其角，吝，无咎。"],"d":"天下有風，姤；后以施命誥四方。","x":["繫于金柅，柔道牽也。","包有魚，義不及賓也。","其行次且，行未牽也。","无魚之凶，遠民也。","九五含章，中正也。有隕自天，志不舍命也。","姤其角，上窮吝也。"]},{"n":"萃","g":"亨。王假有廟，利見大人，亨，利貞。用大牲吉，利有攸往。","lab":["初六","六二","六三","九四","九五","上六"],"y":["有孚不終，乃亂乃萃，若號一握為笑，勿恤，往无咎。","引吉，无咎，孚乃利用禴。","萃如，嗟如，无攸利，往无咎，小吝。","大吉，无咎。","萃有位，无咎。匪孚，元永貞，悔亡。","齎咨涕洟，无咎。"],"d":"澤上於地，萃；君子以除戎器，戒不虞。","x":["乃亂乃萃，其志亂也。","引吉无咎，中未變也。","往无咎，上巽也。","大吉无咎，位不當也。","萃有位，志未光也。","齎咨涕洟，未安上也。"]},{"n":"升","g":"元亨，用見大人，勿恤，南征吉。","lab":["初六","九二","九三","六四","六五","上六"],"y":["允升，大吉。","孚乃利用禴，无咎。","升虛邑。","王用亨于岐山，吉无咎。","貞吉，升階。","冥升，利于不息之貞。"],"d":"地中生木，升；君子以順德，積小以高大。","x":["允升大吉，上合志也。","九二之孚，有喜也。","升虛邑，无所疑也。","王用亨于岐山，順事也。","貞吉升階，大得志也。","冥升在上，消不富也。"]},{"n":"困","g":"亨，貞，大人吉，无咎，有言不信。","lab":["初六","九二","六三","九四","九五","上六"],"y":["臀困于株木，入于幽谷，三歲不覿。","困于酒食，朱紱方來，利用亨祀，征凶，无咎。","困于石，據于蒺蔾，入于其宮，不見其妻，凶。","來徐徐，困于金車，吝，有終。","劓刖，困于赤紱，乃徐有說，利用祭祀。","困于葛藟，于臲卼，曰動悔。有悔，征吉。"],"d":"澤无水，困；君子以致命遂志。","x":["入于幽谷，幽不明也。","困于酒食，中有慶也。","據于蒺蔾，乘剛也。入于其宮，不見其妻，不祥也。","來徐徐，志在下也。雖不當位，有與也。","劓刖，志未得也。乃徐有說，以中直也。利用祭祀，受福也。","困于葛藟，未當也。動悔，有悔，吉行也。"]},{"n":"井","g":"改邑不改井，无喪无得，往來井井。汔至，亦未繘井，羸其瓶，凶。","lab":["初六","九二","九三","六四","九五","上六"],"y":["井泥不食，舊井无禽。","井谷射鮒，甕敝漏。","井渫不食，為我心惻，可用汲，王明，並受其福。","井甃，无咎。","井冽，寒泉食。","井收勿幕，有孚元吉。"],"d":"木上有水，井；君子以勞民勸相。","x":["井泥不食，下也。舊井无禽，時舍也。","井谷射鮒，无與也。","井渫不食，行惻也。求王明，受福也。","井甃无咎，脩井也。","寒泉之食，中正也。","元吉在上，大成也。"]},{"n":"革","g":"巳日乃孚，元亨利貞，悔亡。","lab":["初九","六二","九三","九四","九五","上六"],"y":["鞏用黃牛之革。","巳日乃革之，征吉，无咎。","征凶，貞厲，革言三就，有孚。","悔亡，有孚改命，吉。","大人虎變，未占有孚。","君子豹變，小人革面，征凶，居貞吉。"],"d":"澤中有火，革；君子以治歷明時。","x":["鞏用黃牛，不可以有為也。","已日革之，行有嘉也。","革言三就，又何之矣。","改命之吉，信志也。","大人虎變，其文炳也。","君子豹變，其文蔚也。小人革面，順以從君也。"]},{"n":"鼎","g":"元吉，亨。","lab":["初六","九二","九三","九四","六五","上九"],"y":["鼎顛趾，利出否，得妾以其子，无咎。","鼎有實，我仇有疾，不我能即，吉。","鼎耳革，其行塞，雉膏不食，方雨虧悔，終吉。","鼎折足，覆公餗，其形渥，凶。","鼎黃耳，金鉉，利貞。","鼎玉鉉，大吉，无不利。"],"d":"木上有火，鼎；君子以正位凝命。","x":["鼎顛趾，未悖也。利出否，以從貴也。","鼎有實，慎所之也。我仇有疾，終无尤也。","鼎耳革，失其義也。","覆公餗，信如何也。","鼎黃耳，中以為實也。","玉鉉在上，剛柔節也。"]},{"n":"震","g":"亨。震來虩虩，笑言啞啞。震驚百里，不喪匕鬯。","lab":["初九","六二","六三","九四","六五","上六"],"y":["震來虩虩，後笑言啞啞，吉。","震來厲，億喪貝，躋于九陵，勿逐，七日得。","震蘇蘇，震行无眚。","震遂泥。","震往來厲，億无喪，有事。","震索索，視矍矍，征凶。震不于其躬，于其鄰，无咎。婚媾有言。"],"d":"洊雷，震；君子以恐懼脩省。","x":["震來虩虩，恐致福也。笑言啞啞，後有則也。","震來厲，乘剛也。","震蘇蘇，位不當也。","震遂泥，未光也。","震往來厲，危行也。其事在中，大无喪也。","震索索，中未得也。雖凶无咎，畏鄰戒也。"]},{"n":"艮","g":"艮其背，不獲其身，行其庭，不見其人，无咎。","lab":["初六","六二","九三","六四","六五","上九"],"y":["艮其趾，无咎，利永貞。","艮其腓，不拯其隨，其心不快。","艮其限，列其夤，厲薰心。","艮其身，无咎。","艮其輔，言有序，悔亡。","敦艮，吉。"],"d":"兼山，艮；君子以思不出其位。","x":["艮其趾，未失正也。","不拯其隨，未退聽也。","艮其限，危薰心也。","艮其身，止諸躬也。","艮其輔，以中正也。","敦艮之吉，以厚終也。"]},{"n":"漸","g":"女歸吉，利貞。","lab":["初六","六二","九三","六四","九五","上九"],"y":["鴻漸于干，小子厲，有言，无咎。","鴻漸于磐，飲食衎衎，吉。","鴻漸于陸，夫征不復，婦孕不育，凶；利禦寇。","鴻漸于木，或得其桷，无咎。","鴻漸于陵，婦三歲不孕，終莫之勝，吉。","鴻漸于陸，其羽可用為儀，吉。"],"d":"山上有木，漸；君子以居賢德，善俗。","x":["小子之厲，義无咎也。","飲食衎衎，不素飽也。","夫征不復，離群醜也。婦孕不育，失其道也。利用禦寇，順相保也。","或得其桷，順以巽也。","終莫之勝，吉；得所願也。","其羽可用為儀，吉；不可亂也。"]},{"n":"歸妹","g":"征凶，无攸利。","lab":["初九","九二","六三","九四","六五","上六"],"y":["歸妹以娣，跛能履，征吉。","眇能視，利幽人之貞。","歸妹以須，反歸以娣。","歸妹愆期，遲歸有時。","帝乙歸妹，其君之袂，不如其娣之袂良，月幾望，吉。","女承筐无實，士刲羊无血，无攸利。"],"d":"澤上有雷，歸妹；君子以永終知敝。","x":["歸妹以娣，以恆也。跛能履吉，相承也。","利幽人之貞，未變常也。","歸妹以須，未當也。","愆期之志，有待而行也。","帝乙歸妹，不如其娣之袂良也。其位在中，以貴行也。","上六无實，承虛筐也。"]},{"n":"豐","g":"亨，王假之，勿憂，宜日中。","lab":["初九","六二","九三","九四","六五","上六"],"y":["遇其配主，雖旬无咎，往有尚。","豐其蔀，日中見斗，往得疑疾，有孚發若，吉。","豐其沛，日中見沬，折其右肱，无咎。","豐其蔀，日中見斗，遇其夷主，吉。","來章，有慶譽，吉。","豐其屋，蔀其家，闚其戶，闃其无人，三歲不覿，凶。"],"d":"雷電皆至，豐；君子以折獄致刑。","x":["雖旬无咎，過旬災也。","有孚發若，信以發志也。","豐其沛，不可大事也。折其右肱，終不可用也。","豐其蔀，位不當也。日中見斗，幽不明也。遇其夷主，吉；行也。","六五之吉，有慶也。","豐其屋，天際翔也。闚其戶，闃其无人，自藏也。"]},{"n":"旅","g":"小亨，旅貞吉。","lab":["初六","六二","九三","九四","六五","上九"],"y":["旅瑣瑣，斯其所取災。","旅即次，懷其資，得童僕貞。","旅焚其次，喪其童僕，貞厲。","旅于處，得其資斧，我心不快。","射雉一矢亡，終以譽命。","鳥焚其巢，旅人先笑後號咷。喪牛于易，凶。"],"d":"山上有火，旅；君子以明慎用刑，而不留獄。","x":["旅瑣瑣，志窮災也。","得童僕貞，終无尤也。","旅焚其次，亦以傷矣。以旅與下，其義喪也。","旅于處，未得位也。得其資斧，心未快也。","終以譽命，上逮也。","以旅在上，其義焚也。喪牛于易，終莫之聞也。"]},{"n":"巽","g":"小亨，利有攸往，利見大人。","lab":["初六","九二","九三","六四","九五","上九"],"y":["進退，利武人之貞。","巽在牀下，用史巫紛若，吉，无咎。","頻巽，吝。","悔亡，田獲三品。","貞吉悔亡，无不利。无初有終，先庚三日，後庚三日，吉。","巽在牀下，喪其資斧，貞凶。"],"d":"隨風，巽；君子以申命行事。","x":["進退，志疑也。利武人之貞，志治也。","紛若之吉，得中也。","頻巽之吝，志窮也。","田獲三品，有功也。","九五之吉，位正中也。","巽在牀下，上窮也。喪其資斧，正乎凶也。"]},{"n":"兌","g":"亨，利貞。","lab":["初九","九二","六三","九四","九五","上六"],"y":["和兌，吉。","孚兌，吉，悔亡。","來兌，凶。","商兌，未寧，介疾有喜。","孚于剝，有厲。","引兌。"],"d":"麗澤，兌；君子以朋友講習。","x":["和兌之吉，行未疑也。","孚兌之吉，信志也。","來兌之凶，位不當也。","九四之喜，有慶也。","孚于剝，位正當也。","上六引兌，未光也。"]},{"n":"渙","g":"亨。王假有廟，利涉大川，利貞。","lab":["初六","九二","六三","六四","九五","上九"],"y":["用拯馬壯，吉。","渙奔其机，悔亡。","渙其躬，无悔。","渙其群，元吉。渙有丘，匪夷所思。","渙汗其大號，渙王居，无咎。","渙其血，去逖出，无咎。"],"d":"風行水上，渙；先王以享于帝立廟。","x":["初六之吉，順也。","渙奔其机，得願也。","渙其躬，志在外也。","渙其群，元吉；光大也。","王居无咎，正位也。","渙其血，遠害也。"]},{"n":"節","g":"亨。苦節，不可貞。","lab":["初九","九二","六三","六四","九五","上六"],"y":["不出戶庭，无咎。","不出門庭，凶。","不節若，則嗟若，无咎。","安節，亨。","甘節，吉；往有尚。","苦節，貞凶，悔亡。"],"d":"澤上有水，節；君子以制數度，議德行。","x":["不出戶庭，知通塞也。","不出門庭凶，失時極也。","不節之嗟，又誰咎也。","安節之亨，承上道也。","甘節之吉，居位中也。","苦節貞凶，其道窮也。"]},{"n":"中孚","g":"豚魚吉，利涉大川，利貞。","lab":["初九","九二","六三","六四","九五","上九"],"y":["虞吉，有它不燕。","鳴鶴在陰，其子和之，我有好爵，吾與爾靡之。","得敵，或鼓或罷，或泣或歌。","月幾望，馬匹亡，无咎。","有孚攣如，无咎。","翰音登于天，貞凶。"],"d":"澤上有風，中孚；君子以議獄緩死。","x":["初九虞吉，志未變也。","其子和之，中心願也。","或鼓或罷，位不當也。","馬匹亡，絕類上也。","有孚攣如，位正當也。","翰音登于天，何可長也。"]},{"n":"小過","g":"亨，利貞，可小事，不可大事。飛鳥遺之音，不宜上，宜下，大吉。","lab":["初六","六二","九三","九四","六五","上六"],"y":["飛鳥以凶。","過其祖，遇其妣；不及其君，遇其臣；无咎。","弗過防之，從或戕之，凶。","无咎，弗過遇之。往厲必戒，勿用永貞。","密雲不雨，自我西郊，公弋取彼在穴。","弗遇過之，飛鳥離之，凶，是謂災眚。"],"d":"山上有雷，小過；君子以行過乎恭，喪過乎哀，用過乎儉。","x":["飛鳥以凶，不可如何也。","不及其君，臣不可過也。","從或戕之，凶如何也。","弗過遇之，位不當也。往厲必戒，終不可長也。","密雲不雨，已上也。","弗遇過之，已亢也。"]},{"n":"既濟","g":"亨，小利貞，初吉終亂。","lab":["初九","六二","九三","六四","九五","上六"],"y":["曳其輪，濡其尾，无咎。","婦喪其茀，勿逐，七日得。","高宗伐鬼方，三年克之，小人勿用。","繻有衣袽，終日戒。","東鄰殺牛，不如西鄰之禴祭，實受其福。","濡其首，厲。"],"d":"水在火上，既濟；君子以思患而豫防之。","x":["曳其輪，義无咎也。","七日得，以中道也。","三年克之，憊也。","終日戒，有所疑也。","東鄰殺牛，不如西鄰之時也；實受其福，吉大來也。","濡其首厲，何可久也。"]},{"n":"未濟","g":"亨，小狐汔濟，濡其尾，无攸利。","lab":["初六","九二","六三","九四","六五","上九"],"y":["濡其尾，吝。","曳其輪，貞吉。","未濟，征凶，利涉大川。","貞吉，悔亡，震用伐鬼方，三年有賞于大國。","貞吉，无悔，君子之光，有孚，吉。","有孚于飲酒，无咎，濡其首，有孚失是。"],"d":"火在水上，未濟；君子以慎辨物居方。","x":["濡其尾，亦不知極也。","九二貞吉，中以行正也。","未濟征凶，位不當也。","貞吉悔亡，志行也。","君子之光，其暉吉也。","飲酒濡首，亦不知節也。"]}];
+/* ===== 介面 ===== */
+(() => {
+"use strict";
+const Y = Liuyao, C = Y.Cal;
+const { GAN, ZHI, WX } = Y;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad2 = n => String(n).padStart(2, "0");
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 無痕或封鎖 */ } }
+};
+/* 原文裡有兩處是使用者避用的那個字，資料中以〓佔位；顯示時依設定換成□或原字 */
+const AVOID_MARK = "〓";
+const AVOID_CHAR = String.fromCharCode(0x63A5);
+const Y_MIN = 1901, Y_MAX = 2099;
+
+/* ---------- 主題 ---------- */
+const WX_LIGHT = { mu: "#1A973D", huo: "#D2261E", tu: "#8A681B", jin: "#D5820A", shui: "#2B62D5" };
+const WX_DARK = { mu: "#58CF78", huo: "#FF6B5E", tu: "#D4AA5E", jin: "#F2AA3A", shui: "#73A2FF" };
+const THEMES = [
+  { id: "yuebai", name: "月白", bg: "#F3F4F6", card: "#FFFFFF", ink: "#1F2328", accent: "#4A5B8C", bar: "#1F2430", barInk: "#E6EAF2" },
+  { id: "subai", name: "素白", bg: "#F6F6F5", card: "#FFFFFF", ink: "#1C1C1C", accent: "#56606B", bar: "#FFFFFF", barInk: "#1C1C1C" },
+  { id: "qingci", name: "青瓷", bg: "#EDF3F1", card: "#FCFEFD", ink: "#1D2B28", accent: "#3A8578", bar: "#1C302D", barInk: "#DDEFEA" },
+  { id: "wulan", name: "霧藍", bg: "#EDF1F7", card: "#FFFFFF", ink: "#1B2433", accent: "#3567B0", bar: "#162238", barInk: "#DCE6F5" },
+  { id: "bingjing", name: "冰晶", bg: "#F1EFFA", card: "#FFFFFF", ink: "#221F33", accent: "#7563C6", bar: "#231D3B", barInk: "#E9E4FF" },
+  { id: "nuancheng", name: "暖橙", bg: "#FAF3EC", card: "#FFFFFF", ink: "#2A1E16", accent: "#D2703A", bar: "#2A1C14", barInk: "#FBE4D2" },
+  { id: "yanzhi", name: "胭脂", bg: "#F9F0F1", card: "#FFFFFF", ink: "#2B1D20", accent: "#B04559", bar: "#2D191D", barInk: "#F6DCE1" },
+  { id: "xuanzhi", name: "宣紙金", bg: "#F2F1ED", card: "#FFFFFF", ink: "#24211C", accent: "#A98A50", bar: "#1C1A16", barInk: "#EBDDBC" },
+  { id: "moye", name: "墨夜", bg: "#111214", card: "#1A1C20", ink: "#E8EAED", accent: "#8AB4F8", bar: "#0B0C0E", barInk: "#DDE3EC" },
+  { id: "yejin", name: "夜金", bg: "#11100E", card: "#1A1916", ink: "#ECE6DA", accent: "#C9A86A", bar: "#0B0A09", barInk: "#EBDBB4" },
+  { id: "shenqing", name: "深青", bg: "#0E1615", card: "#16211F", ink: "#E2EEEA", accent: "#5CC2AE", bar: "#091010", barInk: "#D4ECE6" },
+  { id: "ziye", name: "紫夜", bg: "#13111C", card: "#1C1928", ink: "#ECE8F7", accent: "#B4A2FF", bar: "#0C0A14", barInk: "#E4DEFF" }
+];
+const THEME_PROPS = ["--bg", "--card", "--ink", "--accent", "--on-accent", "--bar", "--bar-ink", "--mu", "--huo", "--tu", "--jin", "--shui", "--danger", "--good", "--warn", "--shadow", "color-scheme"];
+function rgbOf(h) { const m = /^#?([0-9a-f]{6})$/i.exec(h || ""); if (!m) return [128, 128, 128]; const n = parseInt(m[1], 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function lumOf(h) { const c = rgbOf(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+const contrastOf = (a, b) => { const x = lumOf(a), y = lumOf(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const themeIsDark = t => lumOf(t.card) < 0.3;
+function themeVars(t) {
+  const dark = themeIsDark(t), wx = dark ? WX_DARK : WX_LIGHT;
+  return {
+    "--bg": t.bg, "--card": t.card, "--ink": t.ink, "--accent": t.accent,
+    "--on-accent": contrastOf(t.accent, "#FFFFFF") >= contrastOf(t.accent, "#111111") ? "#FFFFFF" : "#111111",
+    "--bar": t.bar, "--bar-ink": t.barInk,
+    "--mu": wx.mu, "--huo": wx.huo, "--tu": wx.tu, "--jin": wx.jin, "--shui": wx.shui,
+    "--danger": dark ? "#FF7B6E" : "#B42318", "--good": dark ? "#5BC98A" : "#1F7A45", "--warn": dark ? "#F0B45A" : "#A45D00",
+    "--shadow": dark ? "0 1px 2px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.25)" : "0 1px 2px rgba(20,24,32,.05), 0 6px 18px rgba(20,24,32,.05)",
+    "color-scheme": dark ? "dark" : "light"
+  };
+}
+function applyTheme() {
+  const st = document.documentElement.style;
+  THEME_PROPS.forEach(p => st.removeProperty(p));
+  const t = THEMES.find(x => x.id === S.theme.id);
+  const vars = t ? themeVars(t) : null;
+  if (vars) for (const k in vars) st.setProperty(k, vars[k]);
+  LS.set("liuyao.theme.v1", S.theme);
+  LS.set("liuyao.theme.vars", vars);
+}
+
+/* ---------- 狀態 ---------- */
+const draft = LS.get("liuyao.draft.v1", {});
+const S = {
+  page: "input",
+  method: ["number", "manual", "time"].includes(draft.method) ? draft.method : "number",
+  nums: Array.isArray(draft.nums) && draft.nums.length === 3 ? draft.nums.map(String) : ["", "", ""],
+  manual: Array.isArray(draft.manual) && draft.manual.length === 6 ? draft.manual.map(v => [6, 7, 8, 9].includes(v) ? v : null) : [null, null, null, null, null, null],
+  q: typeof draft.q === "string" ? draft.q : "",
+  tzMode: draft.tzMode == null ? "auto" : draft.tzMode,
+  zishi: draft.zishi !== false,
+  chart: null, snap: null, curCaseId: null,
+  focus: null, sel: null,
+  prefs: Object.assign({ avoid: true, score: true, top: 5, full: false }, LS.get("liuyao.prefs.v1", {})),
+  theme: Object.assign({ id: "auto" }, LS.get("liuyao.theme.v1", {})),
+  ui: { editing: null, confirming: null }
+};
+if (S.theme.id !== "auto" && !THEMES.some(t => t.id === S.theme.id)) S.theme.id = "auto";
+const savePrefs = () => LS.set("liuyao.prefs.v1", S.prefs);
+const saveDraft = () => LS.set("liuyao.draft.v1", { method: S.method, nums: S.nums, manual: S.manual, q: S.q, tzMode: S.tzMode, zishi: S.zishi });
+
+/* ---------- 卦例存放：本機＋（發布成 Artifact 登入時）帳戶 ---------- */
+const Cases = {
+  list: LS.get("liuyao.cases.v1", []).filter(c => c && c.id && Array.isArray(c.lines)),
+  status: "local", col: null, known: new Set(), subs: [],
+  on(fn) { this.subs.push(fn); }, emit() { this.subs.forEach(f => f()); },
+  sort() { this.list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)); },
+  saveLocal() { LS.set("liuyao.cases.v1", this.list); },
+  get(id) { return this.list.find(c => c.id === id) || null; },
+  async put(c) {
+    c.updatedAt = Date.now();
+    const i = this.list.findIndex(x => x.id === c.id);
+    if (i >= 0) this.list[i] = c; else this.list.unshift(c);
+    this.sort(); this.saveLocal(); this.emit();
+    if (this.col) { try { await this.col.doc(c.id).set(JSON.parse(JSON.stringify(c))); } catch (e) { toast("帳戶存檔沒有成功，這筆先存在本瀏覽器。"); } }
+  },
+  async remove(id) {
+    this.list = this.list.filter(c => c.id !== id); this.saveLocal(); this.emit();
+    if (this.col) { try { await this.col.doc(id).delete(); } catch (e) { toast("帳戶裡的刪除沒有成功，稍後再試一次。"); } }
+  },
+  async initCloud() {
+    const cl = window.claude;
+    if (!cl || typeof cl.use !== "function") return;
+    try {
+      const [db, user] = await Promise.all([cl.use("db"), cl.use("user")]);
+      if (!db || !user) return;
+      const uid = await user.id();
+      if (!uid) return;
+      const col = db.doc("data/users/" + uid + "/liuyao").collection("cases");
+      let synced = false;
+      col.onSnapshot(snap => {
+        if (!synced && snap.metadata.fromCache) return;
+        const remote = snap.docs.map(d => d.data()).filter(x => x && x.id && Array.isArray(x.lines));
+        if (!synced) {
+          synced = true;
+          const ids = new Set(remote.map(c => c.id));
+          const missing = this.list.filter(c => !ids.has(c.id));
+          (async () => { for (const c of missing) { try { await col.doc(c.id).set(JSON.parse(JSON.stringify(c))); } catch (e) { /* 留在本機 */ } } })();
+          this.list = remote.map(x => JSON.parse(JSON.stringify(x))).concat(missing);
+        } else {
+          const pending = this.list.filter(c => !remote.some(r => r.id === c.id) && !this.known.has(c.id));
+          this.list = remote.map(x => JSON.parse(JSON.stringify(x))).concat(pending);
+        }
+        this.known = new Set(remote.map(r => r.id));
+        this.sort(); this.saveLocal(); this.status = "cloud"; this.emit();
+      }, () => { this.col = null; this.status = "local"; this.emit(); });
+      this.col = col;
+    } catch (e) { /* 留在本機 */ }
+  }
+};
+Cases.on(() => { if (S.page === "cases") renderCases(); if (S.page === "chart") renderChart(); });
+
+/* ---------- 小工具 ---------- */
+let toastTimer = null;
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2600); }
+function openModal(html) { const m = $("#modal"); m.innerHTML = `<div class="modal-card" role="dialog" aria-modal="true">${html}</div>`; m.hidden = false; }
+function closeModal() { const m = $("#modal"); m.hidden = true; m.innerHTML = ""; }
+function legacyCopy(text) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0";
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand("copy"); ta.remove(); return ok;
+  } catch (e) { return false; }
+}
+async function copyText(text, okMsg) {
+  /* 先試剪貼簿 API（1.5 秒沒回應就當作不能用），再試舊式複製，都不行才開對話框讓使用者自己複製 */
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await Promise.race([navigator.clipboard.writeText(text), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 1500))]);
+      toast(okMsg); return;
+    } catch (e) { /* 改用其他方式 */ }
+  }
+  if (legacyCopy(text)) { toast(okMsg); return; }
+  openModal(`<div class="card-head"><div class="card-title">複製文字</div><button type="button" class="btn btn-sm" data-act="modal-close">關閉</button></div>
+    <textarea id="copy-area" readonly>${esc(text)}</textarea>
+    <div class="modal-acts"><span class="hint" style="margin-right:auto">這個環境不讓網頁寫剪貼簿，已幫你全選，按 Ctrl+C（手機長按）複製。</span></div>`);
+  const ta = $("#copy-area"); ta.focus(); ta.select();
+}
+const localTzAt = d => -new Date(d.y, d.m - 1, d.d, d.hh, d.mi).getTimezoneOffset() / 60;
+function tzText(tz) { const a = Math.abs(tz), h = Math.floor(a), m = Math.round((a - h) * 60); return `UTC${tz < 0 ? "−" : "+"}${h}${m ? ":" + pad2(m) : ""}`; }
+const TZS = (() => { const a = []; for (let x = -12; x <= 14; x += 0.5) a.push(x); a.push(5.75, 8.75, 12.75); return a.sort((p, q) => p - q); })();
+const wxSpan = (w, txt) => `<span class="w${w}">${txt}</span>`;
+const gzHTML = (g, b) => `<span class="gz"><span class="dim">${GAN[g]}</span>${wxSpan(Y.zhiWx(b), ZHI[b] + WX[Y.zhiWx(b)])}</span>`;
+const yaoHTML = (yang, mv, cls = "") => `<span class="yao${mv ? " mv" : ""}${cls ? " " + cls : ""}" aria-hidden="true">${yang ? "<i></i>" : "<i></i><i></i>"}</span>`;
+function guaMini(bits, mvSet) { let h = ""; for (let k = 0; k < 6; k++) h += yaoHTML((bits >> k) & 1, mvSet && mvSet.has(k)); return `<span class="gua-mini" aria-hidden="true">${h}</span>`; }
+function txt(s) {
+  const e = esc(s);
+  if (!e.includes(AVOID_MARK)) return e;
+  return e.split(AVOID_MARK).join(S.prefs.avoid ? `<span class="avoid" title="原文此字依避字設定以□代替，可在「設定」改回原字">□</span>` : AVOID_CHAR);
+}
+const plain = s => String(s).split(AVOID_MARK).join(S.prefs.avoid ? "□" : AVOID_CHAR);
+const fmtDate = d => `${d.y}-${pad2(d.m)}-${pad2(d.d)} ${pad2(d.hh)}:${pad2(d.mi)}`;
+const fmtClockJD = (jd, tz) => { const c = C.jdToClock(jd + tz / 24); return `${c.m}-${pad2(c.d)} ${pad2(c.hh)}:${pad2(c.mi)}`; };
+
+/* =========================================================
+   起卦頁
+   ========================================================= */
+function opt(v, t, sel) { return `<option value="${esc(v)}"${sel ? " selected" : ""}>${esc(t)}</option>`; }
+function buildDateOptions() {
+  let h = ""; for (let y = Y_MIN; y <= Y_MAX; y++) h += opt(y, y + "年"); $("#f-y").innerHTML = h;
+  h = ""; for (let m = 1; m <= 12; m++) h += opt(m, m + "月"); $("#f-m").innerHTML = h;
+  h = ""; for (let x = 0; x < 24; x++) h += opt(x, pad2(x) + "時"); $("#f-hh").innerHTML = h;
+  h = ""; for (let x = 0; x < 60; x++) h += opt(x, pad2(x) + "分"); $("#f-mi").innerHTML = h;
+  $("#f-tz").innerHTML = opt("auto", "本機時區") + TZS.map(t => opt(t, tzText(t))).join("");
+}
+function fillDays(keep) {
+  const y = +$("#f-y").value, m = +$("#f-m").value, n = C.monthLen(y, m);
+  let h = ""; for (let d = 1; d <= n; d++) h += opt(d, d + "日");
+  $("#f-d").innerHTML = h;
+  $("#f-d").value = String(Math.min(keep || 1, n));
+}
+function setDate(d) {
+  $("#f-y").value = String(Math.min(Y_MAX, Math.max(Y_MIN, d.y))); $("#f-m").value = String(d.m); fillDays(d.d);
+  $("#f-hh").value = String(d.hh); $("#f-mi").value = String(d.mi);
+}
+function nowDate() { const n = new Date(); return { y: n.getFullYear(), m: n.getMonth() + 1, d: n.getDate(), hh: n.getHours(), mi: n.getMinutes() }; }
+const readDate = () => ({ y: +$("#f-y").value, m: +$("#f-m").value, d: +$("#f-d").value, hh: +$("#f-hh").value, mi: +$("#f-mi").value });
+const tzFor = d => S.tzMode === "auto" ? localTzAt(d) : +S.tzMode;
+function currentMoment() { const d = readDate(); return Y.moment(Object.assign({}, d, { tz: tzFor(d), zishi: S.zishi ? "day23" : "split" })); }
+function currentCast(mom) {
+  if (S.method === "number") {
+    const filled = S.nums.filter(x => String(x).trim() !== "").length;
+    if (filled < 3) return { error: filled ? "還差" + (3 - filled) + "個數字" : "請填三個數字", soft: true };
+    return Y.castNumbers(...S.nums);
+  }
+  if (S.method === "manual") {
+    const left = S.manual.filter(v => v == null).length;
+    if (left) return { error: `還有 ${left} 個爻沒選`, soft: true };
+    return Y.castManual(S.manual);
+  }
+  return Y.castTime(mom);
+}
+const PICKS = [[7, "少陽", "⚊"], [8, "少陰", "⚋"], [9, "老陽", "○"], [6, "老陰", "✕"]];
+function renderPicker() {
+  let h = "";
+  for (let k = 5; k >= 0; k--) {
+    const v = S.manual[k];
+    h += `<div class="pick-row"><span class="pl">${Y.POS_SHORT[k]}</span><div class="pick-btns">` +
+      PICKS.map(([val, name, sym]) => `<button type="button" data-act="pick" data-pos="${k}" data-v="${val}" aria-pressed="${v === val}" aria-label="${Y.POS_SHORT[k]}${name}"><span class="sym">${sym}</span>${name}</button>`).join("") +
+      `</div><span class="mini">${v == null ? '<span class="hint">未選</span>' : yaoHTML(Y.isYang(v), Y.isMoving(v))}</span></div>`;
+  }
+  $("#f-picker").innerHTML = h;
+}
+function triText(t) { return `${Y.TRI_NAME[t]}（${Y.TRI_XIANG[t]}）`; }
+function renderInputPreview() {
+  ["number", "manual", "time"].forEach(m => { $("#m-" + m).hidden = S.method !== m; $("#m-btn-" + m).setAttribute("aria-pressed", String(S.method === m)); });
+  let mom, err = null;
+  try { mom = currentMoment(); } catch (e) { err = "日期時間無法換算"; }
+  const pv = $("#f-preview");
+  if (mom) {
+    const L = mom.lunar, tz = mom.tz;
+    const zi = mom.lateZi ? (S.zishi ? "（23 點後，已換日）" : "（夜子時，日柱不換）") : "";
+    pv.innerHTML = `<div class="pv-gz">${mom.pillars.map(Y.gzName).join("　")}</div>
+      <div class="pv-kv"><span class="k">四柱</span><span>${Y.gzName(mom.yearIdx)}年 ${Y.gzName(mom.monthIdx)}月 ${Y.gzName(mom.dayIdx)}日 ${Y.gzName(mom.hourIdx)}時${zi}</span>
+      <span class="k">月建日辰</span><span>月建 ${ZHI[mom.monthBranch]}${WX[Y.zhiWx(mom.monthBranch)]}，日辰 ${Y.gzName(mom.dayIdx)}，旬空 ${mom.xunkong.map(b => ZHI[b]).join("")}</span>
+      <span class="k">農曆</span><span>${L ? esc(C.lunarText(L)) : "—"}</span>
+      <span class="k">節氣</span><span>${esc(mom.prevJie.name)} ${fmtClockJD(mom.prevJie.jd, tz)} 之後，${esc(mom.nextJie.name)} ${fmtClockJD(mom.nextJie.jd, tz)} 之前</span>
+      <span class="k">時區</span><span>${tzText(tz)}${S.tzMode === "auto" ? "（本機）" : ""}</span></div>`;
+  } else pv.innerHTML = `<span class="err">${esc(err)}</span>`;
+  const cast = mom ? currentCast(mom) : { error: err };
+  const st = $("#f-steps"), gv = $("#f-gua"), go = $("#f-go");
+  if (cast.error) {
+    st.innerHTML = `<span class="${cast.soft ? "" : "err"}">${esc(cast.error)}</span>`;
+    gv.innerHTML = `<span class="hint">填好之後，這裡會先顯示本卦與變卦。</span>`;
+    go.disabled = true;
+    return;
+  }
+  go.disabled = false;
+  const det = cast.detail;
+  if (det.steps) {
+    st.innerHTML = det.steps.map(s => `<div class="st"><b>${s.label}</b><span>${esc(s.expr)} 餘 ${s.rem}</span><span class="res">${s.tri != null ? triText(s.tri) : (s.use === 6 ? "上爻" : Y.POS_SHORT[s.use - 1])}</span></div>`).join("");
+  } else st.innerHTML = `<div class="st"><b>六爻</b><span>${cast.lines.slice().reverse().map(v => Y.YAO_LABEL[v]).join("、")}（上爻→初爻）</span><span></span></div>`;
+  let bits = 0, cbits = 0; const mv = new Set();
+  cast.lines.forEach((v, k) => { if (Y.isYang(v)) bits |= 1 << k; if (Y.isMoving(v)) mv.add(k); });
+  cbits = bits; mv.forEach(k => { cbits ^= 1 << k; });
+  const b1 = Y.hexInfo(bits);
+  gv.innerHTML = `<span class="pv-one">${guaMini(bits, mv)}<span class="nm">${b1.full}</span></span>` + (mv.size ? `<span class="arrow" aria-label="變">→</span><span class="pv-one">${guaMini(cbits)}<span class="nm">${Y.hexInfo(cbits).full}</span></span>` : `<span class="hint">靜卦（無動爻）</span>`);
+}
+function castNow() {
+  const mom = currentMoment();
+  const cast = currentCast(mom);
+  if (cast.error) { toast(cast.error); return; }
+  const d = readDate();
+  S.snap = { method: S.method, nums: S.nums.slice(), manual: S.method === "manual" ? S.manual.slice() : null, lines: cast.lines.slice(), date: d, tzMode: S.tzMode, tz: mom.tz, zishi: S.zishi, q: S.q.trim() };
+  S.chart = Y.build(cast, mom);
+  S.curCaseId = null; S.focus = null; S.sel = null;
+  LS.set("liuyao.last.v1", S.snap);
+  go("chart");
+}
+function chartFromSnap(sn) {
+  const mom = Y.moment(Object.assign({}, sn.date, { tz: sn.tz, zishi: sn.zishi === false ? "split" : "day23" }));
+  let cast;
+  if (sn.method === "number" && sn.nums) cast = Y.castNumbers(...sn.nums);
+  else if (sn.method === "time") cast = Y.castTime(mom);
+  else cast = Y.castManual(sn.lines);
+  if (!cast || cast.error || JSON.stringify(cast.lines) !== JSON.stringify(sn.lines)) cast = Object.assign(Y.castManual(sn.lines), { detail: { method: sn.method || "manual" } });
+  return Y.build(cast, mom);
+}
+function loadSnapToForm(sn) {
+  S.method = sn.method || "manual"; S.nums = (sn.nums || ["", "", ""]).map(String);
+  S.manual = sn.method === "manual" ? sn.lines.slice() : S.manual;
+  S.q = sn.q || ""; S.tzMode = sn.tzMode == null ? "auto" : sn.tzMode; S.zishi = sn.zishi !== false;
+  $("#f-n1").value = S.nums[0]; $("#f-n2").value = S.nums[1]; $("#f-n3").value = S.nums[2]; $("#f-q").value = S.q;
+  setDate(sn.date); $("#f-tz").value = String(S.tzMode); $("#f-zs").checked = S.zishi;
+  renderPicker(); saveDraft();
+}
+
+/* =========================================================
+   排盤頁
+   ========================================================= */
+const methodText = (sn, ch) => {
+  if (!sn) return "";
+  if (sn.method === "number") return `數字 ${sn.nums.join("、")}`;
+  if (sn.method === "time") { const d = ch.cast.detail; return d && d.steps ? `時間（年${ZHI[d.yb]}${d.Y}＋${d.leap ? "閏" : ""}${d.M}月＋${d.D}日＋時${d.H}）` : "時間"; }
+  return "手動六爻";
+};
+function emptyHTML(title, body) {
+  return `<div class="card empty"><div class="card-title">${esc(title)}</div><p>${esc(body)}</p><button type="button" class="btn btn-gold" data-act="go" data-page="input">去起卦</button></div>`;
+}
+function lineTags(ch, k) {
+  const s = ch.summary[k];
+  const a = s.tags.map(t => `<span class="chip ${t.k}">${esc(t.t)}</span>`).join("");
+  const b = s.hua.length ? `<span class="tagsep" aria-hidden="true"></span>` + s.hua.map(t => `<span class="chip ${t.k}">${esc(t.t)}</span>`).join("") : "";
+  return a + b;
+}
+function fuHTML(F) {
+  if (!F) return "";
+  const tags = [];
+  if (F.kong) tags.push("空");
+  if (F.month.key === "po") tags.push("月破");
+  if (F.day === "lin") tags.push("臨日"); else if (F.day === "chong") tags.push("日沖"); else if (F.day === "he") tags.push("日合");
+  return `<span class="hint">伏</span> <b>${F.qin}</b>${GAN[F.g]}${wxSpan(F.wx, ZHI[F.b] + WX[F.wx])}${tags.length ? `<span class="dim">（${tags.join("、")}）</span>` : ""}`;
+}
+function renderChart() {
+  const pg = $("#page-chart");
+  const ch = S.chart;
+  if (!ch) { pg.innerHTML = emptyHTML("還沒有排盤", "先到「起卦」選起卦方式，按「開始排盤」。"); return; }
+  const { ben, bian, mom } = ch;
+  const mv = new Set(ch.moving);
+  const tz = mom.tz, d = S.snap ? S.snap.date : null;
+  const saved = S.curCaseId && Cases.get(S.curCaseId);
+  const tagG = h => [h.pair ? h.pair + "卦" : "", h.gen >= 6 ? h.genName + "卦" : ""].filter(Boolean).map(t => `<span class="chip gold">${t}</span>`).join(" ");
+  let h = `<div class="hbar">
+    <div class="hbar-gua">
+      <div class="hg">${guaMini(ben.bits, mv)}<div><div class="hg-name">${ben.full}</div><div class="hg-sub">${ben.palaceName}宮${ben.genName} ${tagG(ben)}</div></div></div>
+      ${bian ? `<span class="hg-arrow" aria-hidden="true">→</span><div class="hg">${guaMini(bian.bits)}<div><div class="hg-name">${bian.full}</div><div class="hg-sub">${bian.palaceName}宮${bian.genName} ${tagG(bian)}</div></div></div>` : `<span class="hg-sub">靜卦，無動爻</span>`}
+    </div>
+    <div class="hbar-acts">
+      <button type="button" class="hbtn" id="c-save" data-act="save-case"${saved ? " disabled" : ""}>${saved ? "已存在卦例" : "存成卦例"}</button>
+      <button type="button" class="hbtn" id="c-copy" data-act="copy-chart">複製文字盤</button>
+      <button type="button" class="hbtn" id="c-edit" data-act="go" data-page="input">改起卦</button>
+    </div>
+    ${S.snap && S.snap.q ? `<div class="q"><span class="k">占事</span>${esc(S.snap.q)}</div>` : ""}
+    <div class="hbar-meta">
+      ${d ? `<span><span class="k">時間</span>${fmtDate(d)}（${tzText(tz)}）</span>` : ""}
+      <span><span class="k">四柱</span>${Y.gzName(mom.yearIdx)}年 ${Y.gzName(mom.monthIdx)}月 ${Y.gzName(mom.dayIdx)}日 ${Y.gzName(mom.hourIdx)}時</span>
+      <span><span class="k">旬空</span>${mom.xunkong.map(b => ZHI[b]).join("")}</span>
+      <span><span class="k">農曆</span>${mom.lunar ? esc(C.lunarText(mom.lunar).replace(/^\d+年/, "")) : "—"}</span>
+      <span><span class="k">節氣</span>${esc(mom.prevJie.name)}後</span>
+      <span><span class="k">起卦</span>${esc(methodText(S.snap, ch))}</span>
+    </div>
+  </div>`;
+  let rows = "";
+  for (let k = 5; k >= 0; k--) {
+    const L = ch.lines[k];
+    const sy = L.shi ? `<span class="sy shi" title="世爻">世</span>` : L.ying ? `<span class="sy ying" title="應爻">應</span>` : `<span class="sy none"></span>`;
+    const mk = L.moving ? (L.yang ? "○" : "✕") : "";
+    const cls = (S.focus === k ? " is-focus" : "") + (S.sel != null && relMarks().has(k) ? " is-mark" : "");
+    rows += `<div class="pan-row${cls}" data-act="focus" data-pos="${k}" role="button" tabindex="0" aria-pressed="${S.focus === k}" aria-label="${Y.POS_SHORT[k]}，點一下聚焦相關關係">
+      <div class="c-shen">${L.shen}</div>
+      <div class="c-fu">${fuHTML(L.fu)}</div>
+      <div class="c-ben"><span class="qin">${L.qin}</span>${gzHTML(L.g, L.b)}</div>
+      <div class="c-yao">${yaoHTML(L.yang, L.moving)}<span class="mvk" title="${L.moving ? (L.yang ? "老陽，動" : "老陰，動") : ""}">${mk}</span>${sy}</div>
+      <div class="c-bian">${L.moving ? `${yaoHTML(!L.yang, false)}<span class="qin">${L.change.qin}</span>${gzHTML(L.change.g, L.change.b)}` : ""}</div>
+      <div class="c-tags">${lineTags(ch, k)}</div>
+    </div>`;
+  }
+  const pan = `<div class="card pan-card">
+    <div class="pan">
+      <div class="pan-head"><span>六神</span><span class="h-fu">伏神</span><span class="h-ben">本卦 ${ben.name}</span><span>爻</span><span class="h-bian">${bian ? "變卦 " + bian.name : "變卦"}</span></div>
+      ${rows}
+    </div>
+    <div class="pan-foot"><span>○ 老陽動　✕ 老陰動</span><span>六親以${ben.palaceName}宮${WX[ben.palaceWx]}為我</span><span>六神依日干${GAN[mom.dayStem]}起</span><span>點一爻可聚焦它的關係</span></div>
+  </div>`;
+  h += `<div class="chart-grid">${pan}${relCardHTML(ch)}</div>`;
+  pg.innerHTML = h;
+}
+function relMarks() {
+  const set = new Set();
+  if (S.sel == null || !S.chart) return set;
+  const r = S.chart.relations.find(x => x.id === S.sel);
+  if (r) { if (r.pos != null) set.add(r.pos); if (r.apos != null) set.add(r.apos); }
+  return set;
+}
+const GROUP_NAME = { hc: "合沖", sk: "生剋", kong: "旬空" };
+function relHTML(r, top) {
+  const dim = S.focus != null && !(r.pos === S.focus || r.apos === S.focus) ? " is-dim" : "";
+  const sel = S.sel === r.id ? " is-sel" : "";
+  return `<div class="rel${top ? " is-top" : ""}${dim}${sel}" data-act="rel" data-id="${r.id}" role="button" tabindex="0" aria-pressed="${S.sel === r.id}">
+    <div class="rel-power" title="力量 ${r.score}"><div class="rel-bar"><i style="width:${r.score}%"></i></div>${S.prefs.score ? `<span class="rel-score">${r.score}</span>` : ""}</div>
+    <div class="rel-title"><span class="verdict ${r.group}">${esc(r.verdict)}</span><span>${esc(r.title)}</span></div>
+    <div class="rel-note">${esc(r.note)}</div>
+  </div>`;
+}
+function relCardHTML(ch) {
+  const R = ch.relations;
+  const topN = Math.max(1, Math.min(8, S.prefs.top | 0));
+  const top = R.slice(0, topN);
+  const topIds = new Set(top.map(r => r.id));
+  const all = g => R.filter(r => r.group === g);
+  const sec = (g) => {
+    const list = all(g), rest = list.filter(r => !topIds.has(r.id));
+    if (!list.length) return "";
+    const inTop = list.length - rest.length;
+    return `<section class="rel-sec" id="rs-${g}"><h3>${GROUP_NAME[g]}<small>${list.length} 條${inTop ? `，其中 ${inTop} 條已排在最要緊，其餘依力量排序` : "，依力量排序"}</small></h3>${rest.length ? rest.map(r => relHTML(r, false)).join("") : `<p class="hint" style="padding:0 20px 6px">都已列在最要緊。</p>`}</section>`;
+  };
+  const jump = ["hc", "sk", "kong"].filter(g => all(g).length).map(g => `<button type="button" data-act="jump" data-sec="rs-${g}">${GROUP_NAME[g]}<b>${all(g).length}</b></button>`).join("");
+  const focusBar = S.focus != null ? `<div class="focusbar"><span>聚焦：${Y.POS_SHORT[S.focus]}${ch.lines[S.focus].shi ? "（世）" : ch.lines[S.focus].ying ? "（應）" : ""}，其他關係變淡但都還在</span><button type="button" class="btn btn-sm" data-act="focus-clear">取消聚焦</button></div>` : "";
+  return `<div class="card rel-card">
+    <div class="card-head"><div class="card-title">關係清單<small>共 ${R.length} 條；先論合沖、再論生剋，每條都列</small></div></div>
+    <div class="rel-jump" role="navigation" aria-label="跳到分類"><button type="button" data-act="jump" data-sec="rs-top">最要緊<b>${top.length}</b></button>${jump}</div>
+    ${focusBar}
+    <section class="rel-sec" id="rs-top"><h3>最要緊<small>力量最強的 ${top.length} 條</small></h3>${top.map(r => relHTML(r, true)).join("")}</section>
+    ${sec("hc")}${sec("sk")}${sec("kong")}
+    <details class="rule-note"><summary>力量怎麼算、規則出處</summary>
+      <ul>
+        <li>力量 0–100：施力者（日辰、月建最強，其次變爻對本位動爻，再次動爻、暗動爻，靜爻最弱）× 關係類型 × 施力爻的旺衰。旺衰以月令為主，日辰生扶、回頭生、化進加分，日剋、合絆、回頭剋、化退、化空、化破、化墓絕減分。</li>
+        <li>同分時合沖排在生剋前。左邊色條是力量，數字可在「設定」關掉。</li>
+        <li>暗動、日破、沖散、合起、合絆、月破、月合、旬空、生旺墓絕、變爻只生剋本位、靜爻旺相可生剋休囚、三合成局條件、反伏：依《增刪卜易》各章。</li>
+        <li>進神退神：亥化子、寅化卯、巳化午、申化酉、丑化辰、辰化未、未化戌、戌化丑為進，反之為退（《增刪卜易·進神退神章》）。</li>
+        <li>飛伏：伏剋飛神為出暴、飛來剋伏反傷身、伏去生飛名洩氣、飛來生伏得長生、飛伏比和為有助（《卜筮正宗》）。卦反吟：乾巽、坎離、艮坤、震兌互變；伏吟：乾震互變。</li>
+        <li>長生取水土同宮：土長生申、旺子、墓辰、絕巳。</li>
+      </ul>
+    </details>
+  </div>`;
+}
+
+/* 文字盤 */
+function chartPlainText(ch) {
+  const { ben, bian, mom } = ch, d = S.snap ? S.snap.date : null;
+  const L = [];
+  L.push(`六爻排盤｜${ben.full}${bian ? "之" + bian.full : "（靜卦）"}`);
+  if (S.snap && S.snap.q) L.push(`占事：${S.snap.q}`);
+  if (d) L.push(`時間：${fmtDate(d)}（${tzText(mom.tz)}）　農曆${mom.lunar ? C.lunarText(mom.lunar).replace(/^\d+年/, "") : "—"}`);
+  L.push(`四柱：${Y.gzName(mom.yearIdx)}年 ${Y.gzName(mom.monthIdx)}月 ${Y.gzName(mom.dayIdx)}日 ${Y.gzName(mom.hourIdx)}時　旬空：${mom.xunkong.map(b => ZHI[b]).join("")}`);
+  L.push(`起卦：${methodText(S.snap, ch)}`);
+  L.push(`本卦：${ben.full}（${ben.palaceName}宮${ben.genName}${ben.pair ? "，" + ben.pair : ""}）${bian ? `　變卦：${bian.full}（${bian.palaceName}宮${bian.genName}${bian.pair ? "，" + bian.pair : ""}）` : ""}`);
+  L.push("");
+  for (let k = 5; k >= 0; k--) {
+    const x = ch.lines[k];
+    const sy = x.shi ? "世" : x.ying ? "應" : "　";
+    const mk = x.moving ? (x.yang ? "○" : "✕") : "　";
+    const fu = x.fu ? `伏${x.fu.qin}${GAN[x.fu.g]}${ZHI[x.fu.b]}${WX[x.fu.wx]}` : "";
+    const tags = ch.summary[k].tags.map(t => t.t).concat(ch.summary[k].hua.map(t => t.t));
+    L.push(`${x.shen}　${x.qin}${GAN[x.g]}${ZHI[x.b]}${WX[x.wx]} ${x.yang ? "⚊" : "⚋"}${mk}${sy}${x.moving ? `　→ ${x.change.qin}${GAN[x.change.g]}${ZHI[x.change.b]}${WX[x.change.wx]}` : ""}${fu ? "　" + fu : ""}${tags.length ? "　［" + tags.join("、") + "］" : ""}`);
+  }
+  L.push("");
+  L.push("關係（依力量排序）：");
+  ch.relations.forEach((r, i) => L.push(`${i + 1}. [${GROUP_NAME[r.group]}｜${r.score}] ${r.title}：${r.verdict}`));
+  return L.join("\n");
+}
+
+/* =========================================================
+   原文頁
+   ========================================================= */
+const ZY = idx => ZHOUYI[idx - 1];
+function guaciHTML(h) {
+  const t = ZY(h.kw);
+  const startsWithName = t.g.startsWith(t.n) || (t.n === "坎" && t.g.startsWith("習坎"));
+  return `<p class="tx">${startsWithName && t.n !== "坎" ? "" : `<span class="lab">${t.n}：</span>`}${txt(t.g)}</p>
+    <p class="tx-xiang"><span class="lab">象曰：</span>${txt(t.d)}</p>`;
+}
+function yaoTextHTML(kw, k, withXiang) {
+  const t = ZY(kw);
+  return `<div class="tx-yao"><p class="tx"><span class="lab">${t.lab[k]}：</span>${txt(t.y[k])}</p>${withXiang ? `<p class="tx-xiang"><span class="lab">象曰：</span>${txt(t.x[k])}</p>` : ""}</div>`;
+}
+function renderText() {
+  const pg = $("#page-text");
+  const ch = S.chart;
+  if (!ch) { pg.innerHTML = emptyHTML("還沒有排盤", "排盤之後，這裡會列出本卦、動爻、變卦的原文。"); return; }
+  const { ben, bian } = ch;
+  const all6 = ch.moving.length === 6 && (ben.kw === 1 || ben.kw === 2);
+  let h = `<div class="texts">
+    <div class="card card-pad" style="display:flex;gap:12px 20px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+      <div class="card-title">《周易》原文<small>卦辭、爻辭與象傳</small></div>
+      <label class="switch"><input type="checkbox" id="t-full" data-act="toggle-full"${S.prefs.full ? " checked" : ""}> 同時列出本卦六爻全文</label>
+    </div>
+    <section class="card tx-sec"><h2>本卦　${ben.full}<small>${ben.palaceName}宮${ben.genName}・卦辭與大象</small></h2>${guaciHTML(ben)}</section>`;
+  if (ch.moving.length) {
+    h += `<section class="card tx-sec"><h2>動爻<small>爻辭與小象（${ch.moving.length} 爻動）</small></h2>
+      ${ch.moving.map(k => yaoTextHTML(ben.kw, k, true)).join("")}
+      ${all6 ? `<div class="tx-yao"><p class="tx"><span class="lab">${ben.kw === 1 ? "用九" : "用六"}：</span>${txt(ZY(ben.kw).yy)}</p><p class="tx-xiang"><span class="lab">象曰：</span>${txt(ZY(ben.kw).yx)}</p><p class="tx-note">六爻皆動，${ben.kw === 1 ? "乾" : "坤"}卦另有${ben.kw === 1 ? "用九" : "用六"}。</p></div>` : ""}
+    </section>
+    <section class="card tx-sec"><h2>變卦　${bian.full}<small>${bian.palaceName}宮${bian.genName}・卦辭與大象</small></h2>${guaciHTML(bian)}</section>
+    <section class="card tx-sec"><h2>變卦對應爻辭<small>變卦中與動爻同位之爻</small></h2>${ch.moving.map(k => yaoTextHTML(bian.kw, k, true)).join("")}</section>`;
+  } else {
+    h += `<section class="card tx-sec"><h2>動爻</h2><p class="tx-note">靜卦，六爻皆不動，沒有爻辭可看；以本卦卦辭與大象為主。</p></section>`;
+  }
+  if (S.prefs.full) h += `<section class="card tx-sec"><h2>本卦六爻全文<small>${ben.full}</small></h2>${[0, 1, 2, 3, 4, 5].map(k => yaoTextHTML(ben.kw, k, true)).join("")}${(ben.kw === 1 || ben.kw === 2) ? `<div class="tx-yao"><p class="tx"><span class="lab">${ben.kw === 1 ? "用九" : "用六"}：</span>${txt(ZY(ben.kw).yy)}</p><p class="tx-xiang"><span class="lab">象曰：</span>${txt(ZY(ben.kw).yx)}</p></div>` : ""}</section>`;
+  h += `<p class="hint">原文以《周易正義》系通行本為準，三個版本逐字比對後校正；校勘清單見倉庫 data/zhouyi_patches.json。</p></div>`;
+  pg.innerHTML = h;
+}
+
+/* =========================================================
+   卦例頁
+   ========================================================= */
+function caseFromCurrent() {
+  const ch = S.chart, sn = S.snap;
+  const id = "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  return Object.assign({ id, title: sn.q || `${ch.ben.full}${ch.bian ? "之" + ch.bian.full : ""}`, createdAt: Date.now(),
+    gua: `${ch.ben.full}${ch.bian ? " → " + ch.bian.full : ""}`, gz: ch.mom.pillars.map(Y.gzName).join(" ") }, JSON.parse(JSON.stringify(sn)));
+}
+async function saveCurrentCase() {
+  if (!S.chart || !S.snap) { toast("先排一卦再存"); return; }
+  if (S.curCaseId && Cases.get(S.curCaseId)) { toast("這一卦已經在卦例裡"); return; }
+  const c = caseFromCurrent();
+  S.curCaseId = c.id;
+  await Cases.put(c);
+  toast("已存成卦例");
+  if (S.page === "chart") renderChart();
+}
+function openCase(id) {
+  const c = Cases.get(id);
+  if (!c) return;
+  try {
+    S.snap = { method: c.method, nums: c.nums, manual: c.manual, lines: c.lines, date: c.date, tzMode: c.tzMode, tz: c.tz, zishi: c.zishi, q: c.q || "" };
+    S.chart = chartFromSnap(S.snap);
+    S.curCaseId = id; S.focus = null; S.sel = null;
+    LS.set("liuyao.last.v1", S.snap);
+    loadSnapToForm(S.snap);
+    go("chart");
+  } catch (e) { toast("這筆卦例的資料不完整，打不開"); }
+}
+function renderCases() {
+  const pg = $("#page-cases");
+  const where = Cases.status === "cloud" ? "存在你的帳戶，換裝置也看得到" : "存在這個瀏覽器";
+  let h = `<div class="card">
+    <div class="listhead"><div class="card-title">卦例<small>${Cases.list.length} 筆，${where}</small></div>
+      <div class="acts">
+        <button type="button" class="btn btn-sm btn-gold" id="cs-save" data-act="save-case"${S.chart && !(S.curCaseId && Cases.get(S.curCaseId)) ? "" : " disabled"}>存目前這一卦</button>
+        <button type="button" class="btn btn-sm" id="cs-export" data-act="export"${Cases.list.length ? "" : " disabled"}>匯出</button>
+        <button type="button" class="btn btn-sm" id="cs-import" data-act="import">匯入</button>
+      </div></div>`;
+  if (!Cases.list.length) {
+    h += `<div class="empty"><p>還沒有卦例。排盤後按「存成卦例」，或在這裡按「存目前這一卦」。匯入可讀回之前匯出的 JSON 檔。</p></div></div>`;
+    pg.innerHTML = h; return;
+  }
+  h += `<div class="caselist">`;
+  for (const c of Cases.list) {
+    const editing = S.ui.editing === c.id, confirming = S.ui.confirming === c.id;
+    const d = c.date;
+    h += `<div class="case${S.curCaseId === c.id ? " is-cur" : ""}">
+      <div><div class="case-name">${esc(c.title)}</div><div class="case-gua">${esc(c.gua || "")}</div>
+        <div class="case-meta">${d ? fmtDate(d) : ""}　${esc(c.gz || "")}${c.q && c.q !== c.title ? "　占事：" + esc(c.q) : ""}</div></div>
+      <div class="case-acts">
+        <button type="button" class="btn btn-sm btn-gold" data-act="case-open" data-id="${c.id}">打開</button>
+        <button type="button" class="btn btn-sm" data-act="case-edit" data-id="${c.id}">改名</button>
+        <button type="button" class="btn btn-sm btn-danger" data-act="case-del" data-id="${c.id}">刪除</button>
+      </div>
+      ${editing ? `<div class="case-edit"><label class="sr-only" for="ce-${c.id}">新名稱</label><input class="field" id="ce-${c.id}" value="${esc(c.title)}" maxlength="80"><button type="button" class="btn btn-sm btn-gold" data-act="case-rename" data-id="${c.id}">儲存</button><button type="button" class="btn btn-sm" data-act="case-cancel">取消</button></div>` : ""}
+      ${confirming ? `<div class="case-confirm"><span>確定刪除「${esc(c.title)}」？刪了無法復原。</span><button type="button" class="btn btn-sm btn-danger solid" data-act="case-del-yes" data-id="${c.id}">刪除</button><button type="button" class="btn btn-sm" data-act="case-cancel">取消</button></div>` : ""}
+    </div>`;
+  }
+  h += `</div></div>`;
+  pg.innerHTML = h;
+  if (S.ui.editing) { const f = $("#ce-" + S.ui.editing); if (f) { f.focus(); f.select(); } }
+}
+async function exportCases() {
+  const data = JSON.stringify({ app: "liuyao-paipan", version: 1, exportedAt: new Date().toISOString(), cases: Cases.list }, null, 1);
+  const name = `liuyao-cases-${new Date().toISOString().slice(0, 10)}.json`;   // 檔名用英數，避免部分瀏覽器把中文檔名換成 download
+  const cl = window.claude;
+  if (cl && typeof cl.use === "function") {
+    try {
+      const dl = await cl.use("downloads");
+      if (dl) { await dl.save({ filename: name, data }); toast("已交給下載"); return; }
+    } catch (e) { if (e && e.code === "declined") return; }
+  }
+  try {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([data], { type: "application/json" })); a.download = name;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    toast("已下載 " + name);
+  } catch (e) { copyText(data, "已複製 JSON"); }
+}
+async function importCases(file) {
+  try {
+    const obj = JSON.parse(await file.text());
+    const arr = Array.isArray(obj) ? obj : obj.cases;
+    if (!Array.isArray(arr)) throw new Error("bad");
+    let n = 0;
+    for (const c of arr) {
+      if (!c || !c.id || !Array.isArray(c.lines) || c.lines.length !== 6 || !c.date) continue;
+      if (Cases.get(c.id)) continue;
+      await Cases.put(c); n++;
+    }
+    toast(n ? `匯入 ${n} 筆卦例` : "沒有新的卦例可匯入");
+  } catch (e) { toast("這個檔案讀不出卦例，請選之前匯出的 JSON"); }
+}
+
+/* =========================================================
+   設定頁
+   ========================================================= */
+function renderSettings() {
+  const pg = $("#page-settings");
+  const sw = (t, label) => {
+    const wx = themeIsDark(t) ? WX_DARK : WX_LIGHT;
+    return `<button type="button" class="tc" data-act="theme" data-id="${t.id}" aria-pressed="${S.theme.id === t.id}">
+      <span class="tc-prev" style="background:${t.bg}"><span class="b" style="background:${t.bar}"></span><span class="c" style="background:${t.card};color:${t.ink}"><i style="background:${t.accent}"></i><i style="background:${wx.mu}"></i><i style="background:${wx.huo}"></i></span></span>${esc(label || t.name)}</button>`;
+  };
+  pg.innerHTML = `<div class="card">
+    <section class="set-sec"><h3>主題</h3>
+      <div class="themes">
+        <button type="button" class="tc" data-act="theme" data-id="auto" aria-pressed="${S.theme.id === "auto"}"><span class="tc-prev"><span class="b" style="background:linear-gradient(90deg,#1F2430 50%,#0B0C0E 50%)"></span><span class="c" style="background:linear-gradient(90deg,#FFFFFF 50%,#1A1C20 50%);color:#888">淺／深</span></span>跟隨系統</button>
+        ${THEMES.map(t => sw(t)).join("")}
+      </div>
+    </section>
+    <section class="set-sec"><h3>原文</h3>
+      <label class="switch"><input type="checkbox" id="s-avoid" data-act="pref" data-k="avoid"${S.prefs.avoid ? " checked" : ""}> 原文避字：那個字以「□」代替（共兩處：晉卦辭、蒙卦九二小象）</label>
+      <p class="hint">關掉就顯示原字。這個設定只影響畫面與複製出去的文字，程式碼裡不含那個字。</p>
+    </section>
+    <section class="set-sec"><h3>關係清單</h3>
+      <label class="switch"><input type="checkbox" id="s-score" data-act="pref" data-k="score"${S.prefs.score ? " checked" : ""}> 顯示力量分數</label>
+      <div class="range"><label for="s-top">「最要緊」列幾條</label><input type="range" id="s-top" min="3" max="8" step="1" value="${S.prefs.top}" data-act="pref-top"><output id="s-top-out" for="s-top">${S.prefs.top}</output></div>
+      <p class="hint">「最要緊」只是把力量最強的幾條放在最上面；下方合沖、生剋、旬空三段仍然每條都列。</p>
+    </section>
+    <section class="set-sec"><h3>關於</h3>
+      <p class="hint">節氣用 VSOP87 截斷級數、農曆用 Meeus 真朔與中氣置閏，曆算與同倉庫的八字排盤相同，並和 lunar-javascript 對過 1901–2099 年。排盤規則以《增刪卜易》為主，進退神、飛伏生剋、卦反吟伏吟參《卜筮正宗》。可用年份 ${Y_MIN}–${Y_MAX}。</p>
+    </section>
+  </div>`;
+}
+
+/* =========================================================
+   導覽與事件
+   ========================================================= */
+function go(page) {
+  S.page = page;
+  $$(".nav-item").forEach(b => b.setAttribute("aria-current", b.dataset.page === page ? "page" : "false"));
+  ["input", "chart", "text", "cases", "settings"].forEach(p => { $("#page-" + p).hidden = p !== page; });
+  if (page === "input") renderInputPreview();
+  else if (page === "chart") renderChart();
+  else if (page === "text") renderText();
+  else if (page === "cases") renderCases();
+  else if (page === "settings") renderSettings();
+  window.scrollTo({ top: 0 });
+}
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const act = el.dataset.act;
+  if (act === "go") { go(el.dataset.page); return; }
+  if (act === "method") { S.method = el.dataset.method; saveDraft(); renderInputPreview(); return; }
+  if (act === "pick") {
+    const k = +el.dataset.pos, v = +el.dataset.v;
+    S.manual[k] = S.manual[k] === v ? null : v; saveDraft(); renderPicker(); renderInputPreview();
+    const again = $(`[data-act="pick"][data-pos="${k}"][data-v="${v}"]`); if (again) again.focus();
+    return;
+  }
+  if (act === "clear-lines") { S.manual = [null, null, null, null, null, null]; saveDraft(); renderPicker(); renderInputPreview(); return; }
+  if (act === "now") { setDate(nowDate()); renderInputPreview(); return; }
+  if (act === "focus") { const k = +el.dataset.pos; S.focus = S.focus === k ? null : k; renderChart(); return; }
+  if (act === "focus-clear") { S.focus = null; renderChart(); return; }
+  if (act === "jump") { const t = document.getElementById(el.dataset.sec); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  if (act === "rel") { const id = +el.dataset.id; S.sel = S.sel === id ? null : id; renderChart(); return; }
+  if (act === "save-case") { saveCurrentCase(); return; }
+  if (act === "copy-chart") { if (S.chart) copyText(plain(chartPlainText(S.chart)), "已複製文字盤"); return; }
+  if (act === "modal-close") { closeModal(); return; }
+  if (act === "case-open") { openCase(el.dataset.id); return; }
+  if (act === "case-edit") { S.ui.editing = el.dataset.id; S.ui.confirming = null; renderCases(); return; }
+  if (act === "case-cancel") { S.ui.editing = null; S.ui.confirming = null; renderCases(); return; }
+  if (act === "case-rename") {
+    const c = Cases.get(el.dataset.id), f = $("#ce-" + el.dataset.id);
+    const name = f ? f.value.trim() : "";
+    if (!name) { toast("名稱不能空白"); return; }
+    if (c) { S.ui.editing = null; Cases.put(Object.assign({}, c, { title: name })); toast("已改名"); }
+    return;
+  }
+  if (act === "case-del") { S.ui.confirming = el.dataset.id; S.ui.editing = null; renderCases(); return; }
+  if (act === "case-del-yes") {
+    const id = el.dataset.id; S.ui.confirming = null;
+    if (S.curCaseId === id) S.curCaseId = null;
+    Cases.remove(id); toast("已刪除"); return;
+  }
+  if (act === "export") { exportCases(); return; }
+  if (act === "import") { $("#f-import").click(); return; }
+  if (act === "theme") { S.theme.id = el.dataset.id; applyTheme(); renderSettings(); return; }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !$("#modal").hidden) { closeModal(); return; }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches('[role="button"][data-act]')) { e.preventDefault(); e.target.click(); }
+  if (e.key === "Enter" && e.target.matches && e.target.matches(".case-edit .field")) { const b = e.target.parentElement.querySelector('[data-act="case-rename"]'); if (b) b.click(); }
+});
+$("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.act === "pref") { S.prefs[el.dataset.k] = el.checked; savePrefs(); if (S.page === "settings") renderSettings(); return; }
+  if (el.dataset && el.dataset.act === "toggle-full") { S.prefs.full = el.checked; savePrefs(); renderText(); return; }
+  if (el.id === "f-import") { const f = el.files && el.files[0]; if (f) importCases(f); el.value = ""; return; }
+});
+document.addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.act === "pref-top") { S.prefs.top = +el.value; $("#s-top-out").textContent = el.value; savePrefs(); return; }
+});
+["f-n1", "f-n2", "f-n3"].forEach((id, i) => {
+  $("#" + id).addEventListener("input", e => {
+    const v = e.target.value.replace(/[^\d]/g, "");
+    if (v !== e.target.value) e.target.value = v;
+    S.nums[i] = v; saveDraft(); renderInputPreview();
+  });
+});
+$("#f-q").addEventListener("input", e => { S.q = e.target.value; saveDraft(); });
+$("#f-y").addEventListener("change", () => { fillDays(+$("#f-d").value); renderInputPreview(); });
+$("#f-m").addEventListener("change", () => { fillDays(+$("#f-d").value); renderInputPreview(); });
+["f-d", "f-hh", "f-mi"].forEach(id => $("#" + id).addEventListener("change", renderInputPreview));
+$("#f-tz").addEventListener("change", e => { S.tzMode = e.target.value === "auto" ? "auto" : +e.target.value; saveDraft(); renderInputPreview(); });
+$("#f-zs").addEventListener("change", e => { S.zishi = e.target.checked; saveDraft(); renderInputPreview(); });
+$("#f-form").addEventListener("submit", e => { e.preventDefault(); castNow(); });
+
+/* ---------- 開始 ---------- */
+buildDateOptions();
+setDate(nowDate());
+$("#f-tz").value = String(S.tzMode);
+if (!$("#f-tz").value) { S.tzMode = "auto"; $("#f-tz").value = "auto"; }
+$("#f-zs").checked = S.zishi;
+$("#f-n1").value = S.nums[0]; $("#f-n2").value = S.nums[1]; $("#f-n3").value = S.nums[2]; $("#f-q").value = S.q;
+renderPicker();
+const last = LS.get("liuyao.last.v1", null);
+if (last && Array.isArray(last.lines) && last.date) { try { S.snap = last; S.chart = chartFromSnap(last); } catch (e) { S.snap = null; S.chart = null; } }
+applyTheme();
+const startPage = (location.hash || "").replace("#", "");
+go(["input", "chart", "text", "cases", "settings"].includes(startPage) ? startPage : "input");
+Cases.initCloud();
+window.__liuyao = { S, Cases, go, castNow };   // 給自動測試用
+})();
+
+</script>
+</body>
+</html>

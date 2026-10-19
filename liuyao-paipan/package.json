@@ -1,0 +1,14 @@
+{
+  "name": "liuyao-paipan",
+  "private": true,
+  "description": "六爻納甲排盤（單一 HTML）",
+  "scripts": {
+    "build": "node build.js",
+    "test": "node tests/acceptance.js",
+    "test:calendar": "node tests/calendar-check.js",
+    "test:ui": "node tests/ui.js"
+  },
+  "devDependencies": {
+    "lunar-javascript": "1.7.7"
+  }
+}
