@@ -1,0 +1,90 @@
+<title>六爻納甲排盤</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="六爻納甲排盤：數字、手動六爻、時間起卦；本卦變卦、世應、六親、六神、伏神、旬空，月建日辰生剋沖合與依力量排序的關係清單，附《周易》原文。">
+<style>
+/*__CSS__*/
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+<script>
+/* 先套用上次選的主題，避免畫面閃一下預設色 */
+try { var tv = JSON.parse(localStorage.getItem("liuyao.theme.vars") || "null"); if (tv) for (var tk in tv) document.documentElement.style.setProperty(tk, tv[tk]); } catch (e) { /* 無痕或封鎖 */ }
+</script>
+<div class="app">
+  <nav class="nav" aria-label="頁面">
+    <div class="nav-brand">六爻排盤<small>納甲・世應・伏神</small></div>
+    <button type="button" class="nav-item" data-act="go" data-page="input" aria-current="page">起卦</button>
+    <button type="button" class="nav-item" data-act="go" data-page="chart" aria-current="false">排盤</button>
+    <button type="button" class="nav-item" data-act="go" data-page="text" aria-current="false">原文</button>
+    <button type="button" class="nav-item" data-act="go" data-page="cases" aria-current="false">卦例</button>
+    <button type="button" class="nav-item" data-act="go" data-page="settings" aria-current="false">設定</button>
+  </nav>
+  <main class="main">
+    <section class="page" id="page-input" aria-label="起卦">
+      <div class="form-wrap">
+        <form class="card card-pad form" id="f-form" novalidate>
+          <div class="method-row">
+            <h1 class="card-title">起卦</h1>
+            <div class="seg" role="group" aria-label="起卦方式">
+              <button type="button" id="m-btn-number" data-act="method" data-method="number" aria-pressed="true">數字</button>
+              <button type="button" id="m-btn-manual" data-act="method" data-method="manual" aria-pressed="false">六爻</button>
+              <button type="button" id="m-btn-time" data-act="method" data-method="time" aria-pressed="false">時間</button>
+            </div>
+          </div>
+          <div id="m-number">
+            <div class="nums">
+              <label for="f-n1">第一數（上卦）<input class="field" id="f-n1" inputmode="numeric" autocomplete="off" maxlength="40" placeholder="例 4"></label>
+              <label for="f-n2">第二數（下卦）<input class="field" id="f-n2" inputmode="numeric" autocomplete="off" maxlength="40" placeholder="例 6"></label>
+              <label for="f-n3">第三數<input class="field" id="f-n3" inputmode="numeric" autocomplete="off" maxlength="40" placeholder="例 2"></label>
+            </div>
+            <p class="hint" style="margin-top:8px">第一數、第二數各除以 8 取上卦、下卦（餘 0 取坤），三數之和除以 6 取動爻（餘 0 取上爻）。先天數：乾1 兌2 離3 震4 巽5 坎6 艮7 坤8。</p>
+          </div>
+          <div id="m-manual" hidden>
+            <div class="picker" id="f-picker" role="group" aria-label="六爻"></div>
+            <div class="picker-foot" style="margin-top:8px">
+              <span class="hint">由上往下是上爻到初爻。三枚錢：一背少陽、二背少陰、三背老陽、無背老陰。</span>
+              <button type="button" class="btn btn-sm" id="f-clear" data-act="clear-lines">全部清除</button>
+            </div>
+          </div>
+          <div id="m-time" hidden>
+            <p class="hint">梅花易數年月日時起卦：年取農曆年地支數（子1 … 亥12），月、日用農曆（閏月按本月數），時取時支數。用右邊（手機在下方）的日期時間計算。</p>
+          </div>
+          <div class="steps" id="f-steps" aria-live="polite"></div>
+          <div class="frow"><label for="f-q">占事</label><input class="field" id="f-q" placeholder="想問的事（可留空，存卦例時當標題）" maxlength="80" autocomplete="off"></div>
+        </form>
+        <div class="card card-pad datebox" id="f-datebox">
+          <h2 class="card-title">日期時間 <small>預設現在，可改</small></h2>
+          <div class="drow"><span class="flabel">日期</span>
+            <div class="fgroup dsel"><select class="field" id="f-y" aria-label="年"></select><select class="field" id="f-m" aria-label="月"></select><select class="field" id="f-d" aria-label="日"></select></div>
+          </div>
+          <div class="drow"><span class="flabel">時間</span>
+            <div class="fgroup dsel"><select class="field" id="f-hh" aria-label="時"></select><select class="field" id="f-mi" aria-label="分"></select><button type="button" class="btn btn-sm" id="f-now" data-act="now">現在</button></div>
+          </div>
+          <div class="drow"><label class="flabel" for="f-tz">時區</label><select class="field" id="f-tz"></select></div>
+          <label class="check"><input type="checkbox" id="f-zs" checked> 子時換日（23:00 起算次日）</label>
+          <p class="hint" style="margin-top:-6px">不勾時，23:00–24:00 為夜子時：日柱用當天，時干用次日。</p>
+          <div class="preview" id="f-preview" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="card gobar">
+        <div class="pv-gua" id="f-gua" aria-live="polite"></div>
+        <button class="btn btn-dark gobtn" id="f-go" type="submit" form="f-form">開始排盤</button>
+      </div>
+    </section>
+    <section class="page" id="page-chart" aria-label="排盤" hidden></section>
+    <section class="page" id="page-text" aria-label="原文" hidden></section>
+    <section class="page" id="page-cases" aria-label="卦例" hidden></section>
+    <section class="page" id="page-settings" aria-label="設定" hidden></section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="modal" id="modal" hidden></div>
+<input type="file" id="f-import" accept="application/json,.json" class="sr-only" tabindex="-1" aria-hidden="true">
+<script>
+/* ===== ENGINE BEGIN ===== */
+/*__CAL__*/
+/*__ENGINE__*/
+/* ===== ENGINE END ===== */
+/*__DATA__*/
+/*__APP__*/
+</script>
