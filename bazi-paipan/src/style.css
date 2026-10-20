@@ -604,6 +604,12 @@ table.pan tr.r-mk td .mk { margin: 1px 0; flex-direction: column; gap: 1px; padd
 /* ---------- 細盤表欄位、神煞 ---------- */
 .dyn-note { margin: 6px 4px 0; font-size: 11.5px; color: var(--dim); }
 table.pan tr.r-sha td .sha.bad { color: var(--ink-2); }
+table.pan tr.r-sha td .sha[role="button"] { cursor: pointer; border-radius: 4px; }
+table.pan tr.r-sha td .sha[role="button"]:hover { background: var(--gold-softer); }
+table.pan tr.r-sha td .sha:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+table.pan tr.r-sha td .sha.on { background: var(--gold-soft); box-shadow: inset 0 -2px 0 var(--accent); }
+.sha-why { margin: 8px 4px 0; line-height: 1.65; overflow-wrap: anywhere; }
+.sha-why b { color: var(--gold-ink); font-weight: 600; }
 .dyn-group .radio, .sha-opt .radio { font-size: 14px; min-height: 32px; align-items: center; }
 #sha-card .sha-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin-top: 12px; }
 .sha-opt { border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px 8px; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 0; }

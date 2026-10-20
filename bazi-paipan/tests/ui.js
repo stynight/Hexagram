@@ -66,6 +66,15 @@ async function run(vp) {
   const c3 = await copyRect("#page-basic", ["ss", 1], ["ny", 4]);
   const l3 = c3.text.split("\n");
   ok(`[${T}] 圍到其他列時每列一行、天干地支合成干支`, l3[0] === "日期\t年柱\t月柱\t日柱\t時柱" && l3.includes("干支\t丙午\t戊戌\t乙丑\t乙酉") && l3.includes("納音\t天河水\t平地木\t海中金\t泉中水") && l3.includes("藏干\t丁火、己土\t戊土、辛金、丁火\t己土、癸水、辛金\t辛金") && !l3.some(l => /^(天干|地支)\t/.test(l)), JSON.stringify(c3.text));
+  // 2c 神煞點一下看為什麼
+  await page.click('#page-basic tr[data-row="sha"] td:nth-of-type(1) .sha[data-n="月德貴人"]');
+  ok(`[${T}] 點神煞，表下寫出這一柱為什麼有它`, (await txt("#page-basic .sha-why")) === "年柱・月德貴人：月支戌屬寅午戌局，月德在丙，這柱天干丙。", await txt("#page-basic .sha-why"));
+  await page.focus('#page-basic tr[data-row="sha"] td:nth-of-type(3) .sha[data-n="元辰"]');
+  await page.keyboard.press("Enter");
+  ok(`[${T}] 鍵盤 Enter 也能看神煞說明`, (await txt("#page-basic .sha-why")).startsWith("日柱・元辰：丙年生男，屬陽男陰女"), await txt("#page-basic .sha-why"));
+  ok(`[${T}] 神煞有滑鼠提示`, ((await page.getAttribute('#page-basic tr[data-row="sha"] td:nth-of-type(4) .sha[data-n="天乙貴人"]', "title")) || "").startsWith("天乙貴人：年干丙，天乙貴人在亥、酉，這柱地支酉"));
+  const c5 = await copyRect("#page-basic", ["ny", 1], ["sha", 4]);
+  ok(`[${T}] 拖選含神煞列照樣按列複製`, c5.text.split("\n").some(l => l.startsWith("神煞\t") && l.includes("月德貴人")), JSON.stringify(c5.text.slice(0, 120)));
   const c4 = await copyRect("#page-basic", ["ny", 1], ["ny", 1]);
   ok(`[${T}] 只選一格裡的字照原本方式複製`, !c4.prevented);
   if (!vp.mobile) {                                                  // 真的用滑鼠拖、按 Ctrl+C
