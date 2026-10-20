@@ -144,7 +144,7 @@ const SHOW_GROUPS = [
 const HIDE_SEL = {
   ss: 'table.pan tr[data-row="ss"]', mk: 'table.pan tr[data-row="mk"]', cang: 'table.pan tr[data-row="cang"]', fu: 'table.pan tr[data-row="fu"]',
   xy: 'table.pan tr[data-row="xy"]', zz: 'table.pan tr[data-row="zz"]', kong: 'table.pan tr[data-row="kong"]', ny: 'table.pan tr[data-row="ny"]',
-  sha: 'table.pan tr[data-row="sha"], .sha-toggle', "s-dayun": ".strip.s-dayun", "s-year": ".strip.s-year", "s-month": ".strip.s-month",
+  sha: 'table.pan tr[data-row="sha"], .sha-toggle, .sha-why', "s-dayun": ".strip.s-dayun", "s-year": ".strip.s-year", "s-month": ".strip.s-month",
   "s-day": ".strip.s-day", "s-hour": ".strip.s-hour", cmk: ".cell .c-mk", info: "#page-basic .infobar, #page-basic .basic-extra",
   pinfo: ".pinfo-lines", algo: ".algo", hint: ".swipe-hint", wbar: ".wbar", attn: ".attn", rel: "section.rel", hpx: ".hpx"
 };
@@ -923,13 +923,15 @@ function cellsFor(col, chart, row, ctx) {
       return `<td${cls}>${ms.length || xs.length ? marksHTML(ms) + (x ? marksHTML(xs, x.side) : "") : '<span class="dim">—</span>'}</td>`;
     }
     case "sha": {
-      const list = B.shensha(chart, g, b, col.kind === "natal" ? col.pos : -1, S.prefs.shaOpt);
-      if (!S.prefs.sha) return `<td${cls}><span class="dim">${list.length ? list.length + " 項" : "—"}</span></td>`;
-      return `<td${cls}>${list.length ? list.map(s => `<span class="sha${B.SHENSHA_BAD.has(s) ? " bad" : ""}">${s.length === 4 ? `<span class="nw">${s.slice(0, 2)}</span><span class="nw">${s.slice(2)}</span>` : s}</span>`).join("") : '<span class="dim">—</span>'}</td>`;
+      const pos = col.kind === "natal" ? col.pos : -1;
+      if (!S.prefs.sha) { const n = B.shensha(chart, g, b, pos, S.prefs.shaOpt).length; return `<td${cls}><span class="dim">${n ? n + " 項" : "—"}</span></td>`; }
+      const list = B.shenshaDetail(chart, g, b, pos, S.prefs.shaOpt);    // 每一項帶著「為什麼」，點一下寫在表下
+      return `<td${cls}>${list.length ? list.map(({ name: s, why }) => { const w = why.join("；"); return `<span class="sha${B.SHENSHA_BAD.has(s) ? " bad" : ""}" role="button" tabindex="0" data-act="sha-why" data-n="${s}" data-why="${esc(w)}" title="${esc(s + "：" + w)}">${s.length === 4 ? `<span class="nw">${s.slice(0, 2)}</span><span class="nw">${s.slice(2)}</span>` : s}</span>`; }).join("") : '<span class="dim">—</span>'}</td>`;
     }
   }
   return "<td></td>";
 }
+const SHA_WHY_HINT = "點一下神煞（電腦上滑鼠停在上面也行），這裡會寫出這一柱為什麼有它。";
 const ROW_LABEL = { head: "日期", ss: "主星", gan: "天干", zhi: "地支", cang: "藏干", fu: "副星", cangss: "藏干", xy: "星運", zz: "自坐", kong: "空亡", ny: "納音", sha: "神煞", mk: "沖合" };
 const ROW_CLASS = { head: "r-head", ss: "r-ss", gan: "r-big", zhi: "r-big", cang: "r-cang", fu: "r-fu", cangss: "r-cang", xy: "r-sm", zz: "r-sm", kong: "r-sm", ny: "r-sm", sha: "r-sha", mk: "r-mk" };
 function panTableHTML(cols, chart, rows, caption, ctx) {
@@ -938,6 +940,7 @@ function panTableHTML(cols, chart, rows, caption, ctx) {
     h += `<tr class="${ROW_CLASS[row]}" data-row="${row === "cangss" ? "cang" : row}"><th scope="row">${ROW_LABEL[row]}</th>${cols.map(col => cellsFor(col, chart, row, ctx)).join("")}</tr>`;
   }
   h += "</table></div>";
+  if (rows.includes("sha") && S.prefs.sha) h += `<p class="sha-why hint" aria-live="polite">${SHA_WHY_HINT}</p>`;
   if (rows.includes("sha")) h += `<button type="button" class="sha-toggle" data-row="sha" data-act="sha" aria-expanded="${S.prefs.sha}">${S.prefs.sha ? "收起神煞（只顯示每柱項數）" : "展開神煞"}</button>`;
   return h;
 }
@@ -1634,6 +1637,17 @@ document.addEventListener("click", e => {
     case "hp-start": if (S.hepan.a && S.hepan.b) { S.hepan.started = true; S.hpSel = { A: null, B: null }; saveHepan(); renderHepan(); const p = $(".hp-panels"); if (p) p.scrollIntoView({ block: "start", behavior: "smooth" }); } break;
     case "modal-close": closeModal(); break;
     case "gz-copy-open": openCopy(); break;
+    case "sha-why": {
+      const sel = getSelection(); if (sel && !sel.isCollapsed) break;     // 正在拖選文字時不動
+      const td = t.closest("td"), wrap = t.closest(".pan-wrap"), box = wrap && wrap.nextElementSibling;
+      if (!td || !box || !box.classList.contains("sha-why")) break;
+      const head = td.closest("table").querySelector('tr[data-row="head"]');
+      const title = head && head.cells[td.cellIndex] ? head.cells[td.cellIndex].textContent.trim() : "";
+      $$(".sha.on", wrap).forEach(x => { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); });
+      t.classList.add("on"); t.setAttribute("aria-pressed", "true");
+      box.innerHTML = `<b>${esc(title)}・${esc(t.dataset.n)}</b>：${esc(t.dataset.why)}。`;
+      break;
+    }
     case "pz-tab": { S.pzActive = +t.dataset.k; renderPz(); const b = $(`#f-pz .pz-tab[data-k="${t.dataset.k}"]`); if (b) b.focus(); break; }
     case "pz-gan": pzPick("gan", +t.dataset.v); break;
     case "pz-zhi": pzPick("zhi", +t.dataset.v); break;
@@ -1730,6 +1744,7 @@ document.addEventListener("copy", e => {
 document.addEventListener("toggle", e => { if (e.target.matches && e.target.matches("details.sha-sw")) S.ui.shaOpen = e.target.open; }, true);
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && !$("#modal").hidden) closeModal();
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches('.sha[data-act="sha-why"]')) { e.preventDefault(); e.target.click(); }
   if (e.key === "Enter" && e.target.id && e.target.id.startsWith("rn-")) { const b = document.querySelector(`[data-act="case-rename-save"][data-id="${e.target.id.slice(3)}"]`); if (b) b.click(); }
 });
 $("#f-form").addEventListener("submit", e => { e.preventDefault(); submitForm(); });
