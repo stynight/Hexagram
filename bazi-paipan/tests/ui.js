@@ -260,8 +260,31 @@ async function run(vp) {
   // 8 四柱輸入（用例 1）
   await page.click('.nav-item[data-page="input"]');
   await page.click('[data-act="mode"][data-mode="sizhu"]');
-  const idx = s => { const G = "甲乙丙丁戊己庚辛壬癸", Z = "子丑寅卯辰巳午未申酉戌亥"; const g = G.indexOf(s[0]), b = Z.indexOf(s[1]); return String(((6 * g - 5 * b) % 60 + 60) % 60); };
-  await page.selectOption("#f-p0", idx("丙午")); await page.selectOption("#f-p1", idx("辛丑")); await page.selectOption("#f-p2", idx("甲寅")); await page.selectOption("#f-p3", idx("丁卯"));
+  const tabs = async () => page.$$eval("#f-pz .pz-tab .pz-gz", es => es.map(e => e.textContent).join(" "));
+  const keys = async act => page.$$eval(`#f-pz .pz-key[data-act="${act}"]`, es => es.map(e => e.textContent).join(""));
+  // 點選：先點一柱，再點干、點支
+  await page.click('#f-pz .pz-tab[data-k="0"]');
+  await page.click('#f-pz .pz-key[data-act="pz-gan"][data-v="0"]');
+  ok(`[${T}] 四柱點選 陽干只列陽支`, (await keys("pz-zhi")) === "子寅辰午申戌", await keys("pz-zhi"));
+  await page.click('#f-pz .pz-key[data-act="pz-gan"][data-v="1"]');
+  ok(`[${T}] 四柱點選 陰干只列陰支、支跟著換成陰支`, (await keys("pz-zhi")) === "丑卯巳未酉亥" && /^乙(丑|卯|巳|未|酉|亥)$/.test((await tabs()).split(" ")[0]), await tabs());
+  await page.click('#f-pz .pz-key[data-act="pz-gan"][data-v="0"]');
+  await page.click('#f-pz .pz-key[data-act="pz-zhi"][data-v="0"]');
+  const act1 = await page.getAttribute('#f-pz .pz-tab[aria-pressed="true"]', "data-k");
+  ok(`[${T}] 四柱點選 點完地支跳到月柱、月柱只要點支`, act1 === "1" && (await keys("pz-gan")) === "" && (await keys("pz-zhi")).length === 12, `${act1} ${await keys("pz-zhi")}`);
+  await page.click('#f-pz .pz-key[data-act="pz-zhi"][data-v="2"]');
+  ok(`[${T}] 四柱點選 月干照五虎遁帶出（甲年寅月丙寅）`, (await tabs()).split(" ").slice(0, 2).join(" ") === "甲子 丙寅", await tabs());
+  ok(`[${T}] 四柱點選 文字框跟著更新`, (await page.inputValue("#f-gzq")).startsWith("甲子 丙寅"), await page.inputValue("#f-gzq"));
+  // 文字框：錯誤提示、貼上複製出來的完整資料
+  await page.fill("#f-gzq", "甲丑");
+  ok(`[${T}] 四柱文字 陰陽不合有提示`, (await txt("#f-gzq-msg")).includes("不成柱"), await txt("#f-gzq-msg"));
+  await page.fill("#f-gzq", "丙午 辛丑");
+  ok(`[${T}] 四柱文字 不足四柱有提示`, (await txt("#f-gzq-msg")).includes("還差 2 柱"), await txt("#f-gzq-msg"));
+  await page.fill("#f-gzq", "乾造 丙午 戊戌 乙丑 乙酉\n公曆 2026-10-18 17:01（北京時間）\n大運 8歲 己亥、18歲 庚子");
+  ok(`[${T}] 四柱文字 貼上完整資料取前四柱`, (await tabs()) === "丙午 戊戌 乙丑 乙酉" && (await txt("#f-gzq-msg")).includes("只取前四柱"), await tabs());
+  // 用例 1：打字輸入
+  await page.fill("#f-gzq", "丙午辛丑甲寅丁卯");
+  ok(`[${T}] 四柱文字 不加空白也認得`, (await tabs()) === "丙午 辛丑 甲寅 丁卯", await tabs());
   const cands = await txt("#f-cands");
   ok(`[${T}] 四柱反查有 2027-02-04`, cands.includes("2027-02-04"), cands.slice(0, 60));
   await shot("12-input-sizhu");

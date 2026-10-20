@@ -499,8 +499,6 @@ function buildFormOptions() {
   h = ""; for (let x = 0; x < 24; x++) h += opt(x, pad2(x) + "時"); $("#f-hh").innerHTML = h;
   h = ""; for (let x = 0; x < 60; x++) h += opt(x, pad2(x) + "分"); $("#f-mi").innerHTML = h;
   h = ""; for (let y = 1801; y <= 2099; y++) h += opt(y, `${y}年（${B.gzName(B.yearGZ(y))}）`); $("#f-ly").innerHTML = h;
-  h = ""; for (let i = 0; i < 60; i++) h += opt(i, B.gzName(i));
-  for (let k = 0; k < 4; k++) $("#f-p" + k).innerHTML = h;
   h = PLACES.map((p, i) => opt(i, p[0])).join("") + opt("custom", "自訂座標"); $("#f-place").innerHTML = h;
   $("#f-tz").innerHTML = TZS.map(t => opt(t, tzOption(t), t === 8)).join("");
 }
@@ -552,11 +550,13 @@ function syncLunarFromSolar() {
 }
 function syncSizhuFromSolar() {
   const r = readSolarRaw();
+  S.pzActive = 0;
   try {
     const ch = B.buildChart(Object.assign({ sex: "m", tz: +$("#f-tz").value, lon: +$("#f-lon").value, trueSolar: false, zishi: $("#f-zs").checked ? "split" : "day23" }, r));
-    ch.pillars.forEach((p, k) => { $("#f-p" + k).value = String(p); });
+    setPillars(ch.pillars, { silent: true });
   } catch (e) { /* 保持原值 */ }
   S.candPick = null;
+  renderPz();
   renderCands();
 }
 function readSolarRaw() { return { y: +$("#f-sy").value, m: +$("#f-sm").value, d: +$("#f-sd").value, hh: +$("#f-hh").value, mi: +$("#f-mi").value }; }
@@ -572,6 +572,82 @@ function fillFormNow() {
   $("#f-save").checked = !!S.prefs.autosave;
 }
 let candList = [];
+/* ---------- 四柱輸入
+   點一柱，再點天干、地支；陽干只列陽支，陰干只列陰支。月干、時干照五虎遁、五鼠遁從年干、日干帶出，只要點地支。
+   點完地支跳到下一柱。上方文字框可以自己打或貼上（例如「丙午 庚寅 壬辰 甲辰」，夾雜別的字也行，取前四柱）。 */
+const PZ_NAME = ["年柱", "月柱", "日柱", "時柱"];
+const PZ_AUTO = { 1: "年干五虎遁", 3: "日干五鼠遁" };
+const getPillars = () => [0, 1, 2, 3].map(k => +$("#f-p" + k).value);
+let PZ_HELP = null;                                                  // 文字框下方原本的說明，改過干支後放回去
+function setPillars(p, opt) {
+  const o = opt || {};
+  p.forEach((v, k) => { $("#f-p" + k).value = String(v); });
+  if (!o.keepText) {
+    const q = $("#f-gzq"), m = $("#f-gzq-msg");
+    if (q) q.value = p.map(B.gzName).join(" ");
+    if (m) { if (PZ_HELP == null) PZ_HELP = m.textContent; m.textContent = PZ_HELP; }
+  }
+  renderPz();
+  if (!o.silent) { S.candPick = null; if (S.mode === "sizhu") renderCands(); updatePreview(); }
+}
+function renderPz() {
+  const box = $("#f-pz"); if (!box) return;
+  const p = getPillars(), a = S.pzActive || 0;
+  const g = p[a] % 10, b = p[a] % 12;
+  const tabs = p.map((v, k) => `<button type="button" class="pz-tab" data-act="pz-tab" data-k="${k}" aria-pressed="${k === a}" aria-label="${PZ_NAME[k]} ${B.gzName(v)}${k === a ? "，正在修改" : "，點一下修改"}"><span class="pz-t">${PZ_NAME[k]}</span><span class="pz-gz">${gzH(v)}</span></button>`).join("");
+  const key = (act, i, on, html, label) => `<button type="button" class="pz-key" data-act="${act}" data-v="${i}" aria-pressed="${on}" aria-label="${label}">${html}</button>`;
+  let rows = "";
+  if (PZ_AUTO[a]) {
+    const want = a === 1 ? B.monthGZ(p[0], b) : B.hourGZ(p[2], b);
+    rows += want === p[a] ? `<p class="hint pz-note">${PZ_NAME[a][0]}干照${PZ_AUTO[a]}帶出（${GAN[g]}），點地支就好。</p>`
+      : `<p class="hint pz-note pz-warn">目前的${PZ_NAME[a][0]}干${GAN[g]}跟${PZ_AUTO[a].slice(0, 2)}不合，照${PZ_AUTO[a]}應為${GAN[want % 10]}；點一下地支就會改正。</p>`;
+  }
+  else rows += `<div class="pz-row pz-row-g" role="group" aria-label="${PZ_NAME[a]}天干"><span class="pz-k" aria-hidden="true">天干</span>${GAN.map((x, i) => key("pz-gan", i, i === g, gS(i), `${PZ_NAME[a]}天干${x}`)).join("")}</div>`;
+  const zs = []; for (let i = 0; i < 12; i++) if (PZ_AUTO[a] || (i & 1) === (g & 1)) zs.push(i);
+  rows += `<div class="pz-row pz-row-z" role="group" aria-label="${PZ_NAME[a]}地支"><span class="pz-k" aria-hidden="true">地支${PZ_AUTO[a] ? "" : (g & 1 ? "（陰支）" : "（陽支）")}</span>${zs.map(i => key("pz-zhi", i, i === b, zS(i), `${PZ_NAME[a]}地支${ZHI[i]}`)).join("")}</div>`;
+  box.innerHTML = `<div class="pz-tabs">${tabs}</div><div class="pz-keys">${rows}</div>`;
+}
+/* 改了年干或日干，月干、時干跟著重算 */
+function pzDerive(p) {
+  p[1] = B.monthGZ(p[0], p[1] % 12);
+  p[3] = B.hourGZ(p[2], p[3] % 12);
+  return p;
+}
+function pzPick(kind, v) {
+  const p = getPillars(), a = S.pzActive || 0;
+  if (kind === "gan") {
+    let b = p[a] % 12; if ((b & 1) !== (v & 1)) b = (b + 1) % 12;          // 陰陽不合時換成下一個支
+    p[a] = B.gzIndex(v, b);
+  } else if (a === 1) p[1] = B.monthGZ(p[0], v);
+  else if (a === 3) p[3] = B.hourGZ(p[2], v);
+  else p[a] = B.gzIndex(p[a] % 10, v);
+  pzDerive(p);
+  if (kind === "zhi" && a < 3) S.pzActive = a + 1;
+  setPillars(p);
+  const f = $(kind === "zhi" && a < 3 ? '#f-pz .pz-key[aria-pressed="true"]' : `#f-pz .pz-key[data-act="pz-${kind}"][aria-pressed="true"]`);
+  if (f) f.focus();
+}
+function parseGzText(s) {
+  const chars = Array.from(s || "").filter(c => GAN.includes(c) || ZHI.includes(c));
+  const p = [];
+  for (let i = 0; i < chars.length && p.length < 4; i += 2) {
+    const g = GAN.indexOf(chars[i]), b = ZHI.indexOf(chars[i + 1]);
+    if (g < 0 || b < 0) return { error: `第 ${p.length + 1} 柱要先寫天干、再寫地支（讀到「${chars[i]}${chars[i + 1] || ""}」）`, n: p.length };
+    if ((g & 1) !== (b & 1)) return { error: `「${chars[i]}${chars[i + 1]}」不成柱：陽干配陽支，陰干配陰支`, n: p.length };
+    p.push(B.gzIndex(g, b));
+  }
+  return { p, n: p.length, extra: chars.length > 8 };
+}
+function onGzText() {
+  const q = $("#f-gzq"), msg = $("#f-gzq-msg");
+  if (PZ_HELP == null) PZ_HELP = msg.textContent;
+  if (!q.value.trim()) { msg.textContent = PZ_HELP; return; }
+  const r = parseGzText(q.value);
+  if (r.error) { msg.textContent = r.error + "。"; return; }
+  if (r.n < 4) { msg.textContent = `已認出 ${r.n} 柱${r.n ? "：" + r.p.map(B.gzName).join(" ") : ""}，還差 ${4 - r.n} 柱。`; return; }
+  msg.textContent = `已填入 ${r.p.map(B.gzName).join(" ")}${r.extra ? "（只取前四柱）" : ""}。`;
+  setPillars(r.p, { keepText: true });
+}
 function renderCands() {
   const p = [0, 1, 2, 3].map(k => +$("#f-p" + k).value);
   const r = B.searchPillars(p, { from: 1801, to: 2100, tz: +$("#f-tz").value });
@@ -654,7 +730,7 @@ function fillFormFromCase(c) {
   if (c.mode === "lunar" && c.lunar) {
     $("#f-ly").value = String(c.lunar.y); rebuildLunarMonths(`${c.lunar.m}|${c.lunar.leap ? 1 : 0}`); rebuildLunarDays(c.lunar.d); $("#f-ld").value = String(c.lunar.d);
   }
-  if (c.mode === "sizhu" && c.sizhu) { c.sizhu.p.forEach((p, k) => { $("#f-p" + k).value = String(p); }); }
+  if (c.mode === "sizhu" && c.sizhu) { S.pzActive = 0; setPillars(c.sizhu.p, { silent: true }); }
   S.mode = c.mode || "solar";
   setModeNoSync(S.mode);
   if (S.mode === "sizhu") { S.candPick = null; renderCands(); if (c.solar) { const i = candList.findIndex(x => x.mid.y === c.solar.y && x.mid.m === c.solar.m && x.mid.d === c.solar.d); if (i >= 0) { S.candPick = i; renderCands(); } } }
@@ -1558,6 +1634,9 @@ document.addEventListener("click", e => {
     case "hp-start": if (S.hepan.a && S.hepan.b) { S.hepan.started = true; S.hpSel = { A: null, B: null }; saveHepan(); renderHepan(); const p = $(".hp-panels"); if (p) p.scrollIntoView({ block: "start", behavior: "smooth" }); } break;
     case "modal-close": closeModal(); break;
     case "gz-copy-open": openCopy(); break;
+    case "pz-tab": { S.pzActive = +t.dataset.k; renderPz(); const b = $(`#f-pz .pz-tab[data-k="${t.dataset.k}"]`); if (b) b.focus(); break; }
+    case "pz-gan": pzPick("gan", +t.dataset.v); break;
+    case "pz-zhi": pzPick("zhi", +t.dataset.v); break;
     case "gz-copy": {
       const pre = document.getElementById("cpf-" + t.dataset.k), nm = document.getElementById("cpn-" + t.dataset.k);
       if (!pre) break;
@@ -1629,7 +1708,7 @@ document.addEventListener("change", e => {
   if (t.id === "f-place") { if (t.value !== "custom") setPlaceByIndex(+t.value); }
   if (t.id === "f-lon" || t.id === "f-lat") $("#f-place").value = "custom";
   if (t.id === "f-save") { S.prefs.autosave = t.checked; savePrefs(); }
-  if (/^f-p\d$/.test(t.id) || t.id === "f-tz") { S.candPick = null; if (S.mode === "sizhu") renderCands(); }
+  if (t.id === "f-tz") { S.candPick = null; if (S.mode === "sizhu") renderCands(); }
   if (t.name === "f-cand") S.candPick = +t.value;
   updatePreview();
 });
@@ -1637,9 +1716,11 @@ document.addEventListener("input", e => {
   const t = e.target;
   if (t.matches('input[type="range"][data-wg]')) { onWeightInput(t); return; }
   if (t.matches('input[type="color"][data-cp]')) { onCustomColor(t); return; }
+  if (t.id === "f-gzq") { if (!e.isComposing) onGzText(); return; }
   if (t.id === "case-filter") { S.ui.filter = t.value.trim(); const pos = t.selectionStart; renderCases(); const f = $("#case-filter"); if (f) { f.focus(); try { f.setSelectionRange(pos, pos); } catch (x) { /* 無妨 */ } } return; }
   if (t.id === "f-lon" || t.id === "f-lat" || t.id === "f-name") { if (t.id !== "f-name") $("#f-place").value = "custom"; updatePreview(); }
 });
+document.addEventListener("compositionend", e => { if (e.target && e.target.id === "f-gzq") onGzText(); });
 document.addEventListener("copy", e => {
   const text = tableCopyText(document.getSelection());
   if (text == null || !e.clipboardData) return;
