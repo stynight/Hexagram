@@ -152,6 +152,28 @@ select.field { padding-right: 28px; }
 .fgroup { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .fgroup select.field { width: auto; min-width: 0; flex: 1 1 82px; }
 .fgroup .unit { color: var(--dim); font-size: 13px; }
+/* 四柱輸入：點柱、點干、點支 */
+.pzbox { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.pzbox > .field { width: 100%; font-family: var(--f-serif); letter-spacing: .06em; }
+.pz-msg { margin: 0; line-height: 1.6; }
+.pz-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.pz-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); }
+.pz-tab:hover { border-color: color-mix(in srgb, var(--gold) 60%, var(--line)); }
+.pz-tab[aria-pressed="true"] { border-color: var(--accent); background: var(--gold-softer); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
+.pz-t { font-size: 12.5px; color: var(--dim); }
+.pz-gz { font-family: var(--f-serif); font-size: 24px; font-weight: 700; letter-spacing: .06em; line-height: 1.25; }
+.pz-keys { display: flex; flex-direction: column; gap: 10px; padding: 10px 12px 12px; border-radius: 10px; background: var(--chip); }
+.pz-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pz-k { width: 100%; font-size: 12.5px; color: var(--dim); }
+.pz-key { min-width: 42px; min-height: 42px; padding: 0 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); font-family: var(--f-serif); font-size: 19px; font-weight: 700; }
+.pz-key:hover { border-color: color-mix(in srgb, var(--gold) 60%, var(--line)); }
+.pz-key[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--gold-soft); }
+.pz-note { margin: 0; }
+.pz-warn { color: var(--danger); }
+@media (max-width: 899px) {
+  .pz-row-g .pz-key { flex: 0 0 calc((100% - 24px) / 5); }
+  .pz-row-z .pz-key { flex: 0 0 calc((100% - 30px) / 6); }
+}
 .sexmode { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 .radios { display: flex; gap: 18px; }
 .radio { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 15px; }
