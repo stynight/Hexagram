@@ -210,6 +210,22 @@ console.log("\n=== 神煞 ===");
   eq("學堂切年納音：己巳大林木見亥", B.shensha(c3, 9, 11, -1, { xuetang: "nayin" }).includes("學堂"), true);
   eq("空亡只看日柱時，年柱旬空（丙午旬空寅卯）不算", [B.shensha(c2, 6, 2, -1).includes("空亡"), B.shensha(c2, 6, 2, -1, { kong: "d" }).includes("空亡")], [true, false]);
   eq("不明的切換值回到預設", B.shaOpt({ yangren: "亂填" }).yangren, "next");
+  // 為什麼成立：與 shensha 結果一致，每項都有說明
+  const opts = [undefined, { ganBase: "d", zhiBase: "y", tianyiGeng: "wu", yangren: "rev", xuetang: "nayin", ciguan: "nayin", fuxing: "simple", tianchu: "old", kong: "d" }, { yangren: "none" }];
+  let same = 0, total = 0, noWhy = 0;
+  for (const c of [c2, c3, cs, ck, ct, cf]) for (const o of opts) for (let i = 0; i < 60; i++) for (const pos of [-1, 0, 1, 2, 3]) {
+    const a = B.shensha(c, i % 10, i % 12, pos, o), d = B.shenshaDetail(c, i % 10, i % 12, pos, o);
+    total++; if (JSON.stringify(a) === JSON.stringify(d.map(x => x.name))) same++;
+    noWhy += d.filter(x => !x.why.length).length;
+  }
+  eq(`神煞說明與神煞清單一致（${total} 組）`, [same, noWhy], [total, 0]);
+  const why = (c, gz, pos, n, o) => { const it = B.shenshaDetail(c, B.GAN.indexOf(gz[0]), B.ZHI.indexOf(gz[1]), pos, o).find(x => x.name === n); return it ? it.why : null; };
+  eq("月德：用月支三合局", why(c2, "丙午", 0, "月德貴人"), ["月支戌屬寅午戌局，月德在丙，這柱天干丙"]);
+  eq("月德合：寫出相合的兩干", why(c2, "辛卯", -1, "月德合"), ["月支戌屬寅午戌局，月德在丙，丙辛相合，這柱天干辛"]);
+  eq("天廚：食神之祿", why(c3, "己巳", 0, "天廚貴人"), ["日干丙的食神是戊，戊的祿在巳，這柱地支巳"]);
+  eq("天乙：寫出是年干查到的", why(c3, "丙子", 1, "天乙貴人"), ["年干己，天乙貴人在子、申，這柱地支子"]);
+  eq("元辰：寫出陽男陰女與沖後一位", why(c2, "乙丑", 2, "元辰"), ["丙年生男，屬陽男陰女；年支午的對沖是子，取沖後一位丑，這柱地支丑"]);
+  eq("華蓋：寫出起查的支與局", why(cs, "戊戌", -1, "華蓋"), ["年支戌屬寅午戌局，華蓋在戌（墓庫），這柱地支戌"]);
 }
 
 /* ---------- 關係清單：整柱收進干支 ---------- */
