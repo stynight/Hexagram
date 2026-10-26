@@ -47,7 +47,12 @@ try { var tv = JSON.parse(localStorage.getItem("bazi.theme.vars") || "null"); if
           <div class="fgroup"><select class="field" id="f-hh" aria-label="時"></select><select class="field" id="f-mi" aria-label="分"></select><span class="unit" id="f-shichen">子時</span></div>
         </div>
         <div class="frow" id="g-sizhu" hidden><span class="flabel">四柱</span>
-          <div class="fgroup"><select class="field" id="f-p0" aria-label="年柱"></select><select class="field" id="f-p1" aria-label="月柱"></select><select class="field" id="f-p2" aria-label="日柱"></select><select class="field" id="f-p3" aria-label="時柱"></select></div>
+          <div class="pzbox">
+            <input class="field" id="f-gzq" type="text" autocomplete="off" spellcheck="false" placeholder="打字或貼上，例如 丙午 庚寅 壬辰 甲辰" aria-label="用文字輸入四柱" aria-describedby="f-gzq-msg">
+            <p class="hint pz-msg" id="f-gzq-msg" aria-live="polite">也可以點下面：先點一柱，再點天干、地支。陽干只列陽支，陰干只列陰支；月干、時干照五虎遁、五鼠遁自動帶出，點地支就好。點完地支會跳到下一柱。</p>
+            <div id="f-pz"></div>
+            <input type="hidden" id="f-p0" value="0"><input type="hidden" id="f-p1" value="2"><input type="hidden" id="f-p2" value="0"><input type="hidden" id="f-p3" value="0">
+          </div>
         </div>
         <div class="frow" id="g-sizhu-note" hidden><span class="flabel">符合時間</span>
           <div style="min-width:0"><div class="cands" id="f-cands"></div><p class="hint" style="margin:6px 0 0">在 1801–2100 年間反查。按所選時區的標準時計，不套用真太陽時與夏令時；取時段中點起大運。預設選離今天最近的一筆。</p></div>

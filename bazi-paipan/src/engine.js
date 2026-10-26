@@ -568,79 +568,104 @@ function shaOpt(o) {
   if (o) for (const it of SHA_OPTIONS) if (it.items.some(x => x[0] === o[it.k])) r[it.k] = o[it.k];
   return r;
 }
-function shensha(chart, g, b, pos, opt) {
+/* 每一項成立時另記一句「為什麼」：用哪一柱、哪個字起查，查到什麼，這一柱是哪個字。只在成立時才組字串。 */
+const JU_NAME = ["申子辰", "巳酉丑", "寅午戌", "亥卯未"];
+const FANG_NAME = ["亥子丑", "寅卯辰", "巳午未", "申酉戌"];
+const SEASON_NAME = ["春", "夏", "秋", "冬"];
+const zl = list => list.map(x => ZHI[x]).join("、");
+function shaCore(chart, g, b, pos, opt) {
   const o = shaOpt(opt);
   if (pos == null) pos = -1;
   const p = chart.pillars, ds = chart.dm, ys = p[0] % 10, yb = p[0] % 12, mb = p[1] % 12, db = p[2] % 12;
   const idx = gzIndex(g, b);
   const gans = o.ganBase === "d" || ys === ds ? [ds] : [ds, ys];
   const zrefs = o.zhiBase === "y" ? [[yb, 0]] : [[yb, 0], [db, 2]];
-  const out = new Set();
-  const add = (n, ok) => { if (ok) out.add(n); };
-  // 以日干、年干查
+  const out = new Map();
+  const add = (n, ok, why) => { if (!ok) return; const w = why(); if (!out.has(n)) out.set(n, []); if (w && !out.get(n).includes(w)) out.get(n).push(w); };
+  const gl = x => (x === ds ? (ys === ds && o.ganBase !== "d" ? "日干（年干同）" : "日干") : "年干") + GAN[x];
+  const atZ = `這柱地支${ZHI[b]}`, atG = `這柱天干${GAN[g]}`;
+  // 以日干、年干查：每個成立的起查干各記一句
+  const byGan = (n, test, target) => { for (const x of gans) if (test(x)) add(n, true, () => `${gl(x)}，${n}在${target(x)}，${atZ}`); };
   const tianyi = x => (x === 6 && o.tianyiGeng === "wu") ? [6, 2] : TIANYI[x];
-  add("天乙貴人", gans.some(x => tianyi(x).includes(b)));
-  add("太極貴人", gans.some(x => TAIJI[x].includes(b)));
-  add("文昌貴人", gans.some(x => WENCHANG[x] === b));
-  add("國印貴人", gans.some(x => GUOYIN[x] === b));
-  add("福星貴人", gans.some(x => FUXING[o.fuxing][x].includes(b)));
-  add("天廚貴人", gans.some(x => (o.tianchu === "old" ? TIANCHU_OLD[x] : luOf(mod(x + 2, 10))) === b));
-  if (o.xuetang === "nayin") add("學堂", b === NY_XUETANG[nayinWx(p[0])]);
-  else add("學堂", gans.some(x => csStart(x) === b));
-  if (o.ciguan === "nayin") add("詞館", b === NY_CIGUAN[nayinWx(p[0])]);
-  else add("詞館", gans.some(x => CIGUAN[x] === idx));
+  byGan("天乙貴人", x => tianyi(x).includes(b), x => zl(tianyi(x)));
+  byGan("太極貴人", x => TAIJI[x].includes(b), x => zl(TAIJI[x]));
+  byGan("文昌貴人", x => WENCHANG[x] === b, x => ZHI[WENCHANG[x]]);
+  byGan("國印貴人", x => GUOYIN[x] === b, x => ZHI[GUOYIN[x]]);
+  byGan("福星貴人", x => FUXING[o.fuxing][x].includes(b), x => zl(FUXING[o.fuxing][x]) + (o.fuxing === "simple" ? "（簡表）" : ""));
+  if (o.tianchu === "old") byGan("天廚貴人", x => TIANCHU_OLD[x] === b, x => ZHI[TIANCHU_OLD[x]] + "（古表）");
+  else for (const x of gans) { const sx = mod(x + 2, 10); add("天廚貴人", luOf(sx) === b, () => `${gl(x)}的食神是${GAN[sx]}，${GAN[sx]}的祿在${ZHI[luOf(sx)]}，${atZ}`); }
+  if (o.xuetang === "nayin") { const w = nayinWx(p[0]); add("學堂", b === NY_XUETANG[w], () => `年柱${gzName(p[0])}納音屬${WX[w]}，${WX[w]}的長生在${ZHI[NY_XUETANG[w]]}，${atZ}`); }
+  else byGan("學堂", x => csStart(x) === b, x => `長生位${ZHI[csStart(x)]}`);
+  if (o.ciguan === "nayin") { const w = nayinWx(p[0]); add("詞館", b === NY_CIGUAN[w], () => `年柱${gzName(p[0])}納音屬${WX[w]}，${WX[w]}的臨官在${ZHI[NY_CIGUAN[w]]}，${atZ}`); }
+  else for (const x of gans) add("詞館", CIGUAN[x] === idx, () => `${gl(x)}，詞館是${gzName(CIGUAN[x])}，這柱正是${gzName(idx)}`);
   // 只以日干查
-  add("祿神", b === luOf(ds));
-  add("金輿", b === mod(luOf(ds) + 2, 12));
-  if (ganYang(ds)) add("羊刃", b === yangRenOf(ds));
-  else if (o.yangren === "next") add("羊刃", b === yangRenOf(ds));
-  else if (o.yangren === "rev") add("羊刃", b === mod(luOf(ds) - 1, 12));
+  add("祿神", b === luOf(ds), () => `日干${GAN[ds]}的祿（臨官）在${ZHI[luOf(ds)]}，${atZ}`);
+  add("金輿", b === mod(luOf(ds) + 2, 12), () => `日干${GAN[ds]}的祿在${ZHI[luOf(ds)]}，祿前二位是${ZHI[mod(luOf(ds) + 2, 12)]}，${atZ}`);
+  if (ganYang(ds)) add("羊刃", b === yangRenOf(ds), () => `日干${GAN[ds]}的祿在${ZHI[luOf(ds)]}，祿前一位${ZHI[yangRenOf(ds)]}是羊刃，${atZ}`);
+  else if (o.yangren === "next") add("羊刃", b === yangRenOf(ds), () => `日干${GAN[ds]}是陰干，取祿${ZHI[luOf(ds)]}前一位${ZHI[yangRenOf(ds)]}，${atZ}`);
+  else if (o.yangren === "rev") add("羊刃", b === mod(luOf(ds) - 1, 12), () => `日干${GAN[ds]}是陰干，逆行取祿${ZHI[luOf(ds)]}後一位${ZHI[mod(luOf(ds) - 1, 12)]}，${atZ}`);
   // 以月支查（不算月柱自己）
   if (pos !== 1) {
-    const td = TIANDE[mb];
-    add("天德貴人", td[0] === "g" ? g === td[1] : b === td[1]);
-    add("天德合", td[0] === "g" ? g === mod(td[1] + 5, 10) : b === mod(1 - td[1], 12));
-    add("月德貴人", g === 2 * JU_WX[juGroup(mb)]);
-    add("月德合", g === mod(2 * JU_WX[juGroup(mb)] + 5, 10));
-    add("天醫", b === mod(mb - 1, 12));
-    add("血刃", b === XUEREN[mb]);
+    const td = TIANDE[mb], mz = `月支${ZHI[mb]}`;
+    const tdTxt = td[0] === "g" ? GAN[td[1]] : ZHI[td[1]];
+    add("天德貴人", td[0] === "g" ? g === td[1] : b === td[1], () => `${mz}，天德在${tdTxt}，${td[0] === "g" ? atG : atZ}`);
+    const hx = td[0] === "g" ? GAN[mod(td[1] + 5, 10)] : ZHI[mod(1 - td[1], 12)];
+    add("天德合", td[0] === "g" ? g === mod(td[1] + 5, 10) : b === mod(1 - td[1], 12), () => `${mz}，天德在${tdTxt}，${tdTxt}與${hx}相合，${td[0] === "g" ? atG : atZ}`);
+    const yd = 2 * JU_WX[juGroup(mb)], ydh = mod(yd + 5, 10);
+    add("月德貴人", g === yd, () => `${mz}屬${JU_NAME[juGroup(mb)]}局，月德在${GAN[yd]}，${atG}`);
+    add("月德合", g === ydh, () => `${mz}屬${JU_NAME[juGroup(mb)]}局，月德在${GAN[yd]}，${GAN[yd]}${GAN[ydh]}相合，${atG}`);
+    add("天醫", b === mod(mb - 1, 12), () => `${mz}的前一位是${ZHI[mod(mb - 1, 12)]}，${atZ}`);
+    add("血刃", b === XUEREN[mb], () => `${mz}的血刃在${ZHI[XUEREN[mb]]}，${atZ}`);
   }
   // 以年支、日支查（不算起查那一柱自己）
   for (const [ref, rp] of zrefs) {
     if (pos === rp) continue;
-    const st = juStart(juGroup(ref));
-    add("桃花", b === mod(st + 1, 12));
-    add("亡神", b === mod(st + 3, 12));
-    add("將星", b === mod(st + 4, 12));
-    add("驛馬", b === mod(st + 6, 12));
-    add("華蓋", b === mod(st + 8, 12));
-    add("劫煞", b === mod(st + 9, 12));
+    const st = juStart(juGroup(ref)), src = `${rp === 0 ? "年支" : "日支"}${ZHI[ref]}屬${JU_NAME[juGroup(ref)]}局`;
+    const ju = (n, k, note) => add(n, b === mod(st + k, 12), () => `${src}，${n}在${ZHI[mod(st + k, 12)]}${note ? "（" + note + "）" : ""}，${atZ}`);
+    ju("桃花", 1, "沐浴"); ju("亡神", 3, "臨官"); ju("將星", 4, "局的中神"); ju("驛馬", 6, "長生的對沖"); ju("華蓋", 8, "墓庫"); ju("劫煞", 9, "絕位");
   }
   // 只以年支查
   if (pos !== 0) {
-    add("災煞", b === mod(juStart(juGroup(yb)) + 10, 12));
-    add("紅鸞", b === mod(3 - yb, 12));
-    add("天喜", b === mod(9 - yb, 12));
-    const f = fangOf(yb);
-    add("孤辰", b === [2, 5, 8, 11][f]);
-    add("寡宿", b === [10, 1, 4, 7][f]);
-    add("喪門", b === mod(yb + 2, 12));
-    add("弔客", b === mod(yb - 2, 12));
-    add("勾絞", b === mod(yb + 3, 12) || b === mod(yb - 3, 12));
-    add("元辰", b === mod(yb + (chart.male === ganYang(ys) ? 7 : 5), 12));   // 陽男陰女沖後一位，陰男陽女沖前一位
+    const yz = `年支${ZHI[yb]}`, jg = juGroup(yb);
+    const zs = mod(juStart(jg) + 4, 12), zz = mod(juStart(jg) + 10, 12);
+    add("災煞", b === zz, () => `${yz}屬${JU_NAME[jg]}局，將星${ZHI[zs]}的對沖是${ZHI[zz]}，${atZ}`);
+    const hl = mod(3 - yb, 12), tx = mod(9 - yb, 12);
+    add("紅鸞", b === hl, () => `${yz}，紅鸞在${ZHI[hl]}，${atZ}`);
+    add("天喜", b === tx, () => `${yz}，紅鸞在${ZHI[hl]}，天喜在它的對沖${ZHI[tx]}，${atZ}`);
+    const f = fangOf(yb), gu = [2, 5, 8, 11][f], gua = [10, 1, 4, 7][f];
+    add("孤辰", b === gu, () => `${yz}屬${FANG_NAME[f]}方，孤辰在${ZHI[gu]}，${atZ}`);
+    add("寡宿", b === gua, () => `${yz}屬${FANG_NAME[f]}方，寡宿在${ZHI[gua]}，${atZ}`);
+    add("喪門", b === mod(yb + 2, 12), () => `${yz}前二位是${ZHI[mod(yb + 2, 12)]}，${atZ}`);
+    add("弔客", b === mod(yb - 2, 12), () => `${yz}後二位是${ZHI[mod(yb - 2, 12)]}，${atZ}`);
+    add("勾絞", b === mod(yb + 3, 12) || b === mod(yb - 3, 12), () => `${yz}前後第三位是${ZHI[mod(yb + 3, 12)]}、${ZHI[mod(yb - 3, 12)]}，${atZ}`);
+    const yangMale = chart.male === ganYang(ys), yc = mod(yb + 6, 12), yr = mod(yb + (yangMale ? 7 : 5), 12);
+    add("元辰", b === yr, () => `${GAN[ys]}年生${chart.male ? "男" : "女"}，屬${yangMale ? "陽男陰女" : "陰男陽女"}；${yz}的對沖是${ZHI[yc]}，取沖${yangMale ? "後" : "前"}一位${ZHI[yr]}，${atZ}`);
   }
   // 查日柱、時柱
   if (pos === 2) {
-    add("魁罡", KUIGANG.has(idx));
-    add("陰差陽錯", YINCHA.has(idx));
-    add("十惡大敗", SHIE.has(idx));
-    add("日德", RIDE.has(idx));
-    add("天赦", idx === TIANSHE[zhiSeason(mb)]);
+    const dz = `日柱${gzName(idx)}`;
+    add("魁罡", KUIGANG.has(idx), () => `${dz}在魁罡四日（庚辰、庚戌、壬辰、戊戌）之列`);
+    add("陰差陽錯", YINCHA.has(idx), () => `${dz}在陰差陽錯十二日之列`);
+    add("十惡大敗", SHIE.has(idx), () => `${dz}在十惡大敗十日之列`);
+    add("日德", RIDE.has(idx), () => `${dz}在日德五日（甲寅、丙辰、戊辰、庚辰、壬戌）之列`);
+    const se = zhiSeason(mb);
+    add("天赦", idx === TIANSHE[se], () => `月支${ZHI[mb]}屬${SEASON_NAME[se]}季，${SEASON_NAME[se]}季逢${gzName(TIANSHE[se])}日為天赦，${dz}`);
   }
-  if (pos === 2 || pos === 3) add("金神", JINSHEN.has(idx));
+  if (pos === 2 || pos === 3) add("金神", JINSHEN.has(idx), () => `${pos === 2 ? "日柱" : "時柱"}${gzName(idx)}是金神（乙丑、己巳、癸酉）`);
   // 空亡
-  add("空亡", xunKong(p[2]).includes(b) || (o.kong === "dy" && xunKong(p[0]).includes(b)));
-  return SHENSHA_ORDER.filter(n => out.has(n));
+  const kd = xunKong(p[2]), ky = xunKong(p[0]);
+  add("空亡", kd.includes(b), () => `日柱${gzName(p[2])}旬空${zl(kd)}，${atZ}`);
+  add("空亡", o.kong === "dy" && ky.includes(b), () => `年柱${gzName(p[0])}旬空${zl(ky)}，${atZ}`);
+  return out;
+}
+function shensha(chart, g, b, pos, opt) {
+  const m = shaCore(chart, g, b, pos, opt);
+  return SHENSHA_ORDER.filter(n => m.has(n));
+}
+/* 同 shensha，另帶每一項為什麼成立：[{ name, why: [句子…] }] */
+function shenshaDetail(chart, g, b, pos, opt) {
+  const m = shaCore(chart, g, b, pos, opt);
+  return SHENSHA_ORDER.filter(n => m.has(n)).map(n => ({ name: n, why: m.get(n) }));
 }
 
 /* ---------------- 9. 干支關係 ---------------- */
@@ -890,7 +915,7 @@ return {
   suiMonths, lunarOfDay, lunarMonthsOfYear, lunarToDayNum, lunarText,
   jdToClock, clockToJD, jdNow, addCalendar, hourBranchOf, SHICHEN_RANGE, pad2,
   buildChart, chartFromPillars, taiMingShen, currentDayunIndex, dayunIndexForYear, xiaoYun, liuYue, liuRi, liuShi, momentOf,
-  shensha, findRelations, foldZhu, pillarRel, scoreRelations, attention, relText, xingTarget, searchPillars
+  shensha, shenshaDetail, findRelations, foldZhu, pillarRel, scoreRelations, attention, relText, xingTarget, searchPillars
 };
 })();
 if (typeof module !== "undefined") module.exports = Bazi;

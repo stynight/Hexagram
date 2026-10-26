@@ -144,7 +144,7 @@ const SHOW_GROUPS = [
 const HIDE_SEL = {
   ss: 'table.pan tr[data-row="ss"]', mk: 'table.pan tr[data-row="mk"]', cang: 'table.pan tr[data-row="cang"]', fu: 'table.pan tr[data-row="fu"]',
   xy: 'table.pan tr[data-row="xy"]', zz: 'table.pan tr[data-row="zz"]', kong: 'table.pan tr[data-row="kong"]', ny: 'table.pan tr[data-row="ny"]',
-  sha: 'table.pan tr[data-row="sha"], .sha-toggle', "s-dayun": ".strip.s-dayun", "s-year": ".strip.s-year", "s-month": ".strip.s-month",
+  sha: 'table.pan tr[data-row="sha"], .sha-toggle, .sha-why', "s-dayun": ".strip.s-dayun", "s-year": ".strip.s-year", "s-month": ".strip.s-month",
   "s-day": ".strip.s-day", "s-hour": ".strip.s-hour", cmk: ".cell .c-mk", info: "#page-basic .infobar, #page-basic .basic-extra",
   pinfo: ".pinfo-lines", algo: ".algo", hint: ".swipe-hint", wbar: ".wbar", attn: ".attn", rel: "section.rel", hpx: ".hpx"
 };
@@ -499,8 +499,6 @@ function buildFormOptions() {
   h = ""; for (let x = 0; x < 24; x++) h += opt(x, pad2(x) + "時"); $("#f-hh").innerHTML = h;
   h = ""; for (let x = 0; x < 60; x++) h += opt(x, pad2(x) + "分"); $("#f-mi").innerHTML = h;
   h = ""; for (let y = 1801; y <= 2099; y++) h += opt(y, `${y}年（${B.gzName(B.yearGZ(y))}）`); $("#f-ly").innerHTML = h;
-  h = ""; for (let i = 0; i < 60; i++) h += opt(i, B.gzName(i));
-  for (let k = 0; k < 4; k++) $("#f-p" + k).innerHTML = h;
   h = PLACES.map((p, i) => opt(i, p[0])).join("") + opt("custom", "自訂座標"); $("#f-place").innerHTML = h;
   $("#f-tz").innerHTML = TZS.map(t => opt(t, tzOption(t), t === 8)).join("");
 }
@@ -552,11 +550,13 @@ function syncLunarFromSolar() {
 }
 function syncSizhuFromSolar() {
   const r = readSolarRaw();
+  S.pzActive = 0;
   try {
     const ch = B.buildChart(Object.assign({ sex: "m", tz: +$("#f-tz").value, lon: +$("#f-lon").value, trueSolar: false, zishi: $("#f-zs").checked ? "split" : "day23" }, r));
-    ch.pillars.forEach((p, k) => { $("#f-p" + k).value = String(p); });
+    setPillars(ch.pillars, { silent: true });
   } catch (e) { /* 保持原值 */ }
   S.candPick = null;
+  renderPz();
   renderCands();
 }
 function readSolarRaw() { return { y: +$("#f-sy").value, m: +$("#f-sm").value, d: +$("#f-sd").value, hh: +$("#f-hh").value, mi: +$("#f-mi").value }; }
@@ -572,6 +572,82 @@ function fillFormNow() {
   $("#f-save").checked = !!S.prefs.autosave;
 }
 let candList = [];
+/* ---------- 四柱輸入
+   點一柱，再點天干、地支；陽干只列陽支，陰干只列陰支。月干、時干照五虎遁、五鼠遁從年干、日干帶出，只要點地支。
+   點完地支跳到下一柱。上方文字框可以自己打或貼上（例如「丙午 庚寅 壬辰 甲辰」，夾雜別的字也行，取前四柱）。 */
+const PZ_NAME = ["年柱", "月柱", "日柱", "時柱"];
+const PZ_AUTO = { 1: "年干五虎遁", 3: "日干五鼠遁" };
+const getPillars = () => [0, 1, 2, 3].map(k => +$("#f-p" + k).value);
+let PZ_HELP = null;                                                  // 文字框下方原本的說明，改過干支後放回去
+function setPillars(p, opt) {
+  const o = opt || {};
+  p.forEach((v, k) => { $("#f-p" + k).value = String(v); });
+  if (!o.keepText) {
+    const q = $("#f-gzq"), m = $("#f-gzq-msg");
+    if (q) q.value = p.map(B.gzName).join(" ");
+    if (m) { if (PZ_HELP == null) PZ_HELP = m.textContent; m.textContent = PZ_HELP; }
+  }
+  renderPz();
+  if (!o.silent) { S.candPick = null; if (S.mode === "sizhu") renderCands(); updatePreview(); }
+}
+function renderPz() {
+  const box = $("#f-pz"); if (!box) return;
+  const p = getPillars(), a = S.pzActive || 0;
+  const g = p[a] % 10, b = p[a] % 12;
+  const tabs = p.map((v, k) => `<button type="button" class="pz-tab" data-act="pz-tab" data-k="${k}" aria-pressed="${k === a}" aria-label="${PZ_NAME[k]} ${B.gzName(v)}${k === a ? "，正在修改" : "，點一下修改"}"><span class="pz-t">${PZ_NAME[k]}</span><span class="pz-gz">${gzH(v)}</span></button>`).join("");
+  const key = (act, i, on, html, label) => `<button type="button" class="pz-key" data-act="${act}" data-v="${i}" aria-pressed="${on}" aria-label="${label}">${html}</button>`;
+  let rows = "";
+  if (PZ_AUTO[a]) {
+    const want = a === 1 ? B.monthGZ(p[0], b) : B.hourGZ(p[2], b);
+    rows += want === p[a] ? `<p class="hint pz-note">${PZ_NAME[a][0]}干照${PZ_AUTO[a]}帶出（${GAN[g]}），點地支就好。</p>`
+      : `<p class="hint pz-note pz-warn">目前的${PZ_NAME[a][0]}干${GAN[g]}跟${PZ_AUTO[a].slice(0, 2)}不合，照${PZ_AUTO[a]}應為${GAN[want % 10]}；點一下地支就會改正。</p>`;
+  }
+  else rows += `<div class="pz-row pz-row-g" role="group" aria-label="${PZ_NAME[a]}天干"><span class="pz-k" aria-hidden="true">天干</span>${GAN.map((x, i) => key("pz-gan", i, i === g, gS(i), `${PZ_NAME[a]}天干${x}`)).join("")}</div>`;
+  const zs = []; for (let i = 0; i < 12; i++) if (PZ_AUTO[a] || (i & 1) === (g & 1)) zs.push(i);
+  rows += `<div class="pz-row pz-row-z" role="group" aria-label="${PZ_NAME[a]}地支"><span class="pz-k" aria-hidden="true">地支${PZ_AUTO[a] ? "" : (g & 1 ? "（陰支）" : "（陽支）")}</span>${zs.map(i => key("pz-zhi", i, i === b, zS(i), `${PZ_NAME[a]}地支${ZHI[i]}`)).join("")}</div>`;
+  box.innerHTML = `<div class="pz-tabs">${tabs}</div><div class="pz-keys">${rows}</div>`;
+}
+/* 改了年干或日干，月干、時干跟著重算 */
+function pzDerive(p) {
+  p[1] = B.monthGZ(p[0], p[1] % 12);
+  p[3] = B.hourGZ(p[2], p[3] % 12);
+  return p;
+}
+function pzPick(kind, v) {
+  const p = getPillars(), a = S.pzActive || 0;
+  if (kind === "gan") {
+    let b = p[a] % 12; if ((b & 1) !== (v & 1)) b = (b + 1) % 12;          // 陰陽不合時換成下一個支
+    p[a] = B.gzIndex(v, b);
+  } else if (a === 1) p[1] = B.monthGZ(p[0], v);
+  else if (a === 3) p[3] = B.hourGZ(p[2], v);
+  else p[a] = B.gzIndex(p[a] % 10, v);
+  pzDerive(p);
+  if (kind === "zhi" && a < 3) S.pzActive = a + 1;
+  setPillars(p);
+  const f = $(kind === "zhi" && a < 3 ? '#f-pz .pz-key[aria-pressed="true"]' : `#f-pz .pz-key[data-act="pz-${kind}"][aria-pressed="true"]`);
+  if (f) f.focus();
+}
+function parseGzText(s) {
+  const chars = Array.from(s || "").filter(c => GAN.includes(c) || ZHI.includes(c));
+  const p = [];
+  for (let i = 0; i < chars.length && p.length < 4; i += 2) {
+    const g = GAN.indexOf(chars[i]), b = ZHI.indexOf(chars[i + 1]);
+    if (g < 0 || b < 0) return { error: `第 ${p.length + 1} 柱要先寫天干、再寫地支（讀到「${chars[i]}${chars[i + 1] || ""}」）`, n: p.length };
+    if ((g & 1) !== (b & 1)) return { error: `「${chars[i]}${chars[i + 1]}」不成柱：陽干配陽支，陰干配陰支`, n: p.length };
+    p.push(B.gzIndex(g, b));
+  }
+  return { p, n: p.length, extra: chars.length > 8 };
+}
+function onGzText() {
+  const q = $("#f-gzq"), msg = $("#f-gzq-msg");
+  if (PZ_HELP == null) PZ_HELP = msg.textContent;
+  if (!q.value.trim()) { msg.textContent = PZ_HELP; return; }
+  const r = parseGzText(q.value);
+  if (r.error) { msg.textContent = r.error + "。"; return; }
+  if (r.n < 4) { msg.textContent = `已認出 ${r.n} 柱${r.n ? "：" + r.p.map(B.gzName).join(" ") : ""}，還差 ${4 - r.n} 柱。`; return; }
+  msg.textContent = `已填入 ${r.p.map(B.gzName).join(" ")}${r.extra ? "（只取前四柱）" : ""}。`;
+  setPillars(r.p, { keepText: true });
+}
 function renderCands() {
   const p = [0, 1, 2, 3].map(k => +$("#f-p" + k).value);
   const r = B.searchPillars(p, { from: 1801, to: 2100, tz: +$("#f-tz").value });
@@ -654,7 +730,7 @@ function fillFormFromCase(c) {
   if (c.mode === "lunar" && c.lunar) {
     $("#f-ly").value = String(c.lunar.y); rebuildLunarMonths(`${c.lunar.m}|${c.lunar.leap ? 1 : 0}`); rebuildLunarDays(c.lunar.d); $("#f-ld").value = String(c.lunar.d);
   }
-  if (c.mode === "sizhu" && c.sizhu) { c.sizhu.p.forEach((p, k) => { $("#f-p" + k).value = String(p); }); }
+  if (c.mode === "sizhu" && c.sizhu) { S.pzActive = 0; setPillars(c.sizhu.p, { silent: true }); }
   S.mode = c.mode || "solar";
   setModeNoSync(S.mode);
   if (S.mode === "sizhu") { S.candPick = null; renderCands(); if (c.solar) { const i = candList.findIndex(x => x.mid.y === c.solar.y && x.mid.m === c.solar.m && x.mid.d === c.solar.d); if (i >= 0) { S.candPick = i; renderCands(); } } }
@@ -771,6 +847,7 @@ function headerHTML(cur, page) {
   const acts = [];
   if (page === "pro") acts.push(`<label class="switch"><input type="checkbox" data-act="tms"${S.prefs.tms ? " checked" : ""}> 胎命身</label>`);
   acts.push(cur.saved ? `<span class="hdone">已存檔</span>` : `<button class="hbtn" type="button" data-act="save-cur">存檔</button>`);
+  acts.push(`<button class="hbtn" type="button" data-act="gz-copy-open" aria-haspopup="dialog">複製</button>`);
   acts.push(`<button class="hbtn" type="button" data-act="edit-cur">編輯</button>`);
   return `<header class="hbar">
     <div class="sx"><span class="sx-ring" aria-label="生肖${sx}">${sx}</span>${tag}</div>
@@ -846,13 +923,15 @@ function cellsFor(col, chart, row, ctx) {
       return `<td${cls}>${ms.length || xs.length ? marksHTML(ms) + (x ? marksHTML(xs, x.side) : "") : '<span class="dim">—</span>'}</td>`;
     }
     case "sha": {
-      const list = B.shensha(chart, g, b, col.kind === "natal" ? col.pos : -1, S.prefs.shaOpt);
-      if (!S.prefs.sha) return `<td${cls}><span class="dim">${list.length ? list.length + " 項" : "—"}</span></td>`;
-      return `<td${cls}>${list.length ? list.map(s => `<span class="sha${B.SHENSHA_BAD.has(s) ? " bad" : ""}">${s.length === 4 ? `<span class="nw">${s.slice(0, 2)}</span><span class="nw">${s.slice(2)}</span>` : s}</span>`).join("") : '<span class="dim">—</span>'}</td>`;
+      const pos = col.kind === "natal" ? col.pos : -1;
+      if (!S.prefs.sha) { const n = B.shensha(chart, g, b, pos, S.prefs.shaOpt).length; return `<td${cls}><span class="dim">${n ? n + " 項" : "—"}</span></td>`; }
+      const list = B.shenshaDetail(chart, g, b, pos, S.prefs.shaOpt);    // 每一項帶著「為什麼」，點一下寫在表下
+      return `<td${cls}>${list.length ? list.map(({ name: s, why }) => { const w = why.join("；"); return `<span class="sha${B.SHENSHA_BAD.has(s) ? " bad" : ""}" role="button" tabindex="0" data-act="sha-why" data-n="${s}" data-why="${esc(w)}" title="${esc(s + "：" + w)}">${s.length === 4 ? `<span class="nw">${s.slice(0, 2)}</span><span class="nw">${s.slice(2)}</span>` : s}</span>`; }).join("") : '<span class="dim">—</span>'}</td>`;
     }
   }
   return "<td></td>";
 }
+const SHA_WHY_HINT = "點一下神煞（電腦上滑鼠停在上面也行），這裡會寫出這一柱為什麼有它。";
 const ROW_LABEL = { head: "日期", ss: "主星", gan: "天干", zhi: "地支", cang: "藏干", fu: "副星", cangss: "藏干", xy: "星運", zz: "自坐", kong: "空亡", ny: "納音", sha: "神煞", mk: "沖合" };
 const ROW_CLASS = { head: "r-head", ss: "r-ss", gan: "r-big", zhi: "r-big", cang: "r-cang", fu: "r-fu", cangss: "r-cang", xy: "r-sm", zz: "r-sm", kong: "r-sm", ny: "r-sm", sha: "r-sha", mk: "r-mk" };
 function panTableHTML(cols, chart, rows, caption, ctx) {
@@ -861,6 +940,7 @@ function panTableHTML(cols, chart, rows, caption, ctx) {
     h += `<tr class="${ROW_CLASS[row]}" data-row="${row === "cangss" ? "cang" : row}"><th scope="row">${ROW_LABEL[row]}</th>${cols.map(col => cellsFor(col, chart, row, ctx)).join("")}</tr>`;
   }
   h += "</table></div>";
+  if (rows.includes("sha") && S.prefs.sha) h += `<p class="sha-why hint" aria-live="polite">${SHA_WHY_HINT}</p>`;
   if (rows.includes("sha")) h += `<button type="button" class="sha-toggle" data-row="sha" data-act="sha" aria-expanded="${S.prefs.sha}">${S.prefs.sha ? "收起神煞（只顯示每柱項數）" : "展開神煞"}</button>`;
   return h;
 }
@@ -881,6 +961,93 @@ function attnHTML(raw) {
 function natalItems(chart, side) {
   return ["年柱", "月柱", "日柱", "時柱"].map((label, pos) => ({ label, short: label[0], kind: "natal", pos, idx: chart.pillars[pos], side: side || "A" }));
 }
+
+/* =========================================================
+   複製
+   命盤表是一列天干、一列地支，瀏覽器照列複製會變成「丙庚壬甲 午寅辰辰」，還夾著五行小字與排版空白。
+   在表格裡拖選時改成按柱輸出，範圍取拖選起點與終點兩格圍出的長方形：
+   只圍到日期、主星、天干、地支這幾列時，得到「丙午 庚寅 壬辰 甲辰」一行；
+   圍到其他列時每列一行、格子用 Tab 隔開（可貼進試算表），天干地支合成「干支」一列。
+   還沒選的流日、流時欄（只有「—」）略過；設定裡隱藏的列不算。
+   起點與終點在同一格裡（只選一格裡的字）時照瀏覽器原本的方式複製。
+   ========================================================= */
+const PILLAR_ROWS = new Set(["head", "ss", "gan", "zhi"]);
+function cellText(td) {
+  if (!td) return "";
+  const c = td.cloneNode(true);
+  c.querySelectorAll(".sr-only, .ssa, .phhint, .wxs").forEach(n => n.remove());
+  const items = c.querySelectorAll(".cg, .sha, .mk");
+  if (items.length) return Array.from(items).map(n => n.textContent.replace(/\s+/g, "")).join("、");
+  return c.textContent.replace(/\s+/g, "");
+}
+function boundaryCell(node, off, isEnd) {
+  let el = node;
+  if (el && el.nodeType === 1 && el.childNodes.length) el = (isEnd ? el.childNodes[off - 1] : el.childNodes[off]) || el;
+  if (el && el.nodeType !== 1) el = el.parentElement;
+  return el && el.closest ? el.closest("table.pan td, table.pan th") : null;
+}
+function tableCopyText(sel) {
+  if (!sel || !sel.rangeCount || sel.isCollapsed) return null;
+  const cells = [];
+  for (let i = 0; i < sel.rangeCount; i++) {
+    const r = sel.getRangeAt(i);
+    cells.push(boundaryCell(r.startContainer, r.startOffset, false), boundaryCell(r.endContainer, r.endOffset, true));
+  }
+  if (cells.some(c => !c)) return null;
+  const table = cells[0].closest("table.pan");
+  if (cells.some(c => c.closest("table.pan") !== table)) return null;
+  if (cells.every(c => c === cells[0])) return null;
+  const rIdx = cells.map(c => c.parentElement.rowIndex), cIdx = cells.map(c => c.cellIndex);
+  const r0 = Math.min(...rIdx), r1 = Math.max(...rIdx);
+  const c0 = Math.max(1, Math.min(...cIdx)), c1 = Math.max(...cIdx);
+  if (c1 < c0) return null;                                          // 只選到左邊的列名
+  const rows = Array.from(table.rows).slice(r0, r1 + 1).filter(tr => tr.getClientRects().length);   // 設定裡隱藏的列不算
+  const keys = rows.map(tr => tr.dataset.row);
+  const ganRow = table.querySelector('tr[data-row="gan"]');
+  const cols = []; for (let i = c0; i <= c1; i++) if (!(ganRow && ganRow.cells[i] && ganRow.cells[i].classList.contains("ph"))) cols.push(i);   // 還沒選的流日、流時欄不算
+  if (!cols.length) return null;
+  const gan = rows.find(tr => tr.dataset.row === "gan"), zhi = rows.find(tr => tr.dataset.row === "zhi");
+  const gz = i => (gan ? cellText(gan.cells[i]) : "") + (zhi ? cellText(zhi.cells[i]) : "");
+  if ((gan || zhi) && keys.every(k => PILLAR_ROWS.has(k))) return cols.map(gz).join(" ");
+  const head = table.querySelector('tr[data-row="head"]');
+  const line = (label, vals) => [label].concat(vals).join("\t");
+  const out = head ? [line(cellText(head.cells[0]), cols.map(i => cellText(head.cells[i])))] : [];
+  for (const tr of rows) {
+    const k = tr.dataset.row;
+    if (k === "head" || (k === "zhi" && gan)) continue;
+    if (k === "gan" && zhi) { out.push(line("干支", cols.map(gz))); continue; }
+    out.push(line(cellText(tr.cells[0]), cols.map(i => cellText(tr.cells[i]))));
+  }
+  return out.join("\n");
+}
+/* 抬頭的「複製」：三種格式，都不含姓名 */
+function copyFormats(chart) {
+  const gz = chart.pillars.map(B.gzName).join(" ");
+  const zao = `${chart.male ? "乾造" : "坤造"} ${gz}`;
+  const lines = [zao];
+  if (chart.pillarsOnly) lines.push("日期未定（四柱直排）");
+  else {
+    lines.push(`公曆 ${fmtDash(chart.civil)}（${tzText(chart.tz)}${chart.dst ? "・夏令時" : ""}）`);
+    if (chart.trueSolar) lines.push(`真太陽時 ${fmtDash(chart.clock)}`);
+    lines.push(`農曆 ${B.lunarText(chart.lunar)} ${ZHI[chart.pillars[3] % 12]}時`);
+    const y = chart.yun;
+    lines.push(`起運 出生後 ${y.Y}年${y.M}月${y.D}天${y.H}時，大運${y.forward ? "順" : "逆"}排`);
+    lines.push(`大運 ${y.dayun.map(d => `${d.startAge}歲 ${B.gzName(d.idx)}`).join("、")}`);
+  }
+  return [["gz", "四柱", gz], ["zao", "乾坤造與四柱", zao], ["full", chart.pillarsOnly ? "完整資料" : "完整資料（公曆、農曆、起運、大運）", lines.join("\n")]];
+}
+async function copyText(text) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch (e) { /* 改用舊方法 */ }
+  const back = document.activeElement;
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.setAttribute("readonly", ""); ta.setAttribute("aria-hidden", "true");
+  ta.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none";
+  document.body.appendChild(ta); ta.select();
+  let done = false; try { done = document.execCommand("copy"); } catch (e) { done = false; }
+  ta.remove(); if (back && back.focus) back.focus();
+  return done;
+}
+function selectNode(el) { try { const s = getSelection(), r = document.createRange(); r.selectNodeContents(el); s.removeAllRanges(); s.addRange(r); } catch (e) { /* 無妨 */ } }
 
 /* =========================================================
    基本排盤
@@ -1403,6 +1570,17 @@ function openPicker(side) {
   const first = $(".pick, .modal-body .btn", m) || $('[data-act="modal-close"]', m);
   if (first) first.focus();
 }
+function openCopy() {
+  if (!S.cur) return;
+  const m = $("#modal");
+  const fm = copyFormats(S.cur.chart);
+  const body = fm.map(([k, name, text]) => `<div class="cpf"><div class="cpf-head"><span class="cpf-name" id="cpn-${k}">${esc(name)}</span><button type="button" class="btn btn-sm btn-gold" data-act="gz-copy" data-k="${k}" aria-describedby="cpn-${k}">複製</button></div><pre class="cpf-text" id="cpf-${k}">${esc(text)}</pre></div>`).join("") +
+    `<p class="hint cpf-hint">都不含姓名。在命盤表裡拖選也會按柱複製：只圍到日期、主星、天干、地支這幾列時，得到「${esc(fm[0][2])}」這樣一行；圍到其他列時每列一行、格子用 Tab 隔開，天干地支合成「干支」一列，可以貼進試算表。</p>`;
+  m.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-t"><div class="modal-head"><h2 class="card-title" id="modal-t">複製八字</h2><button type="button" class="btn btn-sm" data-act="modal-close">關閉</button></div><div class="modal-body">${body}</div></div>`;
+  modalReturn = document.activeElement;
+  m.hidden = false;
+  const first = $('[data-act="gz-copy"]', m); if (first) first.focus();
+}
 function closeModal() { const m = $("#modal"); m.hidden = true; m.innerHTML = ""; if (modalReturn && modalReturn.focus) modalReturn.focus(); modalReturn = null; }
 
 /* =========================================================
@@ -1458,6 +1636,30 @@ document.addEventListener("click", e => {
     case "hp-new": closeModal(); S.flow = { type: "hepan", side: t.dataset.side }; fillFormNow(); $("#f-name").value = ""; setMode("solar"); go("input"); break;
     case "hp-start": if (S.hepan.a && S.hepan.b) { S.hepan.started = true; S.hpSel = { A: null, B: null }; saveHepan(); renderHepan(); const p = $(".hp-panels"); if (p) p.scrollIntoView({ block: "start", behavior: "smooth" }); } break;
     case "modal-close": closeModal(); break;
+    case "gz-copy-open": openCopy(); break;
+    case "sha-why": {
+      const sel = getSelection(); if (sel && !sel.isCollapsed) break;     // 正在拖選文字時不動
+      const td = t.closest("td"), wrap = t.closest(".pan-wrap"), box = wrap && wrap.nextElementSibling;
+      if (!td || !box || !box.classList.contains("sha-why")) break;
+      const head = td.closest("table").querySelector('tr[data-row="head"]');
+      const title = head && head.cells[td.cellIndex] ? head.cells[td.cellIndex].textContent.trim() : "";
+      $$(".sha.on", wrap).forEach(x => { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); });
+      t.classList.add("on"); t.setAttribute("aria-pressed", "true");
+      box.innerHTML = `<b>${esc(title)}・${esc(t.dataset.n)}</b>：${esc(t.dataset.why)}。`;
+      break;
+    }
+    case "pz-tab": { S.pzActive = +t.dataset.k; renderPz(); const b = $(`#f-pz .pz-tab[data-k="${t.dataset.k}"]`); if (b) b.focus(); break; }
+    case "pz-gan": pzPick("gan", +t.dataset.v); break;
+    case "pz-zhi": pzPick("zhi", +t.dataset.v); break;
+    case "gz-copy": {
+      const pre = document.getElementById("cpf-" + t.dataset.k), nm = document.getElementById("cpn-" + t.dataset.k);
+      if (!pre) break;
+      copyText(pre.textContent).then(done => {
+        if (done) { closeModal(); toast(`已複製「${nm ? nm.textContent.replace(/（.*）/, "") : "八字"}」。`); }
+        else { selectNode(pre); toast("瀏覽器不讓網頁寫入剪貼簿，文字已經選好，請按 Ctrl+C（手機長按）複製。"); }
+      });
+      break;
+    }
     case "theme": {
       const id = t.dataset.id;
       S.theme.id = id; applyTheme(); renderTheme();
@@ -1520,7 +1722,7 @@ document.addEventListener("change", e => {
   if (t.id === "f-place") { if (t.value !== "custom") setPlaceByIndex(+t.value); }
   if (t.id === "f-lon" || t.id === "f-lat") $("#f-place").value = "custom";
   if (t.id === "f-save") { S.prefs.autosave = t.checked; savePrefs(); }
-  if (/^f-p\d$/.test(t.id) || t.id === "f-tz") { S.candPick = null; if (S.mode === "sizhu") renderCands(); }
+  if (t.id === "f-tz") { S.candPick = null; if (S.mode === "sizhu") renderCands(); }
   if (t.name === "f-cand") S.candPick = +t.value;
   updatePreview();
 });
@@ -1528,12 +1730,21 @@ document.addEventListener("input", e => {
   const t = e.target;
   if (t.matches('input[type="range"][data-wg]')) { onWeightInput(t); return; }
   if (t.matches('input[type="color"][data-cp]')) { onCustomColor(t); return; }
+  if (t.id === "f-gzq") { if (!e.isComposing) onGzText(); return; }
   if (t.id === "case-filter") { S.ui.filter = t.value.trim(); const pos = t.selectionStart; renderCases(); const f = $("#case-filter"); if (f) { f.focus(); try { f.setSelectionRange(pos, pos); } catch (x) { /* 無妨 */ } } return; }
   if (t.id === "f-lon" || t.id === "f-lat" || t.id === "f-name") { if (t.id !== "f-name") $("#f-place").value = "custom"; updatePreview(); }
+});
+document.addEventListener("compositionend", e => { if (e.target && e.target.id === "f-gzq") onGzText(); });
+document.addEventListener("copy", e => {
+  const text = tableCopyText(document.getSelection());
+  if (text == null || !e.clipboardData) return;
+  e.clipboardData.setData("text/plain", text);
+  e.preventDefault();
 });
 document.addEventListener("toggle", e => { if (e.target.matches && e.target.matches("details.sha-sw")) S.ui.shaOpen = e.target.open; }, true);
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && !$("#modal").hidden) closeModal();
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches('.sha[data-act="sha-why"]')) { e.preventDefault(); e.target.click(); }
   if (e.key === "Enter" && e.target.id && e.target.id.startsWith("rn-")) { const b = document.querySelector(`[data-act="case-rename-save"][data-id="${e.target.id.slice(3)}"]`); if (b) b.click(); }
 });
 $("#f-form").addEventListener("submit", e => { e.preventDefault(); submitForm(); });
