@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hexagram</title>
+<meta name="description" content="八字排盤合盤、六爻納甲排盤，單一 HTML，打開就能用。">
+<style>
+/* 版面：一欄，兩張工具卡片並排（手機疊成一欄）。配色沿用兩個工具的「月白／墨夜」。 */
+:root {
+  --bg: #F3F4F6; --card: #FFFFFF; --ink: #1F2328; --accent: #4A5B8C;
+  --dim: color-mix(in srgb, var(--ink) 58%, var(--card));
+  --line: color-mix(in srgb, var(--ink) 12%, var(--card));
+  --soft: color-mix(in srgb, var(--accent) 8%, var(--card));
+  --f-serif: "Songti TC", "STSong", "Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "PMingLiU", serif;
+  --f-sans: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #111214; --card: #1A1C20; --ink: #E8EAED; --accent: #8AB4F8; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-sans); line-height: 1.6; }
+main { max-width: 860px; margin: 0 auto; padding-block: 56px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+h1 { margin: 0; font-family: var(--f-serif); font-size: 34px; letter-spacing: .12em; }
+.lede { margin: 6px 0 0; color: var(--dim); }
+.tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+a.tool { display: grid; gap: 8px; padding: 22px 24px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: inherit; text-decoration: none; }
+a.tool:hover, a.tool:focus-visible { border-color: var(--accent); background: var(--soft); outline: none; }
+.tool h2 { margin: 0; font-family: var(--f-serif); font-size: 21px; letter-spacing: .06em; }
+.tool p { margin: 0; color: var(--dim); font-size: 14px; }
+.tool .go { color: var(--accent); font-size: 14px; font-weight: 600; }
+.notes { display: grid; gap: 6px; font-size: 13.5px; color: var(--dim); }
+.notes p { margin: 0; }
+.notes a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Hexagram</h1>
+    <p class="lede">八字與六爻的排盤工具，每個都是一個 HTML 檔，打開就能用，不需要網路。</p>
+  </header>
+  <section class="tools" aria-label="工具">
+    <a class="tool" href="bazi-paipan/bazi.html">
+      <h2>八字排盤合盤</h2>
+      <p>公曆、農曆、四柱輸入；基本排盤、專業細盤（大運流年流月流日流時）、兩人合盤與關係清單，近四十種神煞可點看原因。</p>
+      <span class="go">打開</span>
+    </a>
+    <a class="tool" href="liuyao-paipan/liuyao.html">
+      <h2>六爻納甲排盤</h2>
+      <p>數字、手動六爻、時間起卦；本卦變卦、世應、六親、六神、伏神、旬空，依力量排序的合沖生剋清單，附《周易》原文。</p>
+      <span class="go">打開</span>
+    </a>
+  </section>
+  <section class="notes">
+    <p>在這裡打開時，存下的案例只放在你這個瀏覽器裡，換裝置不會跟著走。</p>
+    <p>算法說明、驗收結果和八字統計：<a href="https://github.com/stynight/Hexagram">github.com/stynight/Hexagram</a></p>
+  </section>
+</main>
+</body>
+</html>
