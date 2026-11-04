@@ -1,6 +1,6 @@
 # 加刑以後的偏枯（v4）
 
-`model.js` 的 v3 沒有算刑。這裡另開 `model-xing.js`，把 v3 的步驟抄過去，在合之後、沖之前加上刑，叫 v4。`model.js`、`README.md` 和原有的 `data/` 都沒有改動。
+`model.js` 的 v3 沒有算刑。這裡另開 `model-xing.js`，把 v3 的步驟抄過去，在合之後、沖之前加上刑，叫 v4。`model.js` 和原有的 `data/` 都沒有改動。結果頁是 [`xing.html`](xing.html)，版面照「六十甲子偏枯圖」，由 `build-xing-page.js` 產生。
 
 ```
 node run-xing.js
@@ -8,7 +8,7 @@ node run-xing.js
 
 約 25 秒跑完 1804–2043 四輪甲子，寫出：
 
-- `data/xing.json`：每個年柱 240 年平均的 v3、v4 極端盤比例，和 v4 的四輪各自的比例。
+- `data/xing.json`：每個年柱 240 年平均的 v3、v4 極端盤比例，v4 的四輪各自的比例，以及 v4 四輪合計的缺一行、平均熵、五行比例、極端盤偏向和最常缺的一行。
 - `data/xing-months.json`：1984–2043 這一輪，每個年柱十二個月柱的 v3、v4 極端盤比例。
 
 ## 規則
