@@ -4,205 +4,229 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>加刑以後的偏枯</title>
-<meta name="description" content="六十年柱在不算刑（v3）和加刑（v4）兩種五行模型下的極端盤比例，1804–2043 四輪甲子。">
+<meta name="description" content="六十年柱在加刑（v4）以後的極端盤比例，和不算刑（v3）對照，1804–2043 四輪甲子。">
 <style>
-/* 配色沿用首頁的「月白／墨夜」。這個檔案由 build-xing-page.js 產生，資料內嵌，打開就能看。 */
+/* 版面照「六十甲子偏枯圖」：左邊六十甲子格、右邊詳細面板、下面全表。這個檔案由 build-xing-page.js 產生，資料內嵌。 */
 :root {
-  --bg: #F3F4F6; --card: #FFFFFF; --ink: #1F2328; --accent: #4A5B8C; --up: #B5452F; --down: #2F7A5B;
-  --dim: color-mix(in srgb, var(--ink) 58%, var(--card));
-  --line: color-mix(in srgb, var(--ink) 12%, var(--card));
-  --soft: color-mix(in srgb, var(--accent) 8%, var(--card));
+  --bg: #FAF9F6; --panel: #FFFFFF; --fg: #1F1E1D; --fg-muted: #6B6A68; --line: #E6E4DF; --grid: #EFEDE8; --crit: #C9463D;
+  --wx-wood: #3f9a5c; --wx-fire: #d4553f; --wx-earth: #b8862e; --wx-metal: #8c93a0; --wx-water: #3a78c9;
   --f-serif: "Songti TC", "STSong", "Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "PMingLiU", serif;
   --f-sans: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  --fs-title: 28px; --fs-heading: 17px; --fs-body: 15px; --fs-caption: 12.5px;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #111214; --card: #1A1C20; --ink: #E8EAED; --accent: #8AB4F8; --up: #F28B74; --down: #7FD1A8; color-scheme: dark; }
+  :root { --bg: #1A1918; --panel: #262624; --fg: #ECEBE8; --fg-muted: #A3A19C; --line: #3A3936; --grid: #33322F; --crit: #E0645A; color-scheme: dark; }
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-sans); line-height: 1.6; }
-main { max-width: 960px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 24px; }
-h1 { margin: 0; font-family: var(--f-serif); font-size: 30px; letter-spacing: .08em; }
-h2 { margin: 0 0 12px; font-family: var(--f-serif); font-size: 19px; letter-spacing: .04em; }
-.lede { margin: 6px 0 0; color: var(--dim); }
-.nav { font-size: 14px; } .nav a, .notes a { color: var(--accent); }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
-.kpi .k { font-size: 13px; color: var(--dim); }
-.kpi .v { font-family: var(--f-serif); font-size: 28px; line-height: 1.3; }
-.kpi .s { font-size: 13px; color: var(--dim); }
-.modes { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-.modes button { font: inherit; font-size: 13px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
-.modes button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--card); }
-.grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; }
-.cell { font: inherit; border: 1px solid transparent; border-radius: 8px; padding: 6px 2px; text-align: center; cursor: pointer; color: var(--ink); min-width: 0; }
-.cell .gz { display: block; font-family: var(--f-serif); font-size: 15px; }
-.cell .n { display: block; font-size: 12px; font-variant-numeric: tabular-nums; }
-.cell[aria-pressed="true"] { border-color: var(--ink); }
-.cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.legend { display: flex; justify-content: space-between; font-size: 12px; color: var(--dim); margin-top: 8px; }
-.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 16px; }
-.bars { display: grid; gap: 6px; }
-.bar { display: grid; grid-template-columns: 3.2em 1fr 7.5em; align-items: center; gap: 8px; font-size: 13px; font-variant-numeric: tabular-nums; }
-.bar .lab { font-family: var(--f-serif); font-size: 15px; }
-.track { position: relative; height: 12px; background: var(--soft); border-radius: 6px; overflow: hidden; }
-.track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; }
-.track .old { background: color-mix(in srgb, var(--ink) 22%, var(--card)); }
-.track .new { background: var(--accent); height: 6px; top: 3px; }
-.bar .num { text-align: right; color: var(--dim); }
-.up { color: var(--up); } .down { color: var(--down); }
-.key { display: flex; gap: 16px; font-size: 12px; color: var(--dim); margin-bottom: 10px; flex-wrap: wrap; }
-.key span::before { content: ""; display: inline-block; width: 18px; height: 8px; border-radius: 4px; margin-right: 6px; vertical-align: middle; }
-.key .ko::before { background: color-mix(in srgb, var(--ink) 22%, var(--card)); }
-.key .kn::before { background: var(--accent); }
-.cycles { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--dim); margin: 0 0 12px; font-variant-numeric: tabular-nums; }
-.notes { display: grid; gap: 6px; font-size: 13.5px; color: var(--dim); }
-.notes p, .notes ul { margin: 0; } .notes ul { padding-left: 1.2em; }
-.scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.hint { display: none; font-size: 12px; color: var(--dim); margin: 0 0 6px; }
-@media (max-width: 620px) { .grid { min-width: 560px; } .hint { display: block; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-sans); font-size: var(--fs-body); }
+.lx { display: grid; gap: 20px; max-width: 72rem; margin: 0 auto; padding-block: 32px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.lx .nav { margin: 0 0 8px; font-size: var(--fs-caption); } .lx a { color: inherit; text-underline-offset: 3px; }
+.lx h1 { font-family: var(--f-serif); font-weight: 400; font-size: var(--fs-title); margin: 0; text-wrap: balance; }
+.lx .lede { margin: 6px 0 0; color: var(--fg-muted); max-width: 46rem; line-height: 1.6; }
+.lx .lede b { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.lx .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.lx .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; display: grid; gap: 10px; align-content: start; }
+.lx .card h2 { margin: 0; font-size: var(--fs-heading); font-weight: 500; }
+.lx .note { margin: 0; color: var(--fg-muted); font-size: var(--fs-caption); line-height: 1.5; }
+.lx .heat { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }
+.lx .cell { border: 1px solid transparent; border-radius: 4px; padding: 6px 2px; font: inherit; cursor: pointer; display: grid; gap: 1px; justify-items: center; min-width: 0; }
+.lx .cell .g { font-size: var(--fs-body); font-weight: 600; }
+.lx .cell .v { font-size: var(--fs-caption); font-variant-numeric: tabular-nums; }
+.lx .cell.yiqi .g { text-decoration: underline; text-underline-offset: 3px; }
+.lx .cell[aria-pressed="true"] { border-color: var(--fg); }
+.lx .cell:focus-visible, .lx th button:focus-visible, .lx tbody tr:focus-visible { outline: 2px solid var(--fg); outline-offset: 1px; }
+.lx .ramp { display: flex; align-items: center; gap: 6px; font-size: var(--fs-caption); color: var(--fg-muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.lx .ramp i { display: inline-block; width: 8rem; height: 8px; border-radius: 4px; }
+.lx .detail-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.lx .detail-head .big { font-family: var(--f-serif); font-size: var(--fs-title); }
+.lx .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: 10px; }
+.lx .stat { display: grid; gap: 2px; }
+.lx .stat span { font-size: var(--fs-caption); color: var(--fg-muted); }
+.lx .stat b { font-family: var(--f-serif); font-weight: 400; font-size: var(--fs-heading); font-variant-numeric: tabular-nums; }
+.lx .bars { display: grid; gap: 4px; }
+.lx .bars h3 { margin: 6px 0 2px; font-size: var(--fs-caption); font-weight: 500; color: var(--fg-muted); }
+.lx .bar { display: grid; grid-template-columns: 1.5rem 1fr 3.5rem; align-items: center; gap: 6px; font-size: var(--fs-caption); }
+.lx .bar.wide { grid-template-columns: 2.5rem 1fr 3.5rem; }
+.lx .track { height: 10px; background: var(--grid); border-radius: 5px; overflow: hidden; }
+.lx .fill { height: 100%; border-radius: 5px; }
+.lx .bar .num { text-align: right; font-variant-numeric: tabular-nums; }
+.lx .tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.lx input[type="search"] { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); min-width: 0; width: 12rem; max-width: 100%; }
+.lx .tablebox { max-height: 28rem; overflow: auto; }
+.lx table { border-collapse: collapse; width: 100%; font-size: var(--fs-caption); font-variant-numeric: tabular-nums; }
+.lx th { position: sticky; top: 0; background: var(--panel); text-align: right; padding: 0; border-bottom: 1px solid var(--line); }
+.lx th:first-child, .lx td:first-child { text-align: left; }
+.lx th button { font: inherit; font-weight: 500; color: var(--fg-muted); background: none; border: 0; padding: 6px 8px; cursor: pointer; width: 100%; text-align: inherit; white-space: nowrap; }
+.lx td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+.lx tbody tr { cursor: pointer; }
+.lx tbody tr[aria-selected="true"] td { background: var(--grid); }
+.lx .method { font-size: var(--fs-caption); color: var(--fg-muted); line-height: 1.7; display: grid; gap: 6px; }
+.lx .method h2 { color: var(--fg); }
+.lx .method p { margin: 0; max-width: 60rem; }
+.lx .cell .g, .lx .cell .v { white-space: nowrap; }
+@media (max-width: 30rem) {
+  .lx .card { padding: 14px; }
+  .lx .heat { gap: 2px; }
+  .lx .cell { padding: 5px 0; }
+  .lx .cell .g { font-size: 11.5px; letter-spacing: -0.02em; }
+  .lx .cell .v { font-size: 9.5px; }
+  .lx .hide-narrow { display: none; }
+}
 </style>
 </head>
 <body>
-<main>
+<div class="lx">
   <header>
     <p class="nav"><a href="../index.html">Hexagram</a> · <a href="https://github.com/stynight/Hexagram/blob/main/bazi-stats/XING.md">規則與全部數字</a></p>
     <h1>加刑以後的偏枯</h1>
-    <p class="lede">六十年柱出生的所有盤裡，某一行佔一半以上（極端盤）的比例。v3 不算刑，v4 加刑。1804–2043 年四輪甲子，每個時辰排一盤。</p>
+    <p class="lede" id="lede"></p>
   </header>
 
-  <section class="kpis" id="kpis" aria-label="摘要"></section>
-
-  <section class="card" aria-labelledby="h-grid">
-    <h2 id="h-grid">六十甲子極端盤比例</h2>
-    <div class="modes" role="group" aria-label="顯示">
-      <button type="button" data-mode="v4" aria-pressed="true">加刑（v4）</button>
-      <button type="button" data-mode="v3" aria-pressed="false">不算刑（v3）</button>
-      <button type="button" data-mode="d" aria-pressed="false">差</button>
+  <section class="grid">
+    <div class="card">
+      <h2>六十甲子極端盤比例（加刑）</h2>
+      <p class="note">每格是一個年柱出生的所有盤裡，某一行佔一半以上的比例，顏色越深越容易偏枯。一行就是一旬，底線標的是干支一氣。點一格看細節。</p>
+      <div class="heat" id="heat"></div>
+      <div class="ramp">少 <span id="ramp-lo"></span><i id="ramp"></i><span id="ramp-hi"></span> 多</div>
     </div>
-    <p class="hint">左右滑動看全部；點一格看按月拆分。</p>
-    <div class="scroll"><div class="grid" id="grid"></div></div>
-    <div class="legend" id="legend"></div>
+
+    <div class="card">
+      <div class="detail-head"><span class="big" id="sel-gz">—</span><span class="note" id="sel-sub"></span></div>
+      <div class="stats">
+        <div class="stat"><span>極端盤</span><b id="s-ext">—</b></div>
+        <div class="stat"><span>不算刑</span><b id="s-v3">—</b></div>
+        <div class="stat"><span>缺一行</span><b id="s-miss">—</b></div>
+        <div class="stat"><span>平均熵</span><b id="s-ent">—</b></div>
+        <div class="stat"><span>年柱純度</span><b id="s-pur">—</b></div>
+      </div>
+      <div class="bars" id="bars"></div>
+      <div class="bars" id="mbars"></div>
+    </div>
   </section>
 
-  <section class="card" aria-labelledby="h-detail">
-    <h2 id="h-detail">—</h2>
-    <p class="cycles" id="cycles"></p>
-    <div class="key"><span class="ko">不算刑（v3）</span><span class="kn">加刑（v4）</span></div>
-    <div class="bars" id="months"></div>
+  <section class="card">
+    <h2>全部六十年柱</h2>
+    <div class="tools"><input type="search" id="q" placeholder="搜尋年柱或旬" aria-label="搜尋年柱或旬"><span class="note">點欄名排序，點一列看細節</span></div>
+    <div class="tablebox">
+      <table id="tbl">
+        <thead><tr>
+          <th><button type="button" data-k="order">年柱</button></th>
+          <th><button type="button" data-k="v4">加刑</button></th>
+          <th><button type="button" data-k="v3">不算刑</button></th>
+          <th><button type="button" data-k="d">差</button></th>
+          <th><button type="button" data-k="lean">偏向</button></th>
+          <th class="hide-narrow"><button type="button" data-k="miss">缺一行</button></th>
+          <th class="hide-narrow"><button type="button" data-k="ent">熵</button></th>
+          <th class="hide-narrow"><button type="button" data-k="purity">純度</button></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </section>
 
-  <section class="two">
-    <div class="card"><h2>按年干平均</h2><div class="bars" id="stems"></div></div>
-    <div class="card"><h2>按年支平均</h2><div class="bars" id="branches"></div></div>
+  <section class="card method">
+    <h2>怎麼算的</h2>
+    <p>1804 到 2043 年四輪甲子，每年從立春到下一個立春，每天十二個時辰各排一盤，四柱用 Hexagram 的排盤引擎。不算刑的模型（v3）：四個天干各一份，地支按人元司令天數分給藏干，月令加倍，再結算合、會、沖、害、剋。加刑的模型（v4）在合之後、沖之前加上刑。</p>
+    <p>刑只加力、不扣力，每支加兩成，全部加給一行。自刑（辰辰、午午、酉酉、亥亥）、寅巳、巳申要有月支參與，加給出生那天月令司令的藏干，沒有月支就不加；自刑相鄰全額、隔一柱三成，寅巳、巳申只認相鄰。丑戌未只加本氣土，藏干不動，相鄰全額、隔一柱三成。子卯不加。蓋頭、日主、寅亥巳申的排列順序都沒有算，留給看盤的人。</p>
+    <p>極端盤是某一行佔一半以上，缺一行是某一行不到百分之二，熵越趨近 1 五行越勻。年柱數字是四輪合計，按月拆分用 1984 到 2043 這一輪。權重是人定的，從格、調候、用神位置都沒有算進去，只能看出哪個年柱的材料比較容易偏，不能當成命好命壞。</p>
   </section>
+</div>
 
-  <section class="card notes" aria-labelledby="h-rules">
-    <h2 id="h-rules">刑怎麼算</h2>
-    <p>刑只加力、不扣力，每支加兩成：把該支力量的兩成，全部加給一行。</p>
-    <ul>
-      <li>自刑（辰辰、午午、酉酉、亥亥）、寅巳、巳申：要有月支參與，加給出生那天月令司令的藏干；沒有月支就不加。自刑相鄰全額、隔一柱三成；寅巳、巳申只認相鄰。</li>
-      <li>丑戌未：只加本氣土，藏干不動；相鄰全額、隔一柱三成。</li>
-      <li>子卯不加。蓋頭、日主、寅亥巳申的排列順序都沒有算，留給看盤的人。</li>
-    </ul>
-    <p>按月拆分用的是 1984–2043 這一輪。權重是人定的，從格、調候、用神都沒有算，這些數字只看得出材料容易偏到哪裡，不能當成命好命壞。</p>
-  </section>
-</main>
 <script>
 const PILLARS = __PILLARS__;
 const MONTHS = __MONTHS__;
-const GAN = '甲乙丙丁戊己庚辛壬癸', ZHI = '子丑寅卯辰巳午未申酉戌亥';
-const pct = x => (x * 100).toFixed(1) + '%';
-const pts = x => (x >= 0 ? '+' : '−') + Math.abs(x * 100).toFixed(2);
-const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const byGz = Object.fromEntries(PILLARS.map(p => [p.gz, p]));
-const avg = xs => xs.reduce((a, b) => a + b, 0) / xs.length;
-
-// 摘要
 (() => {
-  const top = [...PILLARS].sort((a, b) => b.v4 - a.v4)[0];
-  const rise = [...PILLARS].sort((a, b) => (b.v4 - b.v3) - (a.v4 - a.v3))[0];
-  const ups = PILLARS.filter(p => p.v4 > p.v3).length;
-  const top6 = [...PILLARS].sort((a, b) => b.v4 - a.v4).slice(0, 6).map(p => p.gz).join('、');
-  const items = [
-    ['最容易偏枯', top.gz + ' ' + pct(top.v4), '不算刑時 ' + pct(top.v3)],
-    ['漲最多', rise.gz + ' ' + pts(rise.v4 - rise.v3), pct(rise.v3) + ' → ' + pct(rise.v4)],
-    ['變得更偏', ups + ' / ' + PILLARS.length, '個年柱的極端盤比例上升'],
-    ['加刑後前六名', top6, '']
-  ];
-  const box = document.getElementById('kpis');
-  for (const [k, v, s] of items) {
-    const c = el('div', 'card kpi'); c.append(el('div', 'k', k), el('div', 'v', v));
-    if (s) c.append(el('div', 's', s));
-    box.append(c);
+  const WX = [['wood', '木'], ['fire', '火'], ['earth', '土'], ['metal', '金'], ['water', '水']];
+  const pct = x => (x * 100).toFixed(1) + '%', pct0 = x => Math.round(x * 100) + '%';
+  const pts = x => (x >= 0 ? '+' : '−') + Math.abs(x * 100).toFixed(2);
+  const $ = id => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const rows = PILLARS.map(p => ({ ...p, d: p.v4 - p.v3 }));
+  const top = rows.reduce((a, b) => (b.v4 > a.v4 ? b : a));
+  const low = rows.reduce((a, b) => (b.v4 < a.v4 ? b : a));
+  const rise = rows.reduce((a, b) => (b.d > a.d ? b : a));
+  let selected = top.gz, sortK = 'order', sortDir = 1, query = '';
+
+  // 開頭一段話：數字全從資料算
+  (() => {
+    const p = $('lede'), b = t => el('b', '', t), tx = t => document.createTextNode(t);
+    p.append(tx('加了刑以後，最容易偏枯的年柱是 '), b(top.gz), tx('，某一行獨佔一半以上的盤佔 '), b(pct(top.v4)),
+      tx('（不算刑時 ' + pct(top.v3) + '）。六十個年柱裡 '), b(String(rows.filter(r => r.d > 0).length)),
+      tx(' 個變得更偏，漲最多的是 '), b(rise.gz), tx('，多了 ' + pts(rise.d).slice(1) + ' 個百分點。'));
+  })();
+
+  const ramp = t => `color-mix(in srgb, var(--crit) ${Math.round(12 + 88 * t)}%, var(--panel))`;
+  $('ramp').style.background = `linear-gradient(90deg, ${ramp(0)}, ${ramp(1)})`;
+  $('ramp-lo').textContent = pct(low.v4); $('ramp-hi').textContent = pct(top.v4);
+
+  function select(gz) { selected = gz; draw(); }
+
+  function drawHeat() {
+    const box = $('heat'); box.replaceChildren();
+    for (const r of [...rows].sort((a, b) => a.order - b.order)) {
+      const t = (r.v4 - low.v4) / (top.v4 - low.v4 || 1);
+      const b = el('button', 'cell' + (r.yiqi ? ' yiqi' : ''));
+      b.type = 'button'; b.style.background = ramp(t); b.style.color = t > 0.55 ? 'var(--panel)' : 'var(--fg)';
+      b.setAttribute('aria-pressed', String(r.gz === selected));
+      b.setAttribute('aria-label', r.gz + ' 加刑 ' + pct(r.v4) + '，不算刑 ' + pct(r.v3));
+      b.append(el('span', 'g', r.gz), el('span', 'v', pct0(r.v4)));
+      b.addEventListener('click', () => select(r.gz));
+      box.append(b);
+    }
   }
-  box.lastChild.querySelector('.v').style.fontSize = '20px';
+
+  function bar(label, value, max, color, wide) {
+    const row = el('div', 'bar' + (wide ? ' wide' : '')), tr = el('div', 'track'), fl = el('div', 'fill');
+    fl.style.width = (100 * value / max) + '%'; fl.style.background = color;
+    tr.append(fl); row.append(el('span', '', label), tr, el('span', 'num', pct(value)));
+    return row;
+  }
+
+  function drawDetail() {
+    const r = rows.find(x => x.gz === selected);
+    $('sel-gz').textContent = r.gz;
+    $('sel-sub').textContent = `${r.xun}${r.yiqi ? '，干支一氣' : ''}，1804–2043 四輪，共 ${r.charts.toLocaleString('en-US')} 盤`;
+    $('s-ext').textContent = pct(r.v4); $('s-v3').textContent = pct(r.v3);
+    $('s-miss').textContent = pct(r.miss); $('s-ent').textContent = r.ent.toFixed(3); $('s-pur').textContent = pct0(r.purity);
+    const box = $('bars'); box.replaceChildren();
+    for (const [pre, label] of [['avg_', '平均五行比例'], ['ext_', '極端盤偏向哪一行（佔全部盤）'], ['miss_', '缺這一行的盤（佔全部盤）']]) {
+      box.append(el('h3', '', label));
+      const max = Math.max(...WX.map(([k]) => r[pre + k]), 0.0001);
+      for (const [k, name] of WX) box.append(bar(name, r[pre + k], max, `var(--wx-${k})`));
+    }
+    const mb = $('mbars'); mb.replaceChildren();
+    mb.append(el('h3', '', '按月份拆開的極端盤比例（1984–2043）'));
+    const ms = MONTHS.filter(m => m.gz === r.gz).sort((a, b) => a.order - b.order);
+    const max = Math.max(...ms.map(m => m.v4), 0.0001);
+    for (const m of ms) mb.append(bar(m.monthGz, m.v4, max, 'var(--crit)', true));
+  }
+
+  function drawTable() {
+    const tb = $('tbl').querySelector('tbody'); tb.replaceChildren();
+    const q = query.trim();
+    const list = rows.filter(r => !q || r.gz.includes(q) || r.xun.includes(q))
+      .sort((a, b) => { const va = a[sortK], vb = b[sortK]; return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb), 'zh')) * sortDir; });
+    for (const r of list) {
+      const tr = el('tr'); tr.tabIndex = 0; tr.setAttribute('aria-selected', String(r.gz === selected));
+      [r.gz, pct(r.v4), pct(r.v3), pts(r.d), r.lean, pct(r.miss), r.ent.toFixed(3), pct0(r.purity)].forEach((c, i) => {
+        const td = el('td', i >= 5 ? 'hide-narrow' : '', c); tr.append(td);
+      });
+      tr.addEventListener('click', () => select(r.gz));
+      tr.addEventListener('keydown', e => { if (e.key === 'Enter') select(r.gz); });
+      tb.append(tr);
+    }
+    $('tbl').querySelectorAll('th button').forEach(b => b.parentElement.setAttribute('aria-sort', b.dataset.k === sortK ? (sortDir > 0 ? 'ascending' : 'descending') : 'none'));
+  }
+
+  $('tbl').querySelectorAll('th button').forEach(b => b.addEventListener('click', () => {
+    if (sortK === b.dataset.k) sortDir = -sortDir; else { sortK = b.dataset.k; sortDir = b.dataset.k === 'order' ? 1 : -1; }
+    drawTable();
+  }));
+  $('q').addEventListener('input', e => { query = e.target.value; drawTable(); });
+
+  function draw() { drawHeat(); drawDetail(); drawTable(); }
+  draw();
 })();
-
-// 六十甲子格
-let mode = 'v4', selected = [...PILLARS].sort((a, b) => b.v4 - a.v4)[0].gz;
-const val = p => mode === 'd' ? p.v4 - p.v3 : p[mode];
-function drawGrid() {
-  const grid = document.getElementById('grid'); grid.replaceChildren();
-  const vs = PILLARS.map(val), lo = Math.min(...vs), hi = Math.max(...vs);
-  const ordered = [...PILLARS].sort((a, b) => a.order - b.order);
-  for (const p of ordered) {
-    const v = val(p), t = hi > lo ? (v - lo) / (hi - lo) : 0;
-    const b = el('button', 'cell');
-    b.type = 'button';
-    b.setAttribute('aria-pressed', String(p.gz === selected));
-    b.setAttribute('aria-label', p.gz + '：不算刑 ' + pct(p.v3) + '，加刑 ' + pct(p.v4));
-    const tone = mode === 'd' ? (v >= 0 ? 'var(--up)' : 'var(--down)') : 'var(--accent)';
-    const mix = mode === 'd' ? Math.round(8 + 60 * Math.abs(v) / Math.max(Math.abs(lo), Math.abs(hi))) : Math.round(8 + 62 * t);
-    b.style.background = `color-mix(in srgb, ${tone} ${mix}%, var(--card))`;
-    if (mix > 52) b.style.color = 'var(--card)';
-    b.append(el('span', 'gz', p.gz), el('span', 'n', mode === 'd' ? pts(v) : pct(v)));
-    b.addEventListener('click', () => { selected = p.gz; drawGrid(); drawDetail(); });
-    grid.append(b);
-  }
-  const lg = document.getElementById('legend'); lg.replaceChildren();
-  lg.append(el('span', '', mode === 'd' ? '最低 ' + pts(lo) : '最少 ' + pct(lo)), el('span', '', mode === 'd' ? '最高 ' + pts(hi) : '最多 ' + pct(hi)));
-}
-document.querySelectorAll('.modes button').forEach(b => b.addEventListener('click', () => {
-  mode = b.dataset.mode;
-  document.querySelectorAll('.modes button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-  drawGrid();
-}));
-
-// 一條「v3 底、v4 細條」的橫條
-function bar(label, v3, v4, max) {
-  const row = el('div', 'bar'), tr = el('div', 'track');
-  const o = el('i', 'old'), n = el('i', 'new');
-  o.style.width = (100 * v3 / max) + '%'; n.style.width = (100 * v4 / max) + '%';
-  tr.append(o, n);
-  const d = v4 - v3, num = el('span', 'num');
-  num.append(pct(v4) + ' ', el('span', d > 0.00005 ? 'up' : d < -0.00005 ? 'down' : '', pts(d)));
-  row.append(el('span', 'lab', label), tr, num);
-  return row;
-}
-
-function drawDetail() {
-  const p = byGz[selected];
-  document.getElementById('h-detail').textContent = p.gz + '年：按月拆分';
-  const cy = document.getElementById('cycles'); cy.replaceChildren();
-  cy.append(el('span', '', '240 年平均 ' + pct(p.v3) + ' → ' + pct(p.v4)));
-  ['一', '二', '三', '四'].forEach((c, i) => cy.append(el('span', '', '第' + c + '輪 ' + pct(p['c' + (i + 1)]))));
-  const ms = MONTHS.filter(m => m.gz === p.gz).sort((a, b) => a.order - b.order);
-  const max = Math.max(...ms.map(m => Math.max(m.v3, m.v4)), 0.01);
-  const box = document.getElementById('months'); box.replaceChildren();
-  for (const m of ms) box.append(bar(m.monthGz, m.v3, m.v4, max));
-}
-
-function drawGroups() {
-  const stems = [...GAN].map(g => { const ps = PILLARS.filter(p => p.gz[0] === g); return [g, avg(ps.map(p => p.v3)), avg(ps.map(p => p.v4))]; });
-  const brs = [...ZHI].map(z => { const ps = PILLARS.filter(p => p.gz[1] === z); return [z, avg(ps.map(p => p.v3)), avg(ps.map(p => p.v4))]; });
-  for (const [id, rows] of [['stems', stems], ['branches', brs]]) {
-    const max = Math.max(...rows.map(r => Math.max(r[1], r[2])));
-    const box = document.getElementById(id);
-    for (const [l, a, b] of rows) box.append(bar(l, a, b, max));
-  }
-}
-
-drawGrid(); drawDetail(); drawGroups();
 </script>
 </body>
 </html>
