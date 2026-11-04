@@ -15,4 +15,4 @@
 
 ## 八字統計
 
-用八字排盤的引擎把每個時辰都排一盤，看六十年柱哪個容易偏枯、四柱組合 240 年裡重現幾次：[`bazi-stats/`](bazi-stats/)。模型、結論、速算日柱的方法和腳本都在 [`bazi-stats/README.md`](bazi-stats/README.md)。加刑以後的結果：[加刑以後的偏枯](https://stynight.github.io/Hexagram/bazi-stats/xing.html)（[`bazi-stats/xing.html`](bazi-stats/xing.html)），規則見 [`bazi-stats/XING.md`](bazi-stats/XING.md)。
+用八字排盤的引擎把每個時辰都排一盤，看六十年柱哪個容易偏枯、四柱組合 240 年裡重現幾次：[`bazi-stats/`](bazi-stats/)。模型、結論、速算日柱的方法和腳本都在 [`bazi-stats/README.md`](bazi-stats/README.md)。圖表頁：[六十甲子偏枯圖](https://stynight.github.io/Hexagram/bazi-stats/pianku.html)（[`bazi-stats/pianku.html`](bazi-stats/pianku.html)）。加刑以後的結果：[加刑以後的偏枯](https://stynight.github.io/Hexagram/bazi-stats/xing.html)（[`bazi-stats/xing.html`](bazi-stats/xing.html)），規則見 [`bazi-stats/XING.md`](bazi-stats/XING.md)。
