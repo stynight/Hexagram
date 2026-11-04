@@ -1,7 +1,6 @@
 // 五行力量模型。
 // v2：天干各 1 份，地支按人元司令天數分給藏干，月令加倍。
 // v3：在 v2 上加入合、會、沖、剋、害（規則見 README）。
-// v4：在 v3 上加入刑，需要月令司令的藏干（buildChart 的 siling）。
 const path = require('path');
 const B = require(path.join(__dirname, '..', 'bazi-paipan', 'src', 'engine.js'));
 
@@ -41,17 +40,7 @@ function totals(S, Z) {
 function move(v, frac, to) { const t = sum(v); v.forEach((x, e) => { v[e] = x * (1 - frac); }); v[to] += frac * t; }
 function scale(v, f) { v.forEach((x, e) => { v[e] = x * f; }); }
 
-// v4 的刑：只加力、不扣力，每支加兩成。
-//   自刑（辰辰、午午、酉酉、亥亥）與寅巳、巳申：要有月支參與，加給月令司令的那個藏干；沒有月支就不加。
-//     自刑相鄰全額、隔一柱三成；寅巳、巳申只認相鄰。
-//   丑戌未：只加本氣土，藏干不動；相鄰全額、隔一柱三成。
-//   子卯：不加。蓋頭、日主、寅亥巳申的排列都不算，留給看盤的人。
-const XING = 0.2;
-const ZIXING = new Set([4, 6, 9, 11]);                              // 辰午酉亥
-const XING_SIL = new Set(['2,5', '5,8']);                           // 寅巳 巳申
-const XING_TU = new Set(['1,10', '7,10', '1,7']);                   // 丑戌 戌未 丑未
-
-function v3(p, opt) {
+function v3(p) {
   const g = p.map(x => x % 10), z = p.map(x => x % 12);
   const { S, Z } = baseVectors(p);
   const monthWx = mainWx(z[1]);
@@ -104,20 +93,6 @@ function v3(p, opt) {
     scale(Z[i], 0.9); scale(Z[i + 1], 0.9); boundZ[i] = boundZ[i + 1] = 1;
   }
 
-  // 2.5 刑（只在 v4）：見檔頭說明
-  if (opt) for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
-    const d = j - i - 1, f = F_HE[d]; if (!f) continue;
-    const k2 = key(z[i], z[j]);
-    let to = -1;
-    if (XING_TU.has(k2)) to = 2;
-    else if (i === 1 || j === 1) {
-      if (z[i] === z[j] && ZIXING.has(z[i])) to = gw(opt.siling);
-      else if (XING_SIL.has(k2) && d === 0) to = gw(opt.siling);
-    }
-    if (to < 0) continue;
-    for (const k of [i, j]) Z[k][to] += XING * f * sum(Z[k]);
-  }
-
   // 3. 沖、害、剋：同時結算。雙方都受傷，傷害量取兩方五行總力較弱的那邊乘係數，
   //    所以衰的一方按比例傷得重，旺的一方傷得輕；被合住的地支受沖減半（貪合忘沖）。
   const T = totals(S, Z);
@@ -149,7 +124,6 @@ function v3(p, opt) {
   const t = totals(S, Z), all = sum(t);
   return t.map(x => x / all);
 }
-const v4 = (p, siling) => v3(p, { siling });
 function v2(p) { const { S, Z } = baseVectors(p); const t = totals(S, Z), all = sum(t); return t.map(x => x / all); }
 
 const ent = s => -s.reduce((a, x) => a + (x > 0 ? x * Math.log(x) : 0), 0) / Math.log(5);
@@ -171,4 +145,4 @@ function eachChart(Y, fn) {
   }
 }
 
-module.exports = { B, v2, v3, v4, purity, ent, eachChart };
+module.exports = { B, v2, v3, purity, ent, eachChart };

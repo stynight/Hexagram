@@ -1,6 +1,7 @@
 // 1804–2043 四輪甲子：v3（不算刑）和 v4（加刑）的極端盤比例對比 → data/xing.json、data/xing-months.json
 const fs = require('fs'), path = require('path');
-const { B, v3, v4 } = require('./model.js');
+const { B, v3 } = require('./model.js');
+const { v4 } = require('./model-xing.js');
 
 const pil = {}, months = {};
 for (let Y = 1804; Y <= 2043; Y++) {
