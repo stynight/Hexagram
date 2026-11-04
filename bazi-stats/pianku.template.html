@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>六十甲子偏枯圖</title>
+<meta name="description" content="六十年柱出生的所有盤裡，五行偏枯的比例、四輪甲子對比和 240 年裡四柱組合的重現次數。">
+<style>
+/* 這頁搬自 claude.ai 上的「六十甲子偏枯圖」，由 build-pianku-page.js 產生：資料和 d3 都內嵌，打開就能看。
+   下面這組變數代替原來儀表板提供的主題。 */
+:root {
+  --color-bg: #FAF9F6; --color-panel: #FFFFFF; --color-fg: #1F1E1D; --color-fg-muted: #6B6A68;
+  --color-border-line: #E6E4DF; --color-bad: #C9463D;
+  --cds-chart-grid: #EFEDE8; --cds-chart-axis: #B9B6AF; --cds-chart-reference: #8A8780; --cds-chart-muted: #A9A6A0;
+  --cds-chart-status-critical: #C9463D;
+  --cds-surface-popover: #FFFFFF; --cds-border: #E6E4DF; --cds-shadow-popover: 0 4px 16px rgba(0, 0, 0, .12); --cds-text-secondary: #6B6A68;
+  --font-anthropic-serif: "Songti TC", "STSong", "Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "PMingLiU", serif;
+  --font-anthropic-sans: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  --cds-gap-xs: 6px; --cds-gap-sm: 10px; --cds-gap-md: 16px; --cds-gap-lg: 20px;
+  --cds-pad-xs: 4px; --cds-pad-sm: 8px; --cds-pad-lg: 20px; --cds-radius: 10px;
+  --cds-font-size-title: 28px; --cds-font-size-heading: 17px; --cds-font-size-body: 15px; --cds-font-size-caption: 12.5px;
+  --cds-font-weight-medium: 500; --cds-dur-slow: .3s;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1A1918; --color-panel: #262624; --color-fg: #ECEBE8; --color-fg-muted: #A3A19C;
+    --color-border-line: #3A3936; --color-bad: #E0645A;
+    --cds-chart-grid: #33322F; --cds-chart-axis: #55534F; --cds-chart-reference: #8A8780; --cds-chart-muted: #77756F;
+    --cds-chart-status-critical: #E0645A;
+    --cds-surface-popover: #2E2D2B; --cds-border: #3A3936; --cds-shadow-popover: 0 4px 16px rgba(0, 0, 0, .4); --cds-text-secondary: #A3A19C;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-body); }
+.page { padding-block: 32px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.lx .nav { margin: 0 0 8px; font-size: var(--cds-font-size-caption); } .lx .nav a { color: inherit; text-underline-offset: 3px; }
+
+.lx { --wx-wood: #3f9a5c; --wx-fire: #d4553f; --wx-earth: #b8862e; --wx-metal: #8c93a0; --wx-water: #3a78c9;
+  font-family: var(--font-anthropic-sans); display: grid; gap: var(--cds-gap-lg); max-width: 72rem; margin-inline: auto; }
+.lx h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+.lx .lede { margin: var(--cds-gap-xs) 0 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-body); max-width: 46rem; line-height: 1.6; }
+.lx .lede b { color: var(--color-fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.lx .grid { display: grid; gap: var(--cds-gap-md); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.lx .card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; display: grid; gap: var(--cds-gap-sm); align-content: start; }
+.lx .card h2 { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+.lx .note { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); line-height: 1.5; }
+.lx .heat { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; min-height: 15rem; }
+.lx .cell { border: 1px solid transparent; border-radius: 4px; padding: 6px 2px; font: inherit; cursor: pointer; display: grid; gap: 1px; justify-items: center; min-width: 0; }
+.lx .cell .g { font-size: var(--cds-font-size-body); font-weight: 600; white-space: nowrap; }
+.lx .cell .v { font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lx .cell.yiqi .g { text-decoration: underline; text-underline-offset: 3px; }
+.lx .cell[aria-pressed="true"] { border-color: var(--color-fg); }
+.lx .cell:focus-visible, .lx th button:focus-visible, .lx tbody tr:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 1px; }
+.lx .ramp { display: flex; align-items: center; gap: var(--cds-gap-xs); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.lx .ramp i { display: inline-block; width: 8rem; height: 8px; border-radius: 4px; }
+.lx .detail-head { display: flex; align-items: baseline; gap: var(--cds-gap-sm); flex-wrap: wrap; }
+.lx .detail-head .big { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); }
+.lx .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: var(--cds-gap-sm); }
+.lx .stat { display: grid; gap: 2px; }
+.lx .stat span { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.lx .stat b { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-heading); font-variant-numeric: tabular-nums; }
+.lx .bars { display: grid; gap: 4px; }
+.lx .bars h3 { margin: var(--cds-gap-xs) 0 2px; font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); }
+.lx .bar { display: grid; grid-template-columns: 1.5rem 1fr 3.5rem; align-items: center; gap: var(--cds-gap-xs); font-size: var(--cds-font-size-caption); }
+.lx .track { height: 10px; background: var(--cds-chart-grid); border-radius: 5px; overflow: hidden; }
+.lx .fill { height: 100%; border-radius: 5px; }
+.lx .bar .num { text-align: right; font-variant-numeric: tabular-nums; }
+.lx .scatter { position: relative; min-height: 18rem; }
+.lx .tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; }
+.lx .tip .k { color: var(--cds-text-secondary); }
+.lx .tools { display: flex; gap: var(--cds-gap-sm); align-items: center; flex-wrap: wrap; }
+.lx input[type="search"] { font: inherit; padding: 6px 10px; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-bg); color: var(--color-fg); min-width: 0; width: 12rem; max-width: 100%; }
+.lx .tablebox { max-height: 28rem; overflow: auto; }
+.lx table { border-collapse: collapse; width: 100%; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.lx th { position: sticky; top: 0; background: var(--color-panel); text-align: right; padding: 0; border-bottom: 1px solid var(--color-border-line); }
+.lx th:first-child, .lx td:first-child { text-align: left; }
+.lx th button { font: inherit; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); background: none; border: 0; padding: 6px 8px; cursor: pointer; width: 100%; text-align: inherit; white-space: nowrap; }
+.lx td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--cds-chart-grid); white-space: nowrap; }
+.lx tbody tr { cursor: pointer; }
+.lx tbody tr[aria-selected="true"] td { background: var(--cds-chart-grid); }
+.lx .method { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.7; display: grid; gap: var(--cds-gap-xs); }
+.lx .method h2 { color: var(--color-fg); }
+.lx .method p { margin: 0; max-width: 60rem; }
+.lx .bar.wide { grid-template-columns: 5.5rem 1fr 4.5rem; }
+.lx #rare-months .bar { grid-template-columns: 2.5rem 1fr 3.5rem; }
+.lx .bar > span:first-child { white-space: nowrap; }
+.lx .lines { position: relative; min-height: 16rem; }
+.lx .legend { display: flex; gap: var(--cds-gap-sm); flex-wrap: wrap; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.lx .legend i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+.lx .reading { display: grid; gap: var(--cds-gap-md); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.lx .reading article { display: grid; gap: var(--cds-gap-xs); align-content: start; }
+.lx .reading h3 { margin: 0; font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-heading); letter-spacing: .08em; }
+.lx .reading p { margin: 0; font-size: var(--cds-font-size-body); line-height: 1.7; }
+@media (max-width: 30rem) {
+  .lx .card { padding: 14px; }
+  .lx .heat { gap: 2px; }
+  .lx .cell { padding: 5px 0; }
+  .lx .cell .g { font-size: 11.5px; letter-spacing: -0.02em; }
+  .lx .cell .v { font-size: 9.5px; }
+  .lx .hide-narrow { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="lx">
+  <header>
+    <p class="nav"><a href="../index.html">Hexagram</a> · <a href="xing.html">加刑以後的偏枯</a> · <a href="https://github.com/stynight/Hexagram/blob/main/bazi-stats/README.md">模型與腳本</a></p>
+    <h1 id="title">六十甲子偏枯圖</h1>
+    <p class="lede" id="takeaway">最容易偏枯的年柱是 <b data-source="summary" data-field="topGz">—</b>，某一行獨佔一半以上的盤佔 <b data-source="summary" data-field="topExt">—</b>。干支一氣的十二個年柱平均 <b data-source="summary" data-field="yiqiExt">—</b>，其餘四十八個平均 <b data-source="summary" data-field="otherExt">—</b>；年柱純度和極端盤比例的相關係數是 <b data-source="summary" data-field="r">—</b>。往前推四輪甲子，所有可能的四柱組合全都出現過，其中只出現一次的有 <b id="rare-total">—</b> 種，全部擠在冬半年。</p>
+  </header>
+
+  <section class="grid">
+    <div class="card" id="heat-card">
+      <h2>六十甲子極端盤比例</h2>
+      <p class="note">每格是一個年柱出生的所有盤裡，某一行佔一半以上的比例，顏色越深越容易偏枯。一行就是一旬，底線標的是干支一氣。點一格看細節。</p>
+      <div class="heat" id="heat"></div>
+      <div class="ramp">少 <span data-source="summary" data-field="minExt">—</span><i id="ramp"></i><span data-source="summary" data-field="maxExt">—</span> 多</div>
+    </div>
+
+    <div class="card" id="detail-card">
+      <div class="detail-head"><span class="big" id="sel-gz">—</span><span class="note" id="sel-sub"></span></div>
+      <div class="stats">
+        <div class="stat"><span>極端盤</span><b id="s-ext">—</b></div>
+        <div class="stat"><span>缺一行</span><b id="s-miss">—</b></div>
+        <div class="stat"><span>平均熵</span><b id="s-ent">—</b></div>
+        <div class="stat"><span>年柱純度</span><b id="s-pur">—</b></div>
+      </div>
+      <div class="bars" id="bars"></div>
+      <div class="bars" id="mbars"></div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card" id="scatter-card">
+      <h2>年柱越純，越容易偏枯</h2>
+      <p class="note">橫軸是年柱本身最多那一行佔幾成，縱軸是極端盤比例。彩色點是干支一氣的年柱。</p>
+      <div class="scatter" id="scatter"></div>
+    </div>
+
+    <div class="card" id="table-card">
+      <h2>全部六十年柱</h2>
+      <div class="tools"><input type="search" id="q" placeholder="搜尋年柱或旬" aria-label="搜尋年柱或旬"><span class="note">點欄名排序，點一列看細節</span></div>
+      <div class="tablebox">
+        <table id="tbl">
+          <thead><tr>
+            <th><button type="button" data-k="order">年柱</button></th>
+            <th><button type="button" data-k="ext">極端</button></th>
+            <th><button type="button" data-k="lean">偏向</button></th>
+            <th><button type="button" data-k="miss">缺一行</button></th>
+            <th><button type="button" data-k="missTop">最常缺</button></th>
+            <th class="hide-narrow"><button type="button" data-k="ent">熵</button></th>
+            <th class="hide-narrow"><button type="button" data-k="purity">純度</button></th>
+            <th class="hide-narrow"><button type="button" data-k="extV2">上一版極端</button></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="cycles-card">
+    <h2>四輪甲子，幾乎一模一樣</h2>
+    <p class="note">同一個年柱在四輪甲子裡的極端盤比例，四條線疊在一起。四輪之間平均只差 <b id="cy-range">—</b> 個百分點，第一輪和第四輪的排名相關係數 <b id="cy-rho">—</b>。年柱定了底色，換多少輪都一樣。</p>
+    <div class="legend" id="cy-legend"></div>
+    <div class="lines" id="cycles"></div>
+  </section>
+
+  <section class="grid">
+    <div class="card" id="recur-card">
+      <h2>240 年裡每種四柱出現幾次</h2>
+      <p class="note">1804 到 2043 年，每個時辰各排一盤，數每種年月日時組合出現的次數。大多數出現兩次，大約每 120 年輪一遍。</p>
+      <div class="bars" id="recur"></div>
+    </div>
+    <div class="card" id="rare-month-card">
+      <h2>只出現一次的，全在冬半年</h2>
+      <p class="note">每輪甲子日柱挪大約 14.5 格，四輪差 2 格繞不滿一圈。冬天地球離太陽近、跑得快，節氣月份短，月中就留下縫；夏天月份長，只有重疊沒有縫。</p>
+      <div class="bars" id="rare-months"></div>
+    </div>
+    <div class="card" id="rare-stem-card">
+      <h2>日主幾乎平均</h2>
+      <p class="note">稀有只看日子落在月中哪個位置，不挑日干，差距在隨機波動以內。</p>
+      <div class="bars" id="rare-stems"></div>
+    </div>
+  </section>
+
+  <section class="card" id="flow-card">
+    <h2>稀有的盤，流通跟普通的差不多</h2>
+    <p class="note">五行相生鏈：佔八個百分點以上的行沿木火土金水能連多長。位置相生：天干相鄰三組、地支相鄰三組、各柱干支四組，十組裡有幾組相生。</p>
+    <div class="tablebox">
+      <table id="flow-tbl">
+        <thead><tr><th><button type="button" tabindex="-1">指標</button></th><th><button type="button" tabindex="-1">只出現一次的</button></th><th><button type="button" tabindex="-1">全部組合</button></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="reading-card">
+    <h2>認真讀兩個稀有盤</h2>
+    <p class="note">統計只數材料，這裡把合沖、司令、調候和大運都算進去看。兩個盤在這 240 年裡都只出現過一次。</p>
+    <div class="reading">
+      <article>
+        <h3>乙丑 戊寅 甲辰 乙丑</h3>
+        <p>統計上十組相鄰沒有一組相生，最不通。甲木生寅月，建祿格，身旺；兩個乙木劫財透出，寅辰暗拱木方。財星戊土透在月干，左右都被木克，地支一堆土財也被比劫圍著，又是群劫爭財。</p>
+        <p>它缺的是木和土之間那座橋：火。妙在出生在立春後第二週，寅月司令的正好是丙火，橋就藏在月令裡沒透出來。男命早年走丁丑、丙子，火透出、橋搭起來；乙亥、甲戌比劫最重，是爭財最兇的一段。女命走到辛巳、壬午，火通關又有金制劫，是全盤最順的一段。最堵的盤不等於最差的盤。</p>
+      </article>
+      <article>
+        <h3>甲子 丙寅 己亥 辛未</h3>
+        <p>天干一路順生：甲木正官生丙火正印，丙火生己土日主，己土生辛金食神，官印相生，五行周流。初春寒土最要丙火，丙火透月干、坐長生，調候到位。月日寅亥合木、日時亥未拱木，官殺旺，靠丙火化殺生身。</p>
+        <p>弱點是一切押在那個丙火上。男命走丁卯、戊辰、己巳、庚午、辛未，五十年印比火土，很順；到壬申運，壬水克丙、申沖寅，用神和長生同時受傷。女命逆行，先走乙丑、甲子、癸亥、壬戌，水運壞印、寒上加寒，前半生辛苦得多。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="card method" id="method">
+    <h2>怎麼算的</h2>
+    <p>六十年柱的主要統計取 1984 到 2043 年這一輪；四輪對比和稀有組合用 1804 到 2043 年。每年從立春到下一個立春，每天十二個時辰各排一盤，四柱用 Hexagram 的排盤引擎。五行力量：四個天干各一份，地支按人元司令天數分給藏干，月令加倍。</p>
+    <p>合：天干五合只認相鄰，合住各扣三成，月令是化神就化過去；三會成方每支五成歸方局，三合成局四成，半合兩成、拱合一成，六合兩成，有化神才化；午亥、寅丑、卯申暗合絆住一成。</p>
+    <p>沖、害、剋：雙方都受傷，傷害量取兩方五行總力較弱的那邊乘係數，所以衰的一方按比例傷得重。沖 0.5、害 0.2、天干同性相剋 0.35、異性 0.2；相鄰全額，隔一柱減半，年時遙對再減半；被合住的地支受沖減半；辰戌、丑未相沖只扣本氣土，算開庫。</p>
+    <p>極端盤是某一行佔一半以上，缺一行是某一行不到百分之二，熵越趨近 1 五行越勻。權重是人定的，從格、調候、用神位置都沒有算進去，只能看出哪個年柱的材料比較容易偏，不能當成命好命壞。這一版沒有算刑；加刑以後的結果見<a href="xing.html">另一頁</a>。</p>
+  </section>
+</div>
+</div>
+
+<script>__D3__</script>
+<script>
+// 代替原來儀表板的 dash：資料內嵌，calc 第一次讀取時才算
+const DATA = { pillars: __PILLARS__, months: __MONTHS__, cycles: __CYCLES__, recurrence: __RECURRENCE__, rareMonths: __RAREMONTHS__, rareStems: __RARESTEMS__, flow: __FLOW__ };
+window.dash = (() => {
+  const calcs = {};
+  const get = id => {
+    if (id in DATA) return DATA[id];
+    const c = calcs[id]; if (!c) return [];
+    if (!c.done) { c.value = c.fn(...c.inputs.map(get)); c.done = true; }
+    return c.value;
+  };
+  return {
+    colors: ['#C96442', '#3A78C9', '#3F9A5C', '#B8862E', '#8C6BB1', '#5A9AA8', '#D4553F', '#8C93A0'],
+    data: id => ({ status: 'ok', data: get(id), refreshing: false }),
+    calc: (id, o) => { calcs[id] = { inputs: o.inputs, fn: o.fn, done: false }; },
+    onData: fn => { fn(); let t; let w = innerWidth; addEventListener('resize', () => { if (innerWidth === w) return; w = innerWidth; clearTimeout(t); t = setTimeout(fn, 150); }); }
+  };
+})();
+</script>
+<script>
+(() => {
+  const WX = [['wood', '木'], ['fire', '火'], ['earth', '土'], ['metal', '金'], ['water', '水']];
+  const pct = d3.format('.1%'), f3 = d3.format('.3f'), f2 = d3.format('.2f');
+  const root = document.querySelector('.lx');
+  const resolve = c => { const s = document.createElement('span'); s.style.color = c; root.appendChild(s); const v = getComputedStyle(s).color; s.remove(); return v; };
+  const cssVar = n => getComputedStyle(root).getPropertyValue(n).trim();
+
+  dash.calc('summary', {
+    inputs: ['pillars'],
+    fn: (pillars) => {
+      const mean = a => a.reduce((s, v) => s + v, 0) / a.length;
+      const xs = pillars.map(p => +p.purity), ys = pillars.map(p => +p.ext);
+      const mx = mean(xs), my = mean(ys);
+      let sxy = 0, sxx = 0, syy = 0;
+      xs.forEach((x, i) => { sxy += (x - mx) * (ys[i] - my); sxx += (x - mx) ** 2; syy += (ys[i] - my) ** 2; });
+      const top = pillars.reduce((a, b) => (+b.ext > +a.ext ? b : a));
+      const low = pillars.reduce((a, b) => (+b.ext < +a.ext ? b : a));
+      return [{
+        r: +(sxy / Math.sqrt(sxx * syy)).toFixed(2),
+        yiqiExt: mean(pillars.filter(p => p.yiqi).map(p => +p.ext)),
+        otherExt: mean(pillars.filter(p => !p.yiqi).map(p => +p.ext)),
+        topGz: top.gz, topExt: +top.ext, minExt: +low.ext, maxExt: +top.ext
+      }];
+    }
+  });
+
+  dash.calc('cycleStats', {
+    inputs: ['cycles'],
+    fn: (cycles) => {
+      const keys = ['c1', 'c2', 'c3', 'c4'];
+      const ranges = cycles.map(c => { const v = keys.map(k => +c[k]); return Math.max(...v) - Math.min(...v); });
+      const rank = a => { const idx = a.map((v, i) => [v, i]).sort((x, y) => x[0] - y[0]); const r = []; idx.forEach(([, i], k) => { r[i] = k; }); return r; };
+      const r1 = rank(cycles.map(c => +c.c1)), r4 = rank(cycles.map(c => +c.c4)), n = cycles.length;
+      const d2 = r1.reduce((s, v, i) => s + (v - r4[i]) ** 2, 0);
+      return [{ avgRange: 100 * ranges.reduce((s, v) => s + v, 0) / n, rho: 1 - 6 * d2 / (n * (n * n - 1)) }];
+    }
+  });
+
+  let selected = null, sortK = 'order', sortDir = 1, query = '';
+  const $ = id => document.getElementById(id);
+
+  function select(gz) { selected = gz; draw(); }
+
+  function drawSummary() {
+    const s = dash.data('summary');
+    root.querySelectorAll('[data-source="summary"]').forEach(el => {
+      const v = s.data[0][el.dataset.field];
+      el.textContent = el.dataset.field === 'r' ? f2(v) : el.dataset.field === 'topGz' ? v : pct(v);
+    });
+    return s;
+  }
+
+  function drawHeat(rows, ramp) {
+    const box = $('heat'); box.replaceChildren();
+    const [lo, hi] = d3.extent(rows, r => +r.ext);
+    const fg = cssVar('--color-fg'), bg = cssVar('--color-bg');
+    for (const r of rows) {
+      const t = (+r.ext - lo) / (hi - lo || 1);
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'cell' + (r.yiqi ? ' yiqi' : '');
+      b.style.background = ramp(t); b.style.color = t > 0.55 ? bg : fg;
+      b.setAttribute('aria-pressed', String(r.gz === selected));
+      b.setAttribute('aria-label', r.gz + ' 極端盤 ' + pct(+r.ext));
+      const g = document.createElement('span'); g.className = 'g'; g.textContent = r.gz;
+      const v = document.createElement('span'); v.className = 'v'; v.textContent = d3.format('.0%')(+r.ext);
+      b.append(g, v); b.addEventListener('click', () => select(r.gz));
+      box.appendChild(b);
+    }
+    $('ramp').style.background = `linear-gradient(90deg, ${ramp(0)}, ${ramp(1)})`;
+  }
+
+  function drawDetail(rows) {
+    const r = rows.find(x => x.gz === selected) || rows[0];
+    $('sel-gz').textContent = r.gz;
+    $('sel-sub').textContent = `${r.xun}${r.yiqi ? '，干支一氣' : ''}，取 ${r.sampleYear} 年，共 ${d3.format(',')(+r.charts)} 盤`;
+    const setStat = (id, field, fmt) => { $(id).textContent = fmt(+r[field]); };
+    setStat('s-ext', 'ext', pct); setStat('s-miss', 'miss', pct); setStat('s-ent', 'ent', f3); setStat('s-pur', 'purity', d3.format('.0%'));
+    const box = $('bars'); box.replaceChildren();
+    const groups = [['avg_', '平均五行比例'], ['ext_', '極端盤偏向哪一行（佔全部盤）'], ['miss_', '缺這一行的盤（佔全部盤）']];
+    for (const [pre, label] of groups) {
+      const h = document.createElement('h3'); h.textContent = label; box.appendChild(h);
+      const max = Math.max(...WX.map(([k]) => +r[pre + k]), 0.0001);
+      for (const [k, name] of WX) {
+        const val = +r[pre + k];
+        const row = document.createElement('div'); row.className = 'bar';
+        const n = document.createElement('span'); n.textContent = name;
+        const tr = document.createElement('div'); tr.className = 'track';
+        const fl = document.createElement('div'); fl.className = 'fill'; fl.style.width = (100 * val / max) + '%'; fl.style.background = `var(--wx-${k})`;
+        tr.appendChild(fl);
+        const num = document.createElement('span'); num.className = 'num'; num.textContent = pct(val);
+        row.append(n, tr, num); box.appendChild(row);
+      }
+    }
+  }
+
+  function hbars(box, rows, label, value, fmt, wide) {
+    box.replaceChildren();
+    const max = Math.max(...rows.map(r => +r[value]), 1e-9);
+    for (const r of rows) {
+      const row = document.createElement('div'); row.className = 'bar' + (wide ? ' wide' : '');
+      const n = document.createElement('span'); n.textContent = label(r);
+      const tr = document.createElement('div'); tr.className = 'track';
+      const fl = document.createElement('div'); fl.className = 'fill'; fl.style.width = (100 * +r[value] / max) + '%'; fl.style.background = dash.colors[0];
+      tr.appendChild(fl);
+      const num = document.createElement('span'); num.className = 'num'; num.textContent = fmt(+r[value]);
+      row.append(n, tr, num); box.appendChild(row);
+    }
+  }
+
+  function drawMonths() {
+    const box = $('mbars'); box.replaceChildren();
+    if (!selected) return;
+    const rows = dash.data('months').data.filter(r => r.gz === selected).sort((a, b) => a.order - b.order);
+    const h = document.createElement('h3'); h.textContent = '按月份拆開的極端盤比例'; box.appendChild(h);
+    const inner = document.createElement('div'); inner.className = 'bars'; box.appendChild(inner);
+    hbars(inner, rows, r => r.monthGz, 'ext', pct, true);
+  }
+
+  function drawCycles() {
+    const rows = dash.data('cycles').data;
+    const box = $('cycles'); box.replaceChildren();
+    const keys = ['c1', 'c2', 'c3', 'c4'], names = ['1804–1863', '1864–1923', '1924–1983', '1984–2043'];
+    const lg = $('cy-legend'); lg.replaceChildren();
+    keys.forEach((k, i) => { const sp = document.createElement('span'); const sw = document.createElement('i'); sw.style.background = dash.colors[i]; sp.append(sw, document.createTextNode(names[i])); lg.appendChild(sp); });
+    const data = [...rows].sort((a, b) => a.order - b.order);
+    const W = Math.max(300, box.clientWidth), H = 240, m = { t: 10, r: 10, b: 28, l: 40 };
+    const x = d3.scalePoint(data.map(r => r.gz), [m.l, W - m.r]);
+    const y = d3.scaleLinear([0, d3.max(data, r => Math.max(...keys.map(k => +r[k]))) * 1.08], [H - m.b, m.t]);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.0%')).tickSize(-(W - m.l - m.r)))
+      .attr('font-size', null).attr('font-family', null).call(g => g.select('.domain').remove())
+      .call(g => g.selectAll('line').attr('stroke', 'var(--cds-chart-grid)'))
+      .call(g => g.selectAll('text').attr('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)'));
+    const ticks = data.filter((r, i) => i % 10 === 0).map(r => r.gz);
+    svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickValues(ticks).tickSizeOuter(0))
+      .attr('font-size', null).attr('font-family', null)
+      .call(g => g.selectAll('line,path').attr('stroke', 'var(--cds-chart-axis)'))
+      .call(g => g.selectAll('text').attr('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)'));
+    keys.forEach((k, i) => {
+      svg.append('path').datum(data).attr('fill', 'none').attr('stroke', dash.colors[i]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round').attr('stroke-opacity', 0.85)
+        .attr('d', d3.line().x(r => x(r.gz)).y(r => y(+r[k])));
+    });
+    const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; box.appendChild(tip);
+    const rule = svg.append('line').attr('y1', m.t).attr('y2', H - m.b).attr('stroke', 'var(--cds-chart-reference)').attr('opacity', 0);
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', H - m.t - m.b).attr('fill', 'transparent')
+      .on('mousemove', ev => {
+        const [px, py] = d3.pointer(ev, box);
+        const i = Math.max(0, Math.min(data.length - 1, Math.round((d3.pointer(ev)[0] - m.l) / x.step())));
+        const r = data[i]; rule.attr('x1', x(r.gz)).attr('x2', x(r.gz)).attr('opacity', 1);
+        tip.replaceChildren();
+        const a = document.createElement('div'); a.className = 'k'; a.textContent = r.gz; tip.appendChild(a);
+        keys.forEach((k, j) => { const l = document.createElement('div'); const sw = document.createElement('i'); sw.style.cssText = `display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;background:${dash.colors[j]}`; l.append(sw, document.createTextNode(names[j] + ' ' + pct(+r[k]))); tip.appendChild(l); });
+        tip.hidden = false;
+        tip.style.left = Math.min(px + 12, box.clientWidth - tip.offsetWidth - 4) + 'px'; tip.style.top = Math.max(0, py - tip.offsetHeight - 8) + 'px';
+      })
+      .on('mouseleave', () => { tip.hidden = true; rule.attr('opacity', 0); });
+  }
+
+  function drawRare() {
+    const cnt = d3.format(',');
+    const rec = dash.data('recurrence').data;
+    hbars($('recur'), [...rec].sort((a, b) => a.times - b.times), r => r.times === 1 ? '只出現一次' : r.times + ' 次', 'combos', cnt, true);
+    const one = rec.find(r => +r.times === 1); $('rare-total').textContent = one ? cnt(+one.combos) : '—';
+    const rm = dash.data('rareMonths').data;
+    hbars($('rare-months'), [...rm].sort((a, b) => a.order - b.order), r => r.month + '月', 'rare', cnt, false);
+    hbars($('rare-stems'), dash.data('rareStems').data, r => r.stem, 'rare', cnt, false);
+    const cy = dash.data('cycleStats').data[0];
+    $('cy-range').textContent = d3.format('.2f')(cy.avgRange); $('cy-rho').textContent = d3.format('.3f')(cy.rho);
+    const tb = $('flow-tbl').querySelector('tbody'); tb.replaceChildren();
+    [...dash.data('flow').data].sort((a, b) => a.order - b.order).forEach(r => {
+      const tr = document.createElement('tr');
+      [r.metric, pct(+r.rare), pct(+r.all)].forEach(c => { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td); });
+      tb.appendChild(tr);
+    });
+  }
+
+  function drawScatter(rows, accent, muted) {
+    const box = $('scatter'); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), H = 288, m = { t: 12, r: 14, b: 36, l: 44 };
+    const x = d3.scaleLinear([0.45, 1.02], [m.l, W - m.r]);
+    const y = d3.scaleLinear([0, d3.max(rows, r => +r.ext) * 1.08], [H - m.b, m.t]);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(5).tickFormat(d3.format('.0%')).tickSizeOuter(0))
+      .attr('font-size', null).attr('font-family', null).call(g => g.selectAll('text').attr('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)'))
+      .call(g => g.selectAll('line,path').attr('stroke', 'var(--cds-chart-axis)'));
+    svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.0%')).tickSize(-(W - m.l - m.r)))
+      .attr('font-size', null).attr('font-family', null).call(g => g.select('.domain').remove())
+      .call(g => g.selectAll('line').attr('stroke', 'var(--cds-chart-grid)'))
+      .call(g => g.selectAll('text').attr('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)'));
+    svg.append('text').attr('x', W - m.r).attr('y', H - 4).attr('text-anchor', 'end').attr('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)').text('年柱純度');
+    const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; box.appendChild(tip);
+    const sorted = [...rows].sort((a, b) => a.yiqi - b.yiqi);
+    svg.append('g').selectAll('circle').data(sorted).join('circle')
+      .attr('cx', r => x(+r.purity)).attr('cy', r => y(+r.ext)).attr('r', r => (r.gz === selected ? 7 : 5))
+      .attr('fill', r => (r.yiqi ? accent : muted)).attr('fill-opacity', r => (r.yiqi ? 0.95 : 0.6))
+      .attr('stroke', r => (r.gz === selected ? 'var(--color-fg)' : 'none')).attr('stroke-width', 2)
+      .style('cursor', 'pointer')
+      .on('mousemove', (ev, r) => {
+        tip.replaceChildren();
+        const a = document.createElement('div'); a.className = 'k'; a.textContent = r.gz + (r.yiqi ? '，干支一氣' : '');
+        const b = document.createElement('div'); b.textContent = `極端 ${pct(+r.ext)}，純度 ${d3.format('.0%')(+r.purity)}`;
+        tip.append(a, b); tip.hidden = false;
+        const [px, py] = d3.pointer(ev, box);
+        tip.style.left = Math.min(px + 12, box.clientWidth - tip.offsetWidth - 4) + 'px'; tip.style.top = Math.max(0, py - tip.offsetHeight - 8) + 'px';
+      })
+      .on('mouseleave', () => { tip.hidden = true; })
+      .on('click', (ev, r) => select(r.gz));
+  }
+
+  function drawTable(rows) {
+    const tb = $('tbl').querySelector('tbody'); tb.replaceChildren();
+    const q = query.trim();
+    const list = rows.filter(r => !q || r.gz.includes(q) || r.xun.includes(q))
+      .sort((a, b) => { const va = a[sortK], vb = b[sortK]; return (typeof va === 'number' || !isNaN(+va) ? (+va - +vb) : String(va).localeCompare(String(vb), 'zh')) * sortDir; });
+    for (const r of list) {
+      const tr = document.createElement('tr'); tr.tabIndex = 0;
+      tr.setAttribute('aria-selected', String(r.gz === selected));
+      const cells = [r.gz, pct(+r.ext), r.lean, pct(+r.miss), r.missTop, f3(+r.ent), d3.format('.0%')(+r.purity), pct(+r.extV2)];
+      cells.forEach((c, i) => { const td = document.createElement('td'); td.textContent = c; if (i >= 5) td.className = 'hide-narrow'; tr.appendChild(td); });
+      tr.addEventListener('click', () => select(r.gz));
+      tr.addEventListener('keydown', e => { if (e.key === 'Enter') select(r.gz); });
+      tb.appendChild(tr);
+    }
+    $('tbl').querySelectorAll('th button').forEach(b => {
+      const th = b.parentElement;
+      th.setAttribute('aria-sort', b.dataset.k === sortK ? (sortDir > 0 ? 'ascending' : 'descending') : 'none');
+    });
+  }
+
+  $('tbl').querySelectorAll('th button').forEach(b => b.addEventListener('click', () => {
+    if (sortK === b.dataset.k) sortDir = -sortDir; else { sortK = b.dataset.k; sortDir = b.dataset.k === 'order' ? 1 : -1; }
+    draw();
+  }));
+  $('q').addEventListener('input', e => { query = e.target.value; draw(); });
+
+  function draw() {
+    drawCycles(); drawRare();
+    const rows = dash.data('pillars').data;
+    const s = drawSummary();
+    if (!selected) selected = s.data[0].topGz;
+    const accent = resolve(dash.colors[0]), muted = resolve('var(--cds-chart-muted)');
+    const lo = resolve('var(--color-panel)'), hi = resolve('var(--cds-chart-status-critical)');
+    const ramp = t => d3.interpolateRgb(lo, hi)(0.12 + 0.88 * t);
+    drawHeat(rows, ramp); drawDetail(rows); drawMonths(); drawScatter(rows, accent, muted); drawTable(rows);
+  }
+  dash.onData(draw);
+})();
+</script>
+</body>
+</html>

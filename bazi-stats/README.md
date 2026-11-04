@@ -1,6 +1,6 @@
 # 八字統計
 
-拿 `bazi-paipan` 的排盤引擎，把每個時辰都排一盤，看哪些年柱容易偏枯、四柱組合多久重現一次。結果做成了圖表頁：[六十甲子偏枯圖](https://claude.ai/artifact/KQX8YKtjbJ31EKM9L9cXZ3)（私人連結，要分享得從頁面的分享選單開）。
+拿 `bazi-paipan` 的排盤引擎，把每個時辰都排一盤，看哪些年柱容易偏枯、四柱組合多久重現一次。結果做成了圖表頁：[六十甲子偏枯圖](https://stynight.github.io/Hexagram/bazi-stats/pianku.html)（倉庫裡的 [`pianku.html`](pianku.html)，單一 HTML，資料和 d3 都內嵌，下載後也能打開）。這頁原本是 claude.ai 上的[私人圖表頁](https://claude.ai/artifact/KQX8YKtjbJ31EKM9L9cXZ3)，版面和數字照搬。
 
 加刑以後的結果另有一頁：[加刑以後的偏枯](https://stynight.github.io/Hexagram/bazi-stats/xing.html)（倉庫裡的 [`xing.html`](xing.html)，單一 HTML，下載後也能打開），規則和全部數字見 [`XING.md`](XING.md)。
 
@@ -12,6 +12,7 @@
 - `rare-examples.js`：只出現一次的組合離節氣多遠、落在哪個月哪個時辰，並挑幾個例子印出來。
 - `model-xing.js`、`run-xing.js`：加刑的 v4 模型和四輪對比，寫出 `data/xing.json`、`data/xing-months.json`，說明見 [`XING.md`](XING.md)。
 - `build-xing-page.js`：把加刑的資料內嵌進 `xing.template.html`，寫出 `xing.html`。
+- `build-pianku-page.js`：把 `data/` 的七份資料和 d3 7.9.0 內嵌進 `pianku.template.html`，寫出 `pianku.html`。第一次要傳入 `d3.min.js` 的路徑，之後不傳就沿用頁面裡已經內嵌的那份。
 - `data/`：圖表頁用的資料，跟腳本跑出來的逐字節相同。
 
 ```
@@ -20,6 +21,7 @@ node run-240.js
 node rare-examples.js
 node run-xing.js
 node build-xing-page.js
+node build-pianku-page.js
 ```
 
 ## 模型
