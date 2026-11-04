@@ -1,0 +1,152 @@
+// v4：model.js 的 v3 再加上刑（規則見 XING.md）。
+// 這個檔案從 model.js 抄出 v3 的全部步驟，只在合之後、沖之前插入刑；model.js 本身不動。
+// 用法：v4(chart.pillars, chart.siling)，siling 是 buildChart 算出的月令司令藏干。
+const path = require('path');
+const B = require(path.join(__dirname, '..', 'bazi-paipan', 'src', 'engine.js'));
+
+const SILING = {
+  2: [[4, 7], [2, 7], [0, 16]], 3: [[0, 10], [1, 20]], 4: [[1, 9], [9, 3], [4, 18]],
+  5: [[4, 5], [6, 9], [2, 16]], 6: [[2, 10], [5, 9], [3, 11]], 7: [[3, 9], [1, 3], [5, 18]],
+  8: [[5, 7], [4, 3], [8, 3], [6, 17]], 9: [[6, 10], [7, 20]], 10: [[7, 9], [3, 3], [4, 18]],
+  11: [[4, 7], [0, 5], [8, 18]], 0: [[8, 10], [9, 20]], 1: [[9, 9], [7, 3], [5, 18]]
+};
+const gw = g => B.ganWx(g);
+const mainWx = z => gw(SILING[z].reduce((a, b) => (b[1] > a[1] ? b : a))[0]);
+const KU = new Set([1, 4, 7, 10]);                                   // 丑辰未戌
+const HUA5 = { '0,5': 2, '1,6': 3, '2,7': 4, '3,8': 0, '4,9': 1 };   // 甲己土 乙庚金 丙辛水 丁壬木 戊癸火
+const HUA6 = { '0,1': 2, '2,11': 0, '3,10': 1, '4,9': 3, '5,8': 4, '6,7': 2 };
+const SANHE = [[8, 0, 4, 4], [11, 3, 7, 0], [2, 6, 10, 1], [5, 9, 1, 3]];   // 生、旺、墓、局五行
+const SANHUI = [[2, 3, 4, 0], [5, 6, 7, 1], [8, 9, 10, 3], [11, 0, 1, 4]];
+const key = (a, b) => (a < b ? a + ',' + b : b + ',' + a);
+const ANHE = new Set(['1,2', '3,8', '6,11']);                       // 寅丑 卯申 午亥
+const sum = v => v.reduce((a, b) => a + b, 0);
+const F_CHONG = [1, 0.5, 0.25];   // 相鄰、隔一柱、年時遙對
+const F_HE = [1, 0.3, 0];         // 合、害只認相鄰，隔一柱很弱
+
+function baseVectors(p) {
+  const S = p.map(gz => { const v = [0, 0, 0, 0, 0]; v[gw(gz % 10)] = 1; return v; });
+  const Z = p.map((gz, i) => {
+    const v = [0, 0, 0, 0, 0], k = i === 1 ? 2 : 1;
+    for (const [g, d] of SILING[gz % 12]) v[gw(g)] += k * d / 30;
+    return v;
+  });
+  return { S, Z };
+}
+function totals(S, Z) {
+  const t = [0, 0, 0, 0, 0];
+  for (const v of S.concat(Z)) v.forEach((x, e) => { t[e] += x; });
+  return t;
+}
+function move(v, frac, to) { const t = sum(v); v.forEach((x, e) => { v[e] = x * (1 - frac); }); v[to] += frac * t; }
+function scale(v, f) { v.forEach((x, e) => { v[e] = x * f; }); }
+
+// 刑只加力、不扣力，每支加兩成（該支力量的兩成，全部加給一行）。
+//   自刑（辰辰、午午、酉酉、亥亥）與寅巳、巳申：要有月支參與，加給月令司令的那個藏干；沒有月支就不加。
+//     自刑相鄰全額、隔一柱三成；寅巳、巳申只認相鄰。
+//   丑戌未：只加本氣土，藏干不動；相鄰全額、隔一柱三成。
+//   子卯：不加。蓋頭、日主、寅亥巳申的排列都不算，留給看盤的人。
+const XING = 0.2;
+const ZIXING = new Set([4, 6, 9, 11]);                              // 辰午酉亥
+const XING_SIL = new Set(['2,5', '5,8']);                           // 寅巳 巳申
+const XING_TU = new Set(['1,10', '7,10', '1,7']);                   // 丑戌 戌未 丑未
+
+function v4(p, siling) {
+  const g = p.map(x => x % 10), z = p.map(x => x % 12);
+  const { S, Z } = baseVectors(p);
+  const monthWx = mainWx(z[1]);
+  const stemWx = new Set(g.map(gw));
+  const boundS = [0, 0, 0, 0], boundZ = [0, 0, 0, 0];
+
+  // 1. 天干五合：只認相鄰。合住各留七成；月令是化神就化過去，否則那三成被絆住。
+  for (let i = 0; i < 3; i++) {
+    const hua = HUA5[key(g[i], g[i + 1])];
+    if (hua === undefined) continue;
+    boundS[i] = boundS[i + 1] = 1;
+    for (const k of [i, i + 1]) {
+      const amt = 0.3 * sum(S[k]); scale(S[k], 0.7);
+      if (monthWx === hua) S[k][hua] += amt;
+    }
+  }
+  // 2. 地支三會（完整）、三合（完整）、半合／拱合、六合
+  for (const [a, b, c, e] of SANHUI) {
+    if ([a, b, c].every(x => z.includes(x)))
+      z.forEach((x, k) => { if (x === a || x === b || x === c) { move(Z[k], 0.5, e); boundZ[k] = 1; } });
+  }
+  for (const [sheng, wang, mu, e] of SANHE) {
+    if ([sheng, wang, mu].every(x => z.includes(x))) {
+      z.forEach((x, k) => { if (x === sheng || x === wang || x === mu) { move(Z[k], 0.4, e); boundZ[k] = 1; } });
+      continue;
+    }
+    for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
+      const f = F_HE[j - i - 1]; if (!f) continue;
+      const pair = [z[i], z[j]];
+      const hasWang = pair.includes(wang), other = pair.find(x => x !== wang);
+      if (hasWang && (other === sheng || other === mu)) {            // 半合：旺地配生地或墓地
+        const k = z[i] === wang ? j : i; move(Z[k], 0.2 * f, e); boundZ[i] = boundZ[j] = 1;
+      } else if (pair.includes(sheng) && pair.includes(mu)) {         // 拱合：生墓相配，缺旺地
+        move(Z[i], 0.1 * f, e); move(Z[j], 0.1 * f, e); boundZ[i] = boundZ[j] = 1;
+      }
+    }
+  }
+  for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
+    const f = F_HE[j - i - 1]; if (!f || (z[i] + z[j]) % 12 !== 1) continue;
+    const hua = HUA6[key(z[i], z[j])], canHua = monthWx === hua || stemWx.has(hua);
+    for (const k of [i, j]) {
+      const amt = 0.2 * f * sum(Z[k]); scale(Z[k], 1 - 0.2 * f);
+      if (canHua) Z[k][hua] += amt;
+    }
+    boundZ[i] = boundZ[j] = 1;
+  }
+  // 暗合（寅丑、卯申、午亥）：藏干相合，只絆住一成，不化
+  for (let i = 0; i < 3; i++) {
+    if (!ANHE.has(key(z[i], z[i + 1]))) continue;
+    scale(Z[i], 0.9); scale(Z[i + 1], 0.9); boundZ[i] = boundZ[i + 1] = 1;
+  }
+
+  // 2.5 刑：見檔頭說明
+  for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
+    const d = j - i - 1, f = F_HE[d]; if (!f) continue;
+    const k2 = key(z[i], z[j]);
+    let to = -1;
+    if (XING_TU.has(k2)) to = 2;
+    else if (i === 1 || j === 1) {
+      if (z[i] === z[j] && ZIXING.has(z[i])) to = gw(siling);
+      else if (XING_SIL.has(k2) && d === 0) to = gw(siling);
+    }
+    if (to < 0) continue;
+    for (const k of [i, j]) Z[k][to] += XING * f * sum(Z[k]);
+  }
+
+  // 3. 沖、害、剋：同時結算。雙方都受傷，傷害量取兩方五行總力較弱的那邊乘係數，
+  //    所以衰的一方按比例傷得重，旺的一方傷得輕；被合住的地支受沖減半（貪合忘沖）。
+  const T = totals(S, Z);
+  const dmgZ = [0, 0, 0, 0], dmgS = [0, 0, 0, 0], kuZ = [0, 0, 0, 0];
+  for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
+    const d = j - i - 1;
+    if ((z[i] + 6) % 12 === z[j]) {
+      if (KU.has(z[i]) && KU.has(z[j])) { kuZ[i] += 0.15 * F_CHONG[d]; kuZ[j] += 0.15 * F_CHONG[d]; continue; } // 庫沖：開庫，只傷本氣土
+      const L = 0.5 * F_CHONG[d] * Math.min(T[mainWx(z[i])], T[mainWx(z[j])]);
+      dmgZ[i] += L * (boundZ[i] ? 0.5 : 1); dmgZ[j] += L * (boundZ[j] ? 0.5 : 1);
+    } else if ((z[i] + z[j]) % 12 === 7 && F_HE[d]) {
+      const L = 0.2 * F_HE[d] * Math.min(T[mainWx(z[i])], T[mainWx(z[j])]);
+      dmgZ[i] += L; dmgZ[j] += L;
+    }
+    const ea = gw(g[i]), eb = gw(g[j]);
+    if (HUA5[key(g[i], g[j])] !== undefined && d === 0) continue;     // 相鄰已合，合而不剋
+    let ctrl = -1, tgt = -1;
+    if ((ea + 2) % 5 === eb) { ctrl = i; tgt = j; } else if ((eb + 2) % 5 === ea) { ctrl = j; tgt = i; }
+    if (ctrl < 0) continue;
+    const c = g[i] % 2 === g[j] % 2 ? 0.35 : 0.2;                   // 同性相剋（七殺式）重，異性輕
+    const L = c * F_CHONG[d] * Math.min(T[ea], T[eb]);
+    dmgS[tgt] += L; dmgS[ctrl] += L / 2;
+  }
+  for (let k = 0; k < 4; k++) {
+    const tz = sum(Z[k]); if (tz > 0 && dmgZ[k]) scale(Z[k], 1 - Math.min(dmgZ[k], 0.8 * tz) / tz);
+    if (kuZ[k]) Z[k][2] *= 1 - Math.min(kuZ[k], 0.8);
+    const ts = sum(S[k]); if (ts > 0 && dmgS[k]) scale(S[k], 1 - Math.min(dmgS[k], 0.8 * ts) / ts);
+  }
+  const t = totals(S, Z), all = sum(t);
+  return t.map(x => x / all);
+}
+
+module.exports = { v4 };
